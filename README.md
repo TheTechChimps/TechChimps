@@ -1,6 +1,6 @@
 <h1 align="center">
   🟡 <b>Exodus — "AI Aimbot"</b>  
-  <sub><i>Adaptive Gaming for Everyone</i></sub>
+  <sub><i>AI Aimbot for Every game</i></sub>
 </h1>
 
 <p align="center">
@@ -12,18 +12,14 @@
 ---
 
 ### ⚠️ Disclaimer  
-> The name **“AI Aimbot”** is purely comical and symbolic.  
-> This project does **not** automate gameplay or violate any fair-play policy.  
-> Our mission is to make gaming **accessible** for players who are hard of sight, hearing, or mobility-impaired — through adaptive AI and visual assistance.
+> The name **“AI Aimbot”** is purely educational and research purposed.  
+> We exclusively do not breach any copyright or terms and conditions in regards to legality.
 
 ---
 
 ## ✨ Vision
 At **Exodus**, we believe every gamer deserves the same chance to compete, create, and connect.  
-We design **premium, low-impact accessibility tools** that empower players with disabilities — enhancing reaction, precision, and visibility *without* altering the integrity of gameplay.
-
-Gaming is more than competition — it’s connection.  
-We make that connection possible for everyone.
+We design **premium, low-impact accessibility tools** that empower players with disabilities — enhancing reaction, precision, and visibility *without* altering the integrity of game files.
 
 ---
 
@@ -71,14 +67,6 @@ We partner with accessibility advocates and developers to build tools that trans
 2. Follow the setup guide in `#getting-started`.  
 3. Configure your vision, input, or reaction-assist preferences.  
 4. Share your feedback — we evolve with you.
-
----
-
-## 📅 Roadmap
-✅ Phase 1 — Low-Vision & Input Assistance Tools  
-🚧 Phase 2 — AI-Driven Gesture & Voice Interaction  
-🧱 Phase 3 — Cross-Platform SDK for Inclusive Game Integration  
-🌟 Phase 4 — Global Accessibility Partner Program  
 
 ---
 
