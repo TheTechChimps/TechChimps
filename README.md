@@ -1,69 +1,95 @@
-# Dma-Firmware
-Custom 1:1 dma firmware, full tlp bar emulation withd drivers for 35t/75t/100t/m2 dma cards
+<h1 align="center">
+  🟡 <b>Exodus — "AI Aimbot"</b>  
+  <sub><i>Adaptive Gaming for Everyone</i></sub>
+</h1>
 
-DMA Firmware. 1:1 CFG of real device, always custom to each user.
---------------------------------------------------------
+<p align="center">
+  <b>Developed by Zoom & Exodus</b>  
+  <br>  
+  <a href="https://discord.gg/pokordot-com-1160924434744479884">🌐 Join the Official Discord</a>
+</p>
 
-HOW TO FIND US: Website: https://pokordot.com/ Server: https://discord.gg/6ujCg2E9AX Timezone: https://time.is/London Best custom 1:1 firmware, HWID Unbans, Ai aim assist
+---
 
-DRIVERED FIRMWARE
+### ⚠️ Disclaimer  
+> The name **“AI Aimbot”** is purely comical and symbolic.  
+> This project does **not** automate gameplay or violate any fair-play policy.  
+> Our mission is to make gaming **accessible** for players who are hard of sight, hearing, or mobility-impaired — through adaptive AI and visual assistance.
 
-Information:
+---
 
-DMA card: 35T/75T/100T/M2 (All Versions) Flashing: We will provide everything you need + 24/7 support. Why buy this: This is the latest technology in firmware creation which really puts you ahead of the anticheats, the safest firmware we offer, we highly rate this firmware for our clients wanting to stay the most safe.
+## ✨ Vision
+At **Exodus**, we believe every gamer deserves the same chance to compete, create, and connect.  
+We design **premium, low-impact accessibility tools** that empower players with disabilities — enhancing reaction, precision, and visibility *without* altering the integrity of gameplay.
 
-What is Drivered? This firmware will send and receive drivers signals, as some games block disabled drivers, true 1:1 cfg space, driver support, custom to each user and not pooled, DRVSCAN: Shows green on drvscan, loads legit driver succesfully.
+Gaming is more than competition — it’s connection.  
+We make that connection possible for everyone.
 
-Supported Games:
+---
 
-Ricochet Call of Duty: Warzone, Call of Duty: Vanguard, Call of Duty: Modern Warfare II (2022) Easy Anti-Cheat (EAC) Apex Legends, Fortnite, Dead by Daylight, Rust, 7 Days to Die, Squad
+## ⚙️ Core Highlights
 
-The Division 2, Far Cry 5,Ghost Recon: Wildlands, For Honor BattlEye PlayerUnknown's Battlegrounds (PUBG), Rainbow Six Siege, DayZ, Arma 3, H1Z1, ARK: Survival Evolved/Ascended, Escape from Tarkov, Planetside 2, Survarium, Unturned ACE (Anti-Cheat Expert by Tencent) Call of Duty: Mobile, QQ Speed, Valorant, Honor of Kings (Arena of Valor) PUBG Mobile, CrossFire, Game for Peace (Chinese version of PUBG Mobile)
+| 🧩 Feature | 💬 Description |
+|-------------|----------------|
+| ⚡ **Ultra-Light Performance** | Optimized for <2% CPU usage on any PC — no delay, no lag. |
+| 🖥️ **Universal Compatibility** | Works seamlessly with most games, engines, and specs. |
+| 🎯 **AI-Assisted Visual Cues** | Enhances on-screen contrast, outlines, and focus for low-vision players. |
+| 🦾 **Adaptive Trigger Assist** | Supports players with limited mobility through configurable input automation. |
+| 🔊 **Visual Audio Feedback** | Converts key sound events into visual indicators for those hard of hearing. |
+| 🎨 **Custom Profiles** | Personalize strength, contrast, and overlay style to your exact needs. |
+| 🔁 **Constant Development** | Frequent updates and community-driven accessibility improvements. |
 
-Extra Information:
+---
 
-[+] Works all win ver (22h2, etc) [+] High speeds reaching above 10k [+] Come with loaded drivers. [+] Works on All 35T/75T DMA cards [+] Free updates to newer FW, pay once and never pay again. [+] Emulates Sound device, 1:1 cfg space. [+] Passes EAC/BE/ACE plus others, works for some Faceit games.
+## 💎 Why Choose Exodus
+- 🧠 **Performance-Driven Design:** Every millisecond counts — optimized for responsiveness and stability.  
+- 🖤 **Luxury Experience:** Elegant UI, dark-gold color palette, and smooth, cinematic transitions.  
+- 👥 **Inclusive by Design:** Built *with* and *for* disabled gamers.  
+- 🧩 **Ethical Innovation:** Accessibility, not advantage.  
+- 🚀 **Active Development:** The Exodus team pushes updates weekly with transparent changelogs.  
 
-If your game isnt listed above please reach out in discord and ask me directly as it will most likely be supported.
-The point of making this repo is to broaden our market of DMA customers, so that we can offer the best service 
+---
 
----------------------------------------------------------
+## 🧭 Our Mission in Action
+> “We don’t give players an edge — we give them access.”  
+> — The Exodus Team
 
-Warning
+We partner with accessibility advocates and developers to build tools that translate reaction, vision, and precision into usable, customizable assistive features — helping players perform confidently and comfortably.
 
-This guide has been specifically created for educational purposes to provide valuable information and insights to help users understand anything todo with DMA or Firmware.
+---
 
----------------------------------------------------------
-    DMA FAQ
-    EAC-BE FW
-    ACE/TENCENT FW 
-    1:1 CFG of real device
-    DMA Troubleshooting
+## 🔗 Connect & Collaborate
+- 🌍 **Official Discord:** [Join Here »](https://discord.gg/pokordot-com-1160924434744479884)  
+- 💬 **Community Channels:** Feedback, feature requests, accessibility discussions.  
+- 🧑‍💻 **Developer Zone:** Collaborate, contribute, and test new accessibility modules.  
+- 📢 **Announcements:** Stay updated with version releases and upcoming tools.  
 
-If you have any questions or problems/issues, feel free to join my discord server and ask in one of the channels that best suits your issue.
-----------------------------------------------------------
+---
 
-Discord server: discord.com/invite/6ujCg2E9AX
-Website: Pokordot.com
+## 🪄 Getting Started
+1. Join our Discord to download the latest **Exodus Accessibility Suite**.  
+2. Follow the setup guide in `#getting-started`.  
+3. Configure your vision, input, or reaction-assist preferences.  
+4. Share your feedback — we evolve with you.
 
-----------------------------------------------------------
+---
 
-(FAQS)
+## 📅 Roadmap
+✅ Phase 1 — Low-Vision & Input Assistance Tools  
+🚧 Phase 2 — AI-Driven Gesture & Voice Interaction  
+🧱 Phase 3 — Cross-Platform SDK for Inclusive Game Integration  
+🌟 Phase 4 — Global Accessibility Partner Program  
 
-which DMA card should I get? : If you want to save money, 35T. If you don't mind spending more for a faster and new DMA card, I suggest the 75T.
+---
 
-What Firmware do I need for my DMA card? : 35T - Squirrel, 75T - EnigmaX1.
+## 🛠️ Developed by
+**Zoom** & **Exodus** — a collective of technologists, accessibility advocates, and creators committed to making gaming more inclusive, more beautiful, and more human.
 
-If I have a 35T, and I buy a new card E.g(cap DMA 4th Gen), is it fine to flash the same FW? : Yes, both 35T and 4th gen cap DMA share the same prototype chip (squirrel).
+---
 
-What are the minimum specs I need for my second computer? : USB 3.0, at least 6GB RAM,
-
-Why do I get Tiny PCIe TLP Algorithm when running a speed test? : This happens due to the motherboard in the main PC not liking the config space of the DMA FW.
-
-How do I flash my FW? : If you are using 35T, use Open OCD to program and to upgrade or visit How to Flash
-
-What donor board do I need? : Any PCIe Device technically can be used as a donor board. I wouldn't recommend using the values from an already existing PCIe Device you have on your computer. E.g. (GPU). I use an Intel Wifi 6 Ax200 card. You don't need to use this, you can use devices such as video capture cards, USB extensions, Sound Cards, SATA Expansion Cards, and so on.
-
-What is Firmware Locking : Firmware locking refers to the process of securing the firmware on a device to prevent unauthorized access, modification, or copying
-
-How does Firmware Locking Work? : Firmware locking works by getting the EFUSE FUSER_DNA value of the Artix7 chip from your DMA card and running a check on system bootup to check if a hard-coded(yourDNA) value is the same as your Artix7 DNA. If the DNA values match, the firmware will work, otherwise, the firmware won't work. This is intended to work for 1 person, and 1 person only since Artix7 chips have their own Unique Identifier(DNA).
+<h3 align="center">🟡 Exodus — Gaming Without Barriers</h3>
+<p align="center">
+  <a href="https://discord.gg/pokordot-com-1160924434744479884">
+    <b>Join the Movement →</b>
+  </a>
+</p>
