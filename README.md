@@ -1,83 +1,72 @@
-<h1 align="center">
-  🟡 <b>Exodus — "AI Aimbot"</b>  
-  <sub><i>AI Aimbot for Every game</i></sub>
-</h1>
+# TechChimps
 
-<p align="center">
-  <b>Developed by Zoom & Exodus</b>  
-  <br>  
-  <a href="https://discord.gg/pokordot-com-1160924434744479884">🌐 Join the Official Discord</a>
-</p>
+Affordable websites, apps, Discord bots, desktop tools and automation for beginners, creators, communities and small businesses.
 
----
+Powered by bananas.
 
-### ⚠️ Disclaimer  
-> The name **“AI Aimbot”** is purely educational and research purposed.  
-> We exclusively do not breach any copyright or terms and conditions in regards to legality.
+![TechChimps brand card](https://techchimps.com/images/techchimps-social-card-v3.png)
 
----
+## What We Build
 
-## ✨ Vision
-At **Exodus**, we believe every gamer deserves the same chance to compete, create, and connect.  
-We design **premium, low-impact accessibility tools** that empower players with disabilities — enhancing reaction, precision, and visibility *without* altering the integrity of game files.
+TechChimps is a friendly UK digital studio. We turn normal ideas into clear digital products without confusing jargon or scary prices.
 
----
+Services include:
 
-## ⚙️ Core Highlights
-
-| 🧩 Feature | 💬 Description |
-|-------------|----------------|
-| ⚡ **Ultra-Light Performance** | Optimized for <2% CPU usage on any PC — no delay, no lag. |
-| 🖥️ **Universal Compatibility** | Works seamlessly with most games, engines, and specs. |
-| 🎯 **AI-Assisted Visual Cues** | Enhances on-screen contrast, outlines, and focus for low-vision players. |
-| 🦾 **Adaptive Trigger Assist** | Supports players with limited mobility through configurable input automation. |
-| 🔊 **Visual Audio Feedback** | Converts key sound events into visual indicators for those hard of hearing. |
-| 🎨 **Custom Profiles** | Personalize strength, contrast, and overlay style to your exact needs. |
-| 🔁 **Constant Development** | Frequent updates and community-driven accessibility improvements. |
-
----
-
-## 💎 Why Choose Exodus
-- 🧠 **Performance-Driven Design:** Every millisecond counts — optimized for responsiveness and stability.  
-- 🖤 **Luxury Experience:** Elegant UI, dark-gold color palette, and smooth, cinematic transitions.  
-- 👥 **Inclusive by Design:** Built *with* and *for* disabled gamers.  
-- 🧩 **Ethical Innovation:** Accessibility, not advantage.  
-- 🚀 **Active Development:** The Exodus team pushes updates weekly with transparent changelogs.  
-
----
-
-## 🧭 Our Mission in Action
-> “We don’t give players an edge — we give them access.”  
-> — The Exodus Team
-
-We partner with accessibility advocates and developers to build tools that translate reaction, vision, and precision into usable, customizable assistive features — helping players perform confidently and comfortably.
-
----
-
-## 🔗 Connect & Collaborate
-- 🌍 **Official Discord:** [Join Here »](https://discord.gg/pokordot-com-1160924434744479884)  
-- 💬 **Community Channels:** Feedback, feature requests, accessibility discussions.  
-- 🧑‍💻 **Developer Zone:** Collaborate, contribute, and test new accessibility modules.  
-- 📢 **Announcements:** Stay updated with version releases and upcoming tools.  
-
----
-
-## 🪄 Getting Started
-1. Join our Discord to download the latest **Exodus Accessibility Suite**.  
-2. Follow the setup guide in `#getting-started`.  
-3. Configure your vision, input, or reaction-assist preferences.  
-4. Share your feedback — we evolve with you.
-
----
-
-## 🛠️ Developed by
-**Zoom** & **Exodus** — a collective of technologists, accessibility advocates, and creators committed to making gaming more inclusive, more beautiful, and more human.
-
----
-
-<h3 align="center">🟡 Exodus — Gaming Without Barriers</h3>
-<p align="center">
-  <a href="https://discord.gg/pokordot-com-1160924434744479884">
-    <b>Join the Movement →</b>
-  </a>
-</p>
+- Creator link hubs from GBP 49
+- - Business websites from GBP 99
+  - - Web apps and dashboards
+    - - Discord bots and community tools
+      - - Windows desktop tools
+        - - Automation for repeat tasks
+          - - Monthly care plans and support
+            - - Custom software requests
+             
+              - No request is too big or too small. Tell us the dream product and we turn it into a clear price, a fast plan and a build you can understand.
+             
+              - ## Portfolio
+             
+              - ### TechChimps
+             
+              - https://techchimps.com
+             
+              - A complete studio website with service pages, transparent pricing, guided request forms, Stripe Checkout, live support, customer accounts, admin inboxes and automation-ready architecture.
+             
+              - ### Wade2Wavey
+             
+              - https://wade2wavey.com
+             
+              - A branded creative web presence showing how a personal or creator brand can become a polished online identity.
+             
+              - ## Why Work With Us
+             
+              - - Simple wording for non-technical customers
+                - - Clear prices before you commit
+                  - - Fast delivery options
+                    - - Friendly live support
+                      - - Customer accounts and project inboxes
+                        - - Modern responsive design
+                          - - SEO foundations and performance focus
+                            - - Payment and onboarding automation
+                             
+                              - ## Customer Flow
+                             
+                              - 1. Choose a service or make a custom request.
+                                2. 2. Tell us what you want in plain English.
+                                   3. 3. Get a clear estimate and delivery options.
+                                      4. 4. Pay securely or send a custom offer for review.
+                                         5. 5. Continue through live support and your customer portal.
+                                           
+                                            6. ## Tech Stack
+                                           
+                                            7. We build with modern, production-ready tools including Next.js, TypeScript, Stripe, Vercel, Framer Motion, responsive design systems and automation-ready APIs.
+                                           
+                                            8. ## Start A Project
+                                           
+                                            9. Website: https://techchimps.com
+                                           
+                                            10. Contact: techchimps@proton.me
+                                           
+                                            11. Websites | Apps | Bots | Automation
+                                           
+                                            12. Powered by bananas.
+                                            13. 
