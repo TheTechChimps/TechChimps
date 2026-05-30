@@ -195,6 +195,10 @@ export async function saveOrder(order: OrderRecord) {
   return order;
 }
 
+export async function deleteOrder(reference: string) {
+  await writeJson<OrderRecord | null>(ORDER_STORE, orderKey(reference), null);
+}
+
 export async function createOrder(input: OrderInput, status: OrderStatus) {
   return saveOrder(createOrderRecord(input, status));
 }

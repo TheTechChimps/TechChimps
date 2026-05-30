@@ -3662,6 +3662,34 @@ img {
   gap: var(--space-2);
 }
 
+.qa-cleanup-panel {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.cleanup-count-grid {
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cleanup-count-grid span {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.8rem;
+  text-transform: capitalize;
+}
+
+.cleanup-count-grid strong {
+  color: var(--text);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
 .integration-panel {
   display: grid;
   gap: var(--space-3);
@@ -4345,6 +4373,7 @@ img {
   .process-steps,
   .find-us-grid,
   .integration-grid,
+  .cleanup-count-grid,
   .offer-options,
   .waiting-orders,
   .support-session-grid,

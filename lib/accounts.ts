@@ -121,6 +121,16 @@ export async function saveCustomer(account: CustomerAccount) {
   return account;
 }
 
+export async function deleteCustomerAccount(email: string) {
+  const account = await getCustomerByEmail(email);
+  if (account) {
+    await writeJson<CustomerInboxMessage[] | null>(ACCOUNT_STORE, inboxKey(account.id), null);
+  }
+
+  await writeJson<CustomerAccount | null>(ACCOUNT_STORE, userKey(email), null);
+  return account;
+}
+
 export async function ensureCustomerAccount({
   email,
   name

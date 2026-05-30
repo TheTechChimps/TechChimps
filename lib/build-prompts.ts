@@ -225,3 +225,7 @@ export async function listBuildPrompts() {
   const prompts = await listJson<BuildPromptRecord>(PROMPT_STORE, PROMPT_PREFIX);
   return prompts.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
+
+export async function deleteBuildPrompt(reference: string) {
+  await writeJson<BuildPromptRecord | null>(PROMPT_STORE, promptKey(reference), null);
+}

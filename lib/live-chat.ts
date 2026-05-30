@@ -127,3 +127,13 @@ export async function appendLiveChatMessage({
   await writeJson(CHAT_STORE, CHAT_KEY, [...messages, message].slice(-500));
   return message;
 }
+
+export async function deleteLiveChatSessions(sessionIds: string[]) {
+  const sessionSet = new Set(sessionIds);
+  if (!sessionSet.size) return 0;
+
+  const messages = (await readJson<LiveChatMessage[]>(CHAT_STORE, CHAT_KEY)) ?? [];
+  const nextMessages = messages.filter((message) => !sessionSet.has(message.sessionId));
+  await writeJson(CHAT_STORE, CHAT_KEY, nextMessages);
+  return messages.length - nextMessages.length;
+}

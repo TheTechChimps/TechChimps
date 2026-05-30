@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
 import { CustomerInboxConsole } from "@/components/admin/customer-inbox-console";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
+import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { activityTimeline, automationFlows, crmStats, emailTemplates, pipelineColumns } from "@/data/dashboard";
 import { ADMIN_SESSION_COOKIE, getAdminSessionFromToken, isAdminCookieAuthenticated } from "@/lib/admin-session";
@@ -94,6 +95,12 @@ export default async function AdminPage() {
               ))}
             </div>
           </Card>
+        </div>
+      </section>
+
+      <section className="section-tight">
+        <div className="container">
+          <QaCleanupPanel />
         </div>
       </section>
 
