@@ -1,0 +1,193 @@
+"use client";
+
+import { Loader2, MessageSquareReply, Send } from "lucide-react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { StatusIndicator } from "@/components/ui/status-indicator";
+import type { LiveChatMessage, LiveChatSessionSummary } from "@/lib/live-chat";
+import type { OrderRecord } from "@/lib/orders";
+
+export function LiveChatConsole() {
+  const [messages, setMessages] = useState<LiveChatMessage[]>([]);
+  const [sessions, setSessions] = useState<LiveChatSessionSummary[]>([]);
+  const [waitingOrders, setWaitingOrders] = useState<OrderRecord[]>([]);
+  const [activeSession, setActiveSession] = useState("");
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const loadMessages = useCallback(async () => {
+    const [chatResponse, orderResponse] = await Promise.all([
+      fetch("/api/live-chat", { cache: "no-store" }),
+      fetch("/api/orders?waiting=true", { cache: "no-store" })
+    ]);
+    if (chatResponse.ok) {
+      const data = (await chatResponse.json()) as { messages: LiveChatMessage[]; sessions: LiveChatSessionSummary[] };
+      setMessages(data.messages);
+      setSessions(data.sessions);
+      setActiveSession((current) => current || data.sessions[0]?.sessionId || "");
+    }
+    if (orderResponse.ok) {
+      const data = (await orderResponse.json()) as { orders: OrderRecord[] };
+      setWaitingOrders(data.orders);
+    }
+  }, []);
+
+  useEffect(() => {
+    const initial = window.setTimeout(() => {
+      void loadMessages();
+    }, 0);
+    const interval = window.setInterval(() => {
+      void loadMessages();
+    }, 2500);
+
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
+  }, [loadMessages]);
+
+  const activeMessages = useMemo(
+    () => (activeSession ? messages.filter((message) => message.sessionId === activeSession) : []),
+    [activeSession, messages]
+  );
+  const activeSessionSummary = sessions.find((session) => session.sessionId === activeSession);
+  const waitingSessionCount = sessions.filter((session) => session.unreadVisitorMessages || session.priority !== "normal").length;
+
+  const sendReply = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!reply.trim() || !activeSession) return;
+
+    setSending(true);
+    const response = await fetch("/api/live-chat", {
+      body: JSON.stringify({
+        author: "Studio support",
+        body: reply,
+        role: "agent",
+        sessionId: activeSession
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+
+    if (response.ok) {
+      setReply("");
+      await loadMessages();
+    }
+    setSending(false);
+  };
+
+  return (
+    <Card className="live-chat-console">
+      <div className="chat-console-header">
+        <div>
+          <span className="eyebrow">
+            <MessageSquareReply size={15} /> Live support inbox
+          </span>
+          <h2>Reply to website visitors in real time.</h2>
+        </div>
+        <StatusIndicator
+          label={
+            waitingOrders.length || waitingSessionCount
+              ? `${waitingOrders.length + waitingSessionCount} waiting`
+              : `${sessions.length} open chats`
+          }
+          tone={waitingOrders.length || waitingSessionCount ? "warning" : "active"}
+        />
+      </div>
+
+      {waitingOrders.length ? (
+        <div className="waiting-orders" aria-live="polite">
+          {waitingOrders.slice(0, 3).map((order) => (
+            <div key={order.reference}>
+              <strong>{order.contactName || "Customer"} is waiting</strong>
+              <span>
+                {order.serviceName} - {order.reference}
+              </span>
+              <button onClick={() => setActiveSession(order.chatSessionId)} type="button">
+                Join payment chat
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="support-session-grid">
+        <div className="support-session-list" aria-label="Live support queue">
+          {sessions.length ? (
+            sessions.map((session) => (
+              <button
+                className={session.sessionId === activeSession ? "active" : ""}
+                key={session.sessionId}
+                onClick={() => setActiveSession(session.sessionId)}
+                type="button"
+              >
+                <span>
+                  <strong>{session.customerName}</strong>
+                  <small>{session.lastMessage}</small>
+                </span>
+                <StatusIndicator
+                  label={session.priority === "payment" ? "Paid" : session.unreadVisitorMessages ? "Waiting" : "Open"}
+                  tone={session.priority === "payment" || session.unreadVisitorMessages ? "warning" : "active"}
+                />
+              </button>
+            ))
+          ) : (
+            <p className="helper">No active chats yet. New visitors and paid customers will appear here automatically.</p>
+          )}
+        </div>
+
+        <div className="support-active-chat">
+          <div className="portal-card-top">
+            <span className="eyebrow">
+              {activeSessionSummary ? activeSessionSummary.customerName : "No chat selected"}
+            </span>
+            {activeSessionSummary ? (
+              <StatusIndicator
+                label={activeSessionSummary.priority === "payment" ? "Payment handoff" : "Live queue"}
+                tone={activeSessionSummary.priority === "payment" ? "warning" : "active"}
+              />
+            ) : null}
+          </div>
+
+      <div aria-live="polite" className="chat-thread admin-chat-thread">
+        {activeMessages.length ? (
+          activeMessages.map((message) => (
+            <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
+              <strong>{message.author}</strong>
+              <p>{message.body}</p>
+              <time dateTime={message.createdAt}>
+                {new Date(message.createdAt).toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </time>
+            </div>
+          ))
+        ) : (
+          <p className="helper">Select a chat from the queue to join it.</p>
+        )}
+      </div>
+
+      <form className="chat-form" onSubmit={sendReply}>
+        <label className="field">
+          <span className="label">Admin reply</span>
+          <textarea
+            aria-label="Admin live chat reply"
+            className="textarea chat-textarea"
+            onChange={(event) => setReply(event.target.value)}
+            placeholder="Type your reply to the visitor..."
+            value={reply}
+          />
+        </label>
+        <Button disabled={sending || !reply.trim() || !activeSession} icon={sending ? Loader2 : Send} type="submit">
+          {sending ? "Sending reply" : "Send reply"}
+        </Button>
+      </form>
+        </div>
+      </div>
+    </Card>
+  );
+}

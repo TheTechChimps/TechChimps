@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">TechChimps banana logo</title>
+  <desc id="desc">A friendly monkey face inside a yellow banana shaped badge.</desc>
+  <defs>
+    <linearGradient id="badge" x1="88" x2="430" y1="72" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE86B"/>
+      <stop offset=".55" stop-color="#F6C533"/>
+      <stop offset="1" stop-color="#F29F24"/>
+    </linearGradient>
+    <linearGradient id="green" x1="122" x2="428" y1="84" y2="438" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#69E0B5"/>
+      <stop offset="1" stop-color="#159575"/>
+    </linearGradient>
+    <filter id="softShadow" width="140%" height="140%" x="-20%" y="-14%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#211509" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#141B17" rx="112"/>
+  <path fill="url(#green)" d="M80 342c42 92 155 132 253 91 92-39 145-134 123-222-14 61-60 120-129 156-88 46-184 35-247-25Z" opacity=".95"/>
+  <path fill="url(#badge)" d="M89 274c35 64 129 84 211 45 69-33 112-94 104-148 34 46 22 122-32 178-68 70-177 90-249 45-38-24-50-68-34-120Z" filter="url(#softShadow)"/>
+  <path fill="#6B3B1D" d="M145 234c0-75 50-132 116-132s116 57 116 132-50 133-116 133-116-58-116-133Z"/>
+  <path fill="#8B4B22" d="M124 234c0-26 17-47 38-47 24 0 41 21 41 47s-17 47-41 47c-21 0-38-21-38-47Zm195 0c0-26 17-47 41-47 21 0 38 21 38 47s-17 47-38 47c-24 0-41-21-41-47Z"/>
+  <path fill="#F6B26B" d="M164 245c0-68 42-119 97-119s97 51 97 119-42 119-97 119-97-51-97-119Z"/>
+  <path fill="#6B3B1D" d="M175 175c18-49 54-75 86-75s68 26 86 75c-34-22-61-26-86-13-25-13-52-9-86 13Z"/>
+  <circle cx="223" cy="235" r="30" fill="#fff"/>
+  <circle cx="299" cy="235" r="30" fill="#fff"/>
+  <circle cx="226" cy="239" r="17" fill="#2B1A10"/>
+  <circle cx="302" cy="239" r="17" fill="#2B1A10"/>
+  <circle cx="232" cy="231" r="6" fill="#fff"/>
+  <circle cx="308" cy="231" r="6" fill="#fff"/>
+  <path fill="#4F2B16" d="M193 203c15-20 38-21 55-6-16-3-34 0-55 6Zm81-6c17-15 40-14 55 6-21-6-39-9-55-6Z"/>
+  <path fill="#D98543" d="M246 265c7-9 24-9 31 0-5 8-26 8-31 0Z"/>
+  <path fill="#4B2413" d="M214 292c28 29 67 29 95 0-7 43-88 43-95 0Z"/>
+  <path fill="#fff" d="M228 295c21 10 45 10 66 0-6 12-60 12-66 0Z"/>
+  <path fill="#473A25" d="M384 132c16-16 27-24 42-25-2 15-9 29-23 42l-58 56-20-18 59-55Z"/>
+  <path fill="#FFE86B" d="M77 295c11 41 60 71 120 78-59 11-119-10-147-52-25-38-5-87 36-119-15 29-19 60-9 93Z" opacity=".88"/>
+</svg>

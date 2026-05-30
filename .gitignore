@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.next/
+node_modules/
+tsconfig.tsbuildinfo
+next-dev*.log
+qa-screenshots/
+artifacts/
+social-assets/
+
+# Local Netlify folder
+.netlify
+
+.vercel
+.env*
+!.env.example

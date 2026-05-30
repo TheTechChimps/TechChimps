@@ -1,0 +1,43 @@
+{
+  "name": "techchimps",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "domain:setup": "node scripts/setup-domain.mjs",
+    "deploy:netlify": "node scripts/deploy-netlify.mjs",
+    "setup:vercel": "node scripts/setup-vercel.mjs",
+    "sync:stripe": "node scripts/sync-stripe.mjs",
+    "sync:vercel-env": "node scripts/sync-vercel-env.mjs",
+    "sync:vercel-deploy-hook": "node scripts/sync-vercel-deploy-hook.mjs",
+    "deploy:vercel": "node scripts/deploy-vercel.mjs",
+    "migrate:vercel-storage": "node scripts/migrate-netlify-to-vercel.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.7.8",
+    "@vercel/blob": "^2.4.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.468.0",
+    "next": "^16.2.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^22.1.1"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.15.11",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "^16.2.6",
+    "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "postcss": "^8.5.15"
+  }
+}
