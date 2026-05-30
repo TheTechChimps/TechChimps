@@ -203,6 +203,7 @@ function syncVercelEnv(env) {
     "BLOB_READ_WRITE_TOKEN",
     "VERCEL_DEPLOY_HOOK_URL",
     "AUTOMATION_WEBHOOK_TOKEN",
+    "CRON_SECRET",
     "EMAIL_FROM",
     "ADMIN_PASSWORD",
     "ADMIN_SESSION_SECRET"
@@ -438,6 +439,7 @@ function writeEnv(file, env) {
     "AUTOMATION_WEBHOOK_TOKEN",
     "VERCEL_TOKEN",
     "VERCEL_SCOPE",
+    "CRON_SECRET",
     "EMAIL_FROM",
     "ADMIN_PASSWORD",
     "ADMIN_SESSION_SECRET",

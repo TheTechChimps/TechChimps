@@ -3662,6 +3662,13 @@ img {
   gap: var(--space-2);
 }
 
+.admin-ops-grid {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .qa-cleanup-panel {
   display: grid;
   gap: var(--space-2);
@@ -4372,6 +4379,7 @@ img {
   .metric-row,
   .process-steps,
   .find-us-grid,
+  .admin-ops-grid,
   .integration-grid,
   .cleanup-count-grid,
   .offer-options,

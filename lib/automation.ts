@@ -149,6 +149,13 @@ export function getIntegrationReadiness(): IntegrationStatus[] {
       detail: process.env.EMAIL_AUTOMATION_WEBHOOK_URL
         ? "Ready to trigger portal inbox messages. Regular email stays as click-to-send."
         : "Add EMAIL_AUTOMATION_WEBHOOK_URL."
+    },
+    {
+      name: "Daily Maintenance Cron",
+      ready: Boolean(process.env.CRON_SECRET),
+      detail: process.env.CRON_SECRET
+        ? "Daily self-healing and rotating backup snapshots are configured."
+        : "Add CRON_SECRET so Vercel Cron can run daily maintenance."
     }
   ];
 }

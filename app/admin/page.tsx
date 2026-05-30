@@ -5,6 +5,7 @@ import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
 import { CustomerInboxConsole } from "@/components/admin/customer-inbox-console";
+import { DailyMaintenancePanel } from "@/components/admin/daily-maintenance-panel";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { StatusIndicator } from "@/components/ui/status-indicator";
@@ -99,7 +100,8 @@ export default async function AdminPage() {
       </section>
 
       <section className="section-tight">
-        <div className="container">
+        <div className="container admin-ops-grid">
+          <DailyMaintenancePanel />
           <QaCleanupPanel />
         </div>
       </section>
