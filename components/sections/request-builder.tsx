@@ -390,7 +390,7 @@ export function RequestBuilder() {
 
   const requiredQuestionAnswers = selectedQuestions
     .filter((question) => question.required !== false)
-    .map((question) => (getServiceAnswer(question).trim().length >= 3 ? question.id : ""));
+    .map((question) => (getServiceAnswer(question).trim().length > 0 ? question.id : ""));
   const requiredQuestionCount = selectedQuestions.filter((question) => question.required !== false).length;
   const answeredRequiredQuestionCount = requiredQuestionAnswers.filter(Boolean).length;
   const answeredQuestionCount = selectedQuestions.filter((question) => getServiceAnswer(question).trim().length > 0).length;
@@ -400,25 +400,25 @@ export function RequestBuilder() {
     form.budget,
     form.timeline,
     selectedDeliverySpeed,
-    form.goals.length > 12 ? form.goals : "",
+    form.goals.trim(),
     ...requiredQuestionAnswers,
-    form.contactName,
+    form.contactName.trim(),
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) ? form.contactEmail : "",
     !isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0) ? "offer-amount" : ""
   ];
   const progress = clamp(Math.round((requiredFields.filter(Boolean).length / requiredFields.length) * 100), 0, 100);
   const canSubmit = progress >= 100;
   const activeStepIndex = Math.max(0, intakeSteps.findIndex((step) => step.id === activeStep));
-  const serviceStepReady = form.goals.trim().length > 12;
+  const serviceStepReady = form.goals.trim().length > 0;
   const briefStepReady = answeredRequiredQuestionCount >= requiredQuestionCount;
   const timingStepReady = Boolean(form.budget && form.timeline && selectedDeliverySpeed);
   const contactStepReady =
-    form.contactName.trim().length > 1 &&
+    form.contactName.trim().length > 0 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) &&
     (!isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0));
-  const currentQuestionReady = !currentQuestion || currentQuestion.required === false || currentQuestionAnswer.length >= 3;
+  const currentQuestionReady = !currentQuestion || currentQuestion.required === false || currentQuestionAnswer.length > 0;
   const finishHelp =
-    form.contactName.trim().length <= 1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
+    form.contactName.trim().length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
       ? "Add your name and email, then we can open checkout or review your offer."
       : isOffer && (!Number.isFinite(offeredAmount) || offeredAmount <= 0)
         ? "Add the amount you would like to offer so we can review it fairly."
