@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import { ADMIN_SESSION_COOKIE, isAdminConfigured, isAdminCookieAuthenticated } from "@/lib/admin-session";
+import { ADMIN_SESSION_COOKIE, getConfiguredAdminSummary, isAdminConfigured, isAdminCookieAuthenticated } from "@/lib/admin-session";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -15,6 +15,7 @@ export default async function AdminLoginPage() {
   if (isAdminCookieAuthenticated(cookieStore.get(ADMIN_SESSION_COOKIE)?.value)) {
     redirect("/admin");
   }
+  const adminEmail = getConfiguredAdminSummary()[0]?.email ?? "techchimps@proton.me";
 
   return (
     <main>
@@ -25,7 +26,7 @@ export default async function AdminLoginPage() {
             <h1 className="title">Admin is hidden until you log in.</h1>
             <p className="subtitle">Customer-facing visitors only see the public site, prices, request flow, and portal.</p>
           </div>
-          <AdminLoginForm configured={isAdminConfigured()} />
+          <AdminLoginForm adminEmail={adminEmail} configured={isAdminConfigured()} />
         </div>
       </section>
     </main>

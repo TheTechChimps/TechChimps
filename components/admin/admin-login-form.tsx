@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export function AdminLoginForm({ configured }: { configured: boolean }) {
+export function AdminLoginForm({ adminEmail = "techchimps@proton.me", configured }: { adminEmail?: string; configured: boolean }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +47,7 @@ export function AdminLoginForm({ configured }: { configured: boolean }) {
             className="input"
             disabled={!configured}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@techchimps.com"
+            placeholder={adminEmail}
             type="email"
             value={email}
           />
