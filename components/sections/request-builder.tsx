@@ -23,7 +23,6 @@ import { serviceCategories, services, type Service, type ServiceCategory } from 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
-import { StatusIndicator } from "@/components/ui/status-indicator";
 import { LiveSupportWidget } from "@/components/sections/live-support-widget";
 import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
@@ -63,15 +62,6 @@ const initialState: BuilderState = {
   offerReason: ""
 };
 
-const timelineLabels: Record<string, string> = {
-  "one-day": "1 day",
-  "two-day": "2 days",
-  "three-day": "3 days",
-  "this-week": "this week",
-  "this-month": "this month",
-  flexible: "flexible"
-};
-
 const timelineMultipliers: Record<string, number> = {
   "one-day": 1.6,
   "two-day": 1.45,
@@ -79,13 +69,6 @@ const timelineMultipliers: Record<string, number> = {
   "this-week": 1.15,
   "this-month": 1,
   flexible: 0.95
-};
-
-const deliveryLabels: Record<string, string> = {
-  standard: "standard delivery",
-  priority: "priority delivery",
-  express: "fast-track delivery",
-  rush50: "50% faster ETA"
 };
 
 const deliveryMultipliers: Record<string, number> = {
@@ -623,44 +606,6 @@ export function RequestBuilder() {
           <span className="eyebrow">Guided build brief</span>
           <h2 className="title">Tell us the dream product.</h2>
           <p className="subtitle">Choose a service, answer smart questions or give us creative control, then pay or make an offer.</p>
-
-          <Card className="recommendation-card">
-            <div>
-              <StatusIndicator label="Smart recommendation" tone="active" />
-              <h3>{selectedService.name}</h3>
-              {isCustomRequest ? (
-                <p>We will review this with you in live support, agree the right scope, and only request payment once the plan is clear.</p>
-              ) : (
-                <p>
-                  For a {timelineLabels[form.timeline]} request with {deliveryLabels[selectedDeliverySpeed]}, a realistic
-                  starting estimate is{" "}
-                  <strong>{formatPrice(estimate)}</strong>.
-                </p>
-              )}
-              {isOffer && Number.isFinite(offeredAmount) && offeredAmount > 0 ? (
-                <p>
-                  Your proposed offer is <strong>{formatPrice(offeredAmount)}</strong>. It will be reviewed before a payment link is issued.
-                </p>
-              ) : null}
-              {!isOffer && discountPreview.code ? (
-                <p>
-                  Discount <strong>{discountPreview.code}</strong> applied. Checkout total:{" "}
-                  <strong>{formatPrice(discountPreview.amount)}</strong>.
-                </p>
-              ) : null}
-              {form.completionDate ? (
-                <p>Preferred completion date: {new Date(form.completionDate).toLocaleDateString("en-GB")}.</p>
-              ) : null}
-            </div>
-            <ul>
-              {selectedService.outcomes.map((outcome) => (
-                <li key={outcome}>
-                  <CheckCircle2 aria-hidden size={17} />
-                  {outcome}
-                </li>
-              ))}
-            </ul>
-          </Card>
         </div>
 
         <Card className="request-card">
