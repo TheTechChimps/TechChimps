@@ -1,11 +1,12 @@
 "use client";
 
-import { Loader2, MessageSquareReply, Send } from "lucide-react";
+import { Loader2, MessageSquareReply, Send, Volume2, VolumeX } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import type { LiveChatMessage, LiveChatSessionSummary } from "@/lib/live-chat";
+import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
 import type { OrderRecord } from "@/lib/orders";
 
 export function LiveChatConsole() {
@@ -15,7 +16,10 @@ export function LiveChatConsole() {
   const [activeSession, setActiveSession] = useState("");
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const activeChatRef = useRef<HTMLDivElement>(null);
+  const loadedOnceRef = useRef(false);
+  const lastVisitorSignalRef = useRef("");
 
   const loadMessages = useCallback(async () => {
     const [chatResponse, orderResponse] = await Promise.all([
@@ -24,6 +28,22 @@ export function LiveChatConsole() {
     ]);
     if (chatResponse.ok) {
       const data = (await chatResponse.json()) as { messages: LiveChatMessage[]; sessions: LiveChatSessionSummary[] };
+      const latestVisitorMessage = [...data.messages].reverse().find((message) => message.role === "visitor");
+      const latestWaitingSignal = data.sessions
+        .filter((session) => session.unreadVisitorMessages || session.priority !== "normal")
+        .map((session) => `${session.sessionId}:${session.lastMessageAt}:${session.messageCount}`)
+        .sort()
+        .join("|");
+      const alertSignal = latestVisitorMessage
+        ? `${latestVisitorMessage.id}:${latestWaitingSignal}`
+        : latestWaitingSignal;
+
+      if (soundEnabled && loadedOnceRef.current && alertSignal && alertSignal !== lastVisitorSignalRef.current) {
+        void playGentleChimpChime();
+      }
+
+      if (alertSignal) lastVisitorSignalRef.current = alertSignal;
+      loadedOnceRef.current = true;
       setMessages(data.messages);
       setSessions(data.sessions);
       setActiveSession((current) => current || data.sessions[0]?.sessionId || "");
@@ -32,7 +52,7 @@ export function LiveChatConsole() {
       const data = (await orderResponse.json()) as { orders: OrderRecord[] };
       setWaitingOrders(data.orders);
     }
-  }, []);
+  }, [soundEnabled]);
 
   useEffect(() => {
     const initial = window.setTimeout(() => {
@@ -76,6 +96,7 @@ export function LiveChatConsole() {
   }, [sessions, waitingOrders]);
 
   const joinPaymentChat = (order: OrderRecord) => {
+    void primeNotificationSound();
     setActiveSession(order.chatSessionId);
     window.requestAnimationFrame(() => {
       activeChatRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -86,6 +107,7 @@ export function LiveChatConsole() {
     event.preventDefault();
     if (!reply.trim() || !activeSession) return;
 
+    void primeNotificationSound();
     setSending(true);
     const response = await fetch("/api/live-chat", {
       body: JSON.stringify({
@@ -124,6 +146,17 @@ export function LiveChatConsole() {
           }
           tone={waitingChatCount ? "warning" : "active"}
         />
+        <button
+          aria-label={soundEnabled ? "Turn admin chat sound off" : "Turn admin chat sound on"}
+          className="icon-button"
+          onClick={() => {
+            setSoundEnabled((current) => !current);
+            void primeNotificationSound();
+          }}
+          type="button"
+        >
+          {soundEnabled ? <Volume2 aria-hidden size={17} /> : <VolumeX aria-hidden size={17} />}
+        </button>
       </div>
 
       {waitingOrders.length ? (
@@ -149,7 +182,10 @@ export function LiveChatConsole() {
               <button
                 className={session.sessionId === activeSession ? "active" : ""}
                 key={session.sessionId}
-                onClick={() => setActiveSession(session.sessionId)}
+                onClick={() => {
+                  void primeNotificationSound();
+                  setActiveSession(session.sessionId);
+                }}
                 type="button"
               >
                 <span>

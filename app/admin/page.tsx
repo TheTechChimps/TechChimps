@@ -1,4 +1,20 @@
-import { Bell, Bot, CalendarCheck, Download, FileText, FolderKanban, Mail, Search, Sparkles, UploadCloud, Workflow } from "lucide-react";
+import {
+  Bell,
+  Bot,
+  CalendarCheck,
+  Download,
+  FileText,
+  FolderKanban,
+  Gauge,
+  Mail,
+  MessageSquareReply,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  UploadCloud,
+  UserRoundCheck,
+  Workflow
+} from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
@@ -35,6 +51,14 @@ const adminModules = [
   "Project notes"
 ];
 
+const adminQuickLinks = [
+  { href: "#support", icon: MessageSquareReply, label: "Live support", meta: "Join waiting chats" },
+  { href: "#customers", icon: UserRoundCheck, label: "Customers", meta: "Inbox and messages" },
+  { href: "#prompts", icon: Sparkles, label: "Prompts", meta: "Build-ready briefs" },
+  { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily safety checks" },
+  { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Track current work" }
+];
+
 export default async function AdminPage() {
   const cookieStore = await cookies();
   const adminCookie = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
@@ -54,12 +78,9 @@ export default async function AdminPage() {
     <main>
       <section className="section admin-hero">
         <div className="container">
-          <span className="eyebrow">Internal operating system</span>
-          <h1 className="title">Admin and CRM architecture for a scalable studio.</h1>
-          <p className="subtitle">
-            A production-ready screen map for managing leads, projects, invoices, subscriptions, support, automations,
-            assets, prompts, and notes without losing the friendly brand voice.
-          </p>
+          <span className="eyebrow">TechChimps cockpit</span>
+          <h1 className="title">Manage customers, chats, prompts, and automation fast.</h1>
+          <p className="subtitle">A compact private workspace for daily replies, project handoffs, and self-healing checks.</p>
           <div className="admin-hero-actions">
             <StatusIndicator label={`${adminUser?.role ?? "owner"} access`} tone="good" />
             <a className="button button-secondary button-sm" href="/api/admin/backups">
@@ -68,6 +89,35 @@ export default async function AdminPage() {
             </a>
             <AdminLogoutButton />
           </div>
+        </div>
+      </section>
+
+      <section className="section-tight admin-command-section">
+        <div className="container">
+          <Card className="admin-command-center">
+            <div className="admin-command-copy">
+              <span className="eyebrow">
+                <Gauge size={15} /> Today at a glance
+              </span>
+              <strong>One active customer is waiting in support.</strong>
+              <span>Use the quick links to jump straight into the part of the studio you need.</span>
+            </div>
+            <nav aria-label="Admin quick navigation" className="admin-quick-nav">
+              {adminQuickLinks.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <a href={item.href} key={item.href}>
+                    <Icon aria-hidden size={18} />
+                    <span>
+                      {item.label}
+                      <small>{item.meta}</small>
+                    </span>
+                  </a>
+                );
+              })}
+            </nav>
+          </Card>
         </div>
       </section>
 
@@ -82,7 +132,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight" id="automation">
         <div className="container">
           <Card className="integration-panel">
             <div>
@@ -129,19 +179,19 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight" id="support">
         <div className="container">
           <LiveChatConsole />
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight" id="customers">
         <div className="container">
           <CustomerInboxConsole />
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight" id="prompts">
         <div className="container">
           <CodexPromptInbox />
         </div>
@@ -159,7 +209,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="pipeline">
         <div className="container">
           <div className="section-header">
             <span className="eyebrow">Kanban project tracking</span>

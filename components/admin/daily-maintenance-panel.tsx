@@ -83,10 +83,10 @@ export function DailyMaintenancePanel() {
           </span>
           <h2>Maintenance cron</h2>
         </div>
-        <StatusIndicator label={latest ? "Ready" : "Waiting"} tone={latest ? "good" : "active"} />
+        <StatusIndicator label="Daily active" tone="good" />
       </div>
       <p className="helper">
-        Runs once daily on Vercel Hobby. It repairs missed payment handoffs and keeps only the latest and previous backup snapshots.
+        Runs once daily overnight. It repairs missed payment handoffs and keeps only the latest and previous backup snapshots, so it stays light on limits.
       </p>
       <div className="cleanup-count-grid">
         <span>

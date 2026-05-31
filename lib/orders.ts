@@ -120,7 +120,12 @@ function orderKey(reference: string) {
 }
 
 function generateReference() {
-  return `TC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  const troopWords = ["BANANA", "CHIMP", "VINE", "PEEL", "BOUNCE", "JUNGLE", "SPARK", "SWING"];
+  const word = troopWords[Math.floor(Math.random() * troopWords.length)];
+  const timeCode = Date.now().toString(36).toUpperCase().slice(-4);
+  const randomCode = Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  return `TC-${word}-${timeCode}-${randomCode}`;
 }
 
 export function getServiceBySlug(slug: string): Service | undefined {
