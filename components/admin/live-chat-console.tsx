@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2, MessageSquareReply, Send } from "lucide-react";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusIndicator } from "@/components/ui/status-indicator";
@@ -15,6 +15,7 @@ export function LiveChatConsole() {
   const [activeSession, setActiveSession] = useState("");
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const activeChatRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = useCallback(async () => {
     const [chatResponse, orderResponse] = await Promise.all([
@@ -51,8 +52,35 @@ export function LiveChatConsole() {
     () => (activeSession ? messages.filter((message) => message.sessionId === activeSession) : []),
     [activeSession, messages]
   );
-  const activeSessionSummary = sessions.find((session) => session.sessionId === activeSession);
-  const waitingSessionCount = sessions.filter((session) => session.unreadVisitorMessages || session.priority !== "normal").length;
+  const activeWaitingOrder = waitingOrders.find((order) => order.chatSessionId === activeSession);
+  const activeSessionSummary =
+    sessions.find((session) => session.sessionId === activeSession) ??
+    (activeWaitingOrder
+      ? {
+          customerName: activeWaitingOrder.contactName || "Customer",
+          lastMessage: `${activeWaitingOrder.serviceName} - ${activeWaitingOrder.reference}`,
+          lastMessageAt: activeWaitingOrder.updatedAt,
+          messageCount: activeMessages.length,
+          priority: "waiting" as const,
+          sessionId: activeWaitingOrder.chatSessionId,
+          unreadVisitorMessages: 1
+        }
+      : null);
+  const waitingChatCount = useMemo(() => {
+    const waitingSessionIds = new Set<string>();
+    waitingOrders.forEach((order) => waitingSessionIds.add(order.chatSessionId));
+    sessions
+      .filter((session) => session.unreadVisitorMessages || session.priority !== "normal")
+      .forEach((session) => waitingSessionIds.add(session.sessionId));
+    return waitingSessionIds.size;
+  }, [sessions, waitingOrders]);
+
+  const joinPaymentChat = (order: OrderRecord) => {
+    setActiveSession(order.chatSessionId);
+    window.requestAnimationFrame(() => {
+      activeChatRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   const sendReply = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -90,24 +118,24 @@ export function LiveChatConsole() {
         </div>
         <StatusIndicator
           label={
-            waitingOrders.length || waitingSessionCount
-              ? `${waitingOrders.length + waitingSessionCount} waiting`
+            waitingChatCount
+              ? `${waitingChatCount} waiting`
               : `${sessions.length} open chats`
           }
-          tone={waitingOrders.length || waitingSessionCount ? "warning" : "active"}
+          tone={waitingChatCount ? "warning" : "active"}
         />
       </div>
 
       {waitingOrders.length ? (
         <div className="waiting-orders" aria-live="polite">
           {waitingOrders.slice(0, 3).map((order) => (
-            <div key={order.reference}>
+            <div className={order.chatSessionId === activeSession ? "active" : ""} key={order.reference}>
               <strong>{order.contactName || "Customer"} is waiting</strong>
               <span>
                 {order.serviceName} - {order.reference}
               </span>
-              <button onClick={() => setActiveSession(order.chatSessionId)} type="button">
-                Join payment chat
+              <button onClick={() => joinPaymentChat(order)} type="button">
+                {order.chatSessionId === activeSession ? "Chat open" : "Join payment chat"}
               </button>
             </div>
           ))}
@@ -139,7 +167,7 @@ export function LiveChatConsole() {
           )}
         </div>
 
-        <div className="support-active-chat">
+        <div className="support-active-chat" ref={activeChatRef}>
           <div className="portal-card-top">
             <span className="eyebrow">
               {activeSessionSummary ? activeSessionSummary.customerName : "No chat selected"}
@@ -167,7 +195,11 @@ export function LiveChatConsole() {
             </div>
           ))
         ) : (
-          <p className="helper">Select a chat from the queue to join it.</p>
+          <p className="helper">
+            {activeWaitingOrder
+              ? `${activeWaitingOrder.contactName || "Customer"} is waiting. Send a reply below to join this live support thread.`
+              : "Select a chat from the queue to join it."}
+          </p>
         )}
       </div>
 

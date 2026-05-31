@@ -18,10 +18,10 @@ export const pipelineColumns = [
 ];
 
 export const crmStats = [
-  { label: "Active clients", value: "24", tone: "good" },
-  { label: "Open projects", value: "11", tone: "active" },
-  { label: "Care plans", value: "17", tone: "good" },
-  { label: "Support tickets", value: "6", tone: "warning" }
+  { label: "Active customers", value: "1", tone: "good" },
+  { label: "Open projects", value: "0", tone: "active" },
+  { label: "Care plans", value: "0", tone: "good" },
+  { label: "Support tickets", value: "1", tone: "warning" }
 ];
 
 export const activityTimeline = [

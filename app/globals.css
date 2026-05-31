@@ -3828,6 +3828,11 @@ img {
   padding: 0.85rem;
 }
 
+.waiting-orders div.active {
+  background: color-mix(in srgb, var(--brand) 12%, var(--bg-soft));
+  border-color: color-mix(in srgb, var(--brand) 48%, var(--border));
+}
+
 .integration-grid strong,
 .integration-grid span,
 .waiting-orders strong,
@@ -3847,6 +3852,10 @@ img {
   min-height: 2rem;
   padding: 0.35rem 0.7rem;
   width: fit-content;
+}
+
+.waiting-orders div.active button {
+  background: color-mix(in srgb, var(--honey) 60%, var(--brand));
 }
 
 .integration-grid span,
