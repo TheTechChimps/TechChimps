@@ -21,7 +21,7 @@ import { redirect } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
-import { CustomerInboxConsole } from "@/components/admin/customer-inbox-console";
+import { CustomerListConsole } from "@/components/admin/customer-list-console";
 import { DailyMaintenancePanel } from "@/components/admin/daily-maintenance-panel";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
@@ -58,7 +58,7 @@ const adminModules = [
 const adminQuickLinks = [
   { href: "#support", icon: MessageSquareReply, label: "Reply to chats", meta: "Customers waiting" },
   { href: "#payments", icon: CreditCard, label: "Payment hub", meta: "Refunds and receipts" },
-  { href: "#customers", icon: UserRoundCheck, label: "Customer inbox", meta: "Send updates" },
+  { href: "#customers", icon: UserRoundCheck, label: "Customer list", meta: "Details and updates" },
   { href: "#prompts", icon: Sparkles, label: "Build prompts", meta: "One-shot briefs" },
   { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily checks", mobileHidden: true },
   { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Current work", mobileHidden: true }
@@ -236,7 +236,7 @@ export default async function AdminPage() {
 
       <section className="section-tight" id="customers">
         <div className="container">
-          <CustomerInboxConsole />
+          <CustomerListConsole />
         </div>
       </section>
 
