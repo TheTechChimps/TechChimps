@@ -8,8 +8,10 @@ import {
   FileUp,
   HandCoins,
   Lightbulb,
+  ListChecks,
   Loader2,
   MessageCircle,
+  Palette,
   Sparkles
 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
@@ -32,6 +34,7 @@ type BuilderState = {
   deliverySpeed: string;
   completionDate: string;
   goals: string;
+  creativeControl: boolean;
   serviceAnswers: Record<string, string>;
   contactName: string;
   contactEmail: string;
@@ -49,6 +52,7 @@ const initialState: BuilderState = {
   deliverySpeed: "standard",
   completionDate: "",
   goals: "",
+  creativeControl: false,
   serviceAnswers: {},
   contactName: "",
   contactEmail: "",
@@ -350,6 +354,7 @@ export function RequestBuilder() {
   const [handoffSessionId, setHandoffSessionId] = useState("");
 
   const selectedService = services.find((service) => service.slug === form.serviceType) ?? services[1];
+  const visibleIntakeSteps = form.creativeControl ? intakeSteps.filter((step) => step.id !== "brief") : intakeSteps;
   const selectedQuestions = useMemo(() => getServiceQuestions(selectedService), [selectedService]);
   const currentQuestionIndex = Math.min(activeQuestionIndex, selectedQuestions.length - 1);
   const currentQuestion = selectedQuestions[currentQuestionIndex];
@@ -388,9 +393,11 @@ export function RequestBuilder() {
   const discountPreview = useMemo(() => applyDiscount(estimate, form.discountCode), [estimate, form.discountCode]);
   const hasDiscountCode = form.discountCode.trim().length > 0;
 
-  const requiredQuestionAnswers = selectedQuestions
-    .filter((question) => question.required !== false)
-    .map((question) => (getServiceAnswer(question).trim().length > 0 ? question.id : ""));
+  const requiredQuestionAnswers = form.creativeControl
+    ? []
+    : selectedQuestions
+        .filter((question) => question.required !== false)
+        .map((question) => (getServiceAnswer(question).trim().length > 0 ? question.id : ""));
   const requiredQuestionCount = selectedQuestions.filter((question) => question.required !== false).length;
   const answeredRequiredQuestionCount = requiredQuestionAnswers.filter(Boolean).length;
   const answeredQuestionCount = selectedQuestions.filter((question) => getServiceAnswer(question).trim().length > 0).length;
@@ -400,7 +407,7 @@ export function RequestBuilder() {
     form.budget,
     form.timeline,
     selectedDeliverySpeed,
-    form.goals.trim(),
+    form.creativeControl || form.goals.trim() ? "brief-style" : "",
     ...requiredQuestionAnswers,
     form.contactName.trim(),
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) ? form.contactEmail : "",
@@ -408,9 +415,9 @@ export function RequestBuilder() {
   ];
   const progress = clamp(Math.round((requiredFields.filter(Boolean).length / requiredFields.length) * 100), 0, 100);
   const canSubmit = progress >= 100;
-  const activeStepIndex = Math.max(0, intakeSteps.findIndex((step) => step.id === activeStep));
-  const serviceStepReady = form.goals.trim().length > 0;
-  const briefStepReady = answeredRequiredQuestionCount >= requiredQuestionCount;
+  const activeStepIndex = Math.max(0, visibleIntakeSteps.findIndex((step) => step.id === activeStep));
+  const serviceStepReady = form.creativeControl || form.goals.trim().length > 0;
+  const briefStepReady = form.creativeControl || answeredRequiredQuestionCount >= requiredQuestionCount;
   const timingStepReady = Boolean(form.budget && form.timeline && selectedDeliverySpeed);
   const contactStepReady =
     form.contactName.trim().length > 0 &&
@@ -449,6 +456,15 @@ export function RequestBuilder() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const setCreativeControl = (value: boolean) => {
+    setStatus("idle");
+    setForm((current) => ({ ...current, creativeControl: value }));
+    setActiveQuestionIndex(0);
+    if (value && activeStep === "brief") {
+      setActiveStep("timing");
+    }
+  };
+
   const updateServiceAnswer = (question: ServiceQuestion, value: string) => {
     setStatus("idle");
     setForm((current) => ({
@@ -475,7 +491,7 @@ export function RequestBuilder() {
       return;
     }
 
-    setActiveStep(intakeSteps[Math.max(0, activeStepIndex - 1)].id);
+    setActiveStep(visibleIntakeSteps[Math.max(0, activeStepIndex - 1)].id);
   };
 
   const goNext = () => {
@@ -486,7 +502,7 @@ export function RequestBuilder() {
       return;
     }
 
-    setActiveStep(intakeSteps[Math.min(intakeSteps.length - 1, activeStepIndex + 1)].id);
+    setActiveStep(visibleIntakeSteps[Math.min(visibleIntakeSteps.length - 1, activeStepIndex + 1)].id);
   };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -503,13 +519,27 @@ export function RequestBuilder() {
       return;
     }
 
+    const creativeGoals =
+      "Creative control selected: the customer wants TechChimps to shape the design, layout, wording, and build direction from the selected service, timing, budget, uploaded examples, and any short notes.";
     const payload = {
       ...form,
       attachmentNames: form.attachmentNames,
+      creativeControl: form.creativeControl,
       deliverySpeed: selectedDeliverySpeed,
       discountCode: isOffer ? "" : normalizeDiscountCode(form.discountCode),
       estimate,
-      serviceAnswers: structuredAnswers,
+      goals: form.creativeControl && !form.goals.trim() ? creativeGoals : form.goals,
+      serviceAnswers: form.creativeControl
+        ? [
+            ...structuredAnswers,
+            {
+              answer: creativeGoals,
+              id: "creative-control",
+              label: "Creative control",
+              prompt: "Customer chose to skip the detailed brief"
+            }
+          ]
+        : structuredAnswers,
       uploadBatchId,
       uploadedFiles: uploadResult.data ?? []
     };
@@ -525,12 +555,14 @@ export function RequestBuilder() {
       }
 
       setStatus("sent");
-      setModalMessage(
-        isOffer
-          ? "Your custom offer has been sent. You are being added directly to live support with the TechChimps team so we can help you get started, answer questions, and shape the next step together. Please never be scared to reach out for help or tell us if you are unhappy with something."
-          : "Checkout is ready, but Stripe did not return a redirect URL. Your support thread is still being prepared so we can help you finish the order."
-      );
-      setModalOpen(true);
+      if (isOffer) {
+        setModalOpen(false);
+      } else {
+        setModalMessage(
+          "Checkout is ready, but Stripe did not return a redirect URL. Your support thread is still being prepared so we can help you finish the order."
+        );
+        setModalOpen(true);
+      }
     } else {
       setStatus("error");
       setReference(result.data?.reference ?? "");
@@ -550,7 +582,7 @@ export function RequestBuilder() {
         <div>
           <span className="eyebrow">Guided build brief</span>
           <h2 className="title">Tell us the dream product.</h2>
-          <p className="subtitle">Choose a service, answer smart questions, then pay or make an offer.</p>
+          <p className="subtitle">Choose a service, answer smart questions or give us creative control, then pay or make an offer.</p>
 
           <Card className="recommendation-card">
             <div>
@@ -603,7 +635,7 @@ export function RequestBuilder() {
 
           <form className="request-form guided-request-form" onSubmit={onSubmit}>
             <nav aria-label="Request steps" className="intake-steps">
-              {intakeSteps.map((step, index) => {
+              {visibleIntakeSteps.map((step, index) => {
                 const complete = isStepComplete(step.id);
                 return (
                   <button
@@ -650,17 +682,55 @@ export function RequestBuilder() {
               </select>
             </label>
 
+            <div className="brief-mode-options" aria-label="Brief style">
+              <button
+                aria-pressed={!form.creativeControl}
+                className={!form.creativeControl ? "brief-mode-option active" : "brief-mode-option"}
+                onClick={() => setCreativeControl(false)}
+                type="button"
+              >
+                <ListChecks aria-hidden size={18} />
+                <span>
+                  Guide me
+                  <small>Answer smart questions so we follow your exact ideas.</small>
+                </span>
+              </button>
+              <button
+                aria-pressed={form.creativeControl}
+                className={form.creativeControl ? "brief-mode-option active" : "brief-mode-option"}
+                onClick={() => setCreativeControl(true)}
+                type="button"
+              >
+                <Palette aria-hidden size={18} />
+                <span>
+                  Creative control
+                  <small>Skip the full brief and let TechChimps design the direction.</small>
+                </span>
+              </button>
+            </div>
+
             <label className="field">
-              <span className="label">Short project summary</span>
+              <span className="label">
+                {form.creativeControl ? "Optional note" : "Short project summary"}
+                {form.creativeControl ? <small>Optional</small> : null}
+              </span>
               <textarea
                 aria-label="Short project summary"
                 className="textarea"
                 onChange={(event) => update("goals", event.target.value)}
-                placeholder="Example: I need a simple website for my cleaning business with prices, photos, and a contact form."
+                placeholder={
+                  form.creativeControl
+                    ? "Optional: tell us anything we should definitely know. You can leave this blank."
+                    : "Example: I need a simple website for my cleaning business with prices, photos, and a contact form."
+                }
                 value={form.goals}
               />
               <span className="helper">
-                {serviceStepReady ? "Perfect. Next we will ask only the questions that fit this service." : "One clear sentence is enough to begin."}
+                {form.creativeControl
+                  ? "We will use full creative control and only ask for budget, timing, contact, and payment or offer details."
+                  : serviceStepReady
+                    ? "Perfect. Next we will ask only the questions that fit this service."
+                    : "One clear sentence is enough to begin."}
               </span>
             </label>
                 </div>

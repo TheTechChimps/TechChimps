@@ -151,6 +151,11 @@ PROJECT SNAPSHOT
 - Price/estimate: ${priceText}
 - Base estimate: ${formatPrice(order.baseAmount, order.priceSuffix)}
 - Offer/payment mode: ${offerText}
+- Creative control: ${
+    order.creativeControl
+      ? "Yes. Customer chose to skip the detailed brief and wants TechChimps to make confident design and UX decisions."
+      : "No. Follow the customer brief and structured answers closely."
+  }
 - Budget comfort: ${clean(order.budget)}
 - Timeline preference: ${clean(timelineLabel(order.timeline))}
 - Delivery speed: ${deliveryText}

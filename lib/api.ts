@@ -6,6 +6,7 @@ export type QuotePayload = {
   deliverySpeed: string;
   completionDate: string;
   goals: string;
+  creativeControl?: boolean;
   serviceAnswers?: {
     answer: string;
     id: string;

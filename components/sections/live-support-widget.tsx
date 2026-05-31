@@ -112,11 +112,11 @@ export function LiveSupportWidget({
         </span>
         <LifeBuoy aria-hidden size={19} />
       </button>
-      <Modal onClose={() => setOpen(false)} open={open} title="Live support chat">
+      <Modal bodyClassName="live-chat-modal-body" className="live-chat-modal" onClose={() => setOpen(false)} open={open} title="Live support">
         <div className="support-modal live-chat">
           <div className="chat-status-row">
             <StatusIndicator label="Live chat connected" tone="good" />
-            <span>You are in the support queue. TechChimps can reply here and help you get started.</span>
+            <span>You are in the support queue. TechChimps can reply here, help you get started, and fix anything that feels off.</span>
           </div>
           <div aria-live="polite" className="chat-thread">
             {messages.map((message) => (

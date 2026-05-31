@@ -20,6 +20,7 @@ export type OrderInput = {
   deliverySpeed: string;
   completionDate: string;
   goals: string;
+  creativeControl?: boolean;
   serviceAnswers?: StructuredOrderAnswer[];
   contactName: string;
   contactEmail: string;
@@ -74,6 +75,7 @@ export type OrderRecord = {
   deliverySpeed: string;
   completionDate: string;
   goals: string;
+  creativeControl: boolean;
   serviceAnswers: StructuredOrderAnswer[];
   contactName: string;
   contactEmail: string;
@@ -182,6 +184,7 @@ export function createOrderRecord(input: OrderInput, status: OrderStatus): Order
     deliverySpeed: input.deliverySpeed || "standard",
     completionDate: input.completionDate,
     goals: input.goals.trim(),
+    creativeControl: Boolean(input.creativeControl),
     serviceAnswers:
       input.serviceAnswers
         ?.map((item) => ({

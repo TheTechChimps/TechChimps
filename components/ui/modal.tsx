@@ -7,11 +7,15 @@ import { Button } from "@/components/ui/button";
 export function Modal({
   open,
   title,
+  className,
+  bodyClassName,
   children,
   onClose
 }: {
   open: boolean;
   title: string;
+  className?: string;
+  bodyClassName?: string;
   children: React.ReactNode;
   onClose: () => void;
 }) {
@@ -32,14 +36,14 @@ export function Modal({
 
   return (
     <div aria-labelledby={titleId} aria-modal="true" className="modal-backdrop" role="dialog">
-      <div className="modal">
+      <div className={`modal ${className ?? ""}`}>
         <div className="modal-header">
           <h2 id={titleId}>{title}</h2>
           <button aria-label="Close modal" className="icon-button" onClick={onClose} type="button">
             <X aria-hidden size={18} />
           </button>
         </div>
-        <div className="modal-body">{children}</div>
+        <div className={`modal-body ${bodyClassName ?? ""}`}>{children}</div>
         <div className="button-row">
           <Button onClick={onClose} type="button" variant="secondary">
             Close
