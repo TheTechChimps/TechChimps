@@ -129,6 +129,36 @@ const commonQuestions: ServiceQuestion[] = [
 ];
 
 const categoryQuestions: Record<ServiceCategory, ServiceQuestion[]> = {
+  "Custom Request": [
+    {
+      id: "dream-product",
+      label: "The idea",
+      prompt: "What would you like us to build, fix, connect, or improve?",
+      placeholder: "Explain it normally. A rough idea is enough to start.",
+      rows: 4
+    },
+    {
+      id: "must-have",
+      label: "Most important result",
+      prompt: "What absolutely needs to work when the project is finished?",
+      placeholder: "The main outcome, action, feature, or problem to solve...",
+      rows: 3
+    },
+    {
+      id: "current-setup",
+      label: "Current setup",
+      prompt: "Is this brand new, or does it need to work with something you already have?",
+      placeholder: "Existing website, app, spreadsheet, Discord, Stripe, social page, or start from scratch..."
+    },
+    {
+      id: "examples",
+      label: "Helpful examples",
+      prompt: "Have you seen anything similar, or is there a style you like?",
+      placeholder: "Links, screenshots, competitors, colours, or leave this blank if you are unsure.",
+      required: false,
+      rows: 3
+    }
+  ],
   "Quick Launch": [
     {
       id: "main-offer",
@@ -355,12 +385,14 @@ export function RequestBuilder() {
   const [handoffSessionId, setHandoffSessionId] = useState("");
 
   const selectedService = services.find((service) => service.slug === form.serviceType) ?? services[1];
+  const isCustomRequest = selectedService.slug === "custom-request";
   const visibleIntakeSteps = form.creativeControl ? intakeSteps.filter((step) => step.id !== "brief") : intakeSteps;
   const selectedQuestions = useMemo(() => getServiceQuestions(selectedService), [selectedService]);
   const currentQuestionIndex = Math.min(activeQuestionIndex, selectedQuestions.length - 1);
   const currentQuestion = selectedQuestions[currentQuestionIndex];
   const selectedDeliverySpeed = form.deliverySpeed || "standard";
-  const isOffer = form.offerMode !== "standard";
+  const isOffer = !isCustomRequest && form.offerMode !== "standard";
+  const needsReview = isCustomRequest || isOffer;
   const offeredAmount = Number.parseFloat(form.offerAmount);
   const getServiceAnswer = (question: ServiceQuestion) => form.serviceAnswers[answerKey(selectedService.slug, question.id)] ?? "";
   const currentQuestionAnswer = currentQuestion ? getServiceAnswer(currentQuestion).trim() : "";
@@ -377,6 +409,7 @@ export function RequestBuilder() {
     [form.serviceAnswers, selectedQuestions, selectedService.slug]
   );
   const estimate = useMemo(() => {
+    if (selectedService.slug === "custom-request") return 0;
     if (selectedService.priceSuffix) return selectedService.price;
     const timelineMultiplier = timelineMultipliers[form.timeline] ?? 1;
     const deliveryMultiplier = deliveryMultipliers[selectedDeliverySpeed] ?? 1;
@@ -389,6 +422,7 @@ export function RequestBuilder() {
     selectedDeliverySpeed,
     selectedService.price,
     selectedService.priceSuffix,
+    selectedService.slug,
     structuredAnswers
   ]);
   const discountPreview = useMemo(() => applyDiscount(estimate, form.discountCode), [estimate, form.discountCode]);
@@ -426,7 +460,9 @@ export function RequestBuilder() {
     (!isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0));
   const currentQuestionReady = !currentQuestion || currentQuestion.required === false || currentQuestionAnswer.length > 0;
   const finishHelp =
-    form.contactName.trim().length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
+    isCustomRequest && form.contactName.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
+      ? "Your custom request goes straight to the team for a friendly scope review before any payment is requested."
+      : form.contactName.trim().length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
       ? "Add your name and email, then we can open checkout or review your offer."
       : isOffer && (!Number.isFinite(offeredAmount) || offeredAmount <= 0)
         ? "Add the amount you would like to offer so we can review it fairly."
@@ -530,6 +566,9 @@ export function RequestBuilder() {
       discountCode: isOffer ? "" : normalizeDiscountCode(form.discountCode),
       estimate,
       goals: form.creativeControl && !form.goals.trim() ? creativeGoals : form.goals,
+      offerAmount: isCustomRequest ? "" : form.offerAmount,
+      offerMode: isCustomRequest ? ("standard" as const) : form.offerMode,
+      offerReason: isCustomRequest ? "" : form.offerReason,
       serviceAnswers: form.creativeControl
         ? [
             ...structuredAnswers,
@@ -544,19 +583,19 @@ export function RequestBuilder() {
       uploadBatchId,
       uploadedFiles: uploadResult.data ?? []
     };
-    const result = isOffer ? await submitQuoteRequest(payload) : await createCheckoutSession(payload);
+    const result = needsReview ? await submitQuoteRequest(payload) : await createCheckoutSession(payload);
 
     if (result.ok && result.data) {
       setReference(result.data.reference);
       setHandoffSessionId(result.data.chatSessionId);
-      if (!isOffer && "url" in result.data && result.data.url) {
+      if (!needsReview && "url" in result.data && result.data.url) {
         setStatus("redirecting");
         window.location.assign(result.data.url);
         return;
       }
 
       setStatus("sent");
-      if (isOffer) {
+      if (needsReview) {
         setModalOpen(false);
       } else {
         setModalMessage(
@@ -589,11 +628,15 @@ export function RequestBuilder() {
             <div>
               <StatusIndicator label="Smart recommendation" tone="active" />
               <h3>{selectedService.name}</h3>
-              <p>
-                For a {timelineLabels[form.timeline]} request with {deliveryLabels[selectedDeliverySpeed]}, a realistic
-                starting estimate is{" "}
-                <strong>{formatPrice(estimate)}</strong>.
-              </p>
+              {isCustomRequest ? (
+                <p>We will review this with you in live support, agree the right scope, and only request payment once the plan is clear.</p>
+              ) : (
+                <p>
+                  For a {timelineLabels[form.timeline]} request with {deliveryLabels[selectedDeliverySpeed]}, a realistic
+                  starting estimate is{" "}
+                  <strong>{formatPrice(estimate)}</strong>.
+                </p>
+              )}
               {isOffer && Number.isFinite(offeredAmount) && offeredAmount > 0 ? (
                 <p>
                   Your proposed offer is <strong>{formatPrice(offeredAmount)}</strong>. It will be reviewed before a payment link is issued.
@@ -686,6 +729,9 @@ export function RequestBuilder() {
                       ))}
                   </optgroup>
                 ))}
+                <optgroup label="Not listed?">
+                  <option value="custom-request">Something else - send a custom request</option>
+                </optgroup>
               </select>
             </label>
 
@@ -883,6 +929,15 @@ export function RequestBuilder() {
                     <p>After checkout or offer review, we connect you to live support so you are not left guessing.</p>
                   </div>
 
+            {isCustomRequest ? (
+              <div className="custom-review-note">
+                <Sparkles aria-hidden size={20} />
+                <div>
+                  <strong>Custom request review</strong>
+                  <p>Send the idea first. A team member will join live support, help shape the plan, and agree the price with you before payment.</p>
+                </div>
+              </div>
+            ) : (
             <fieldset className="offer-panel">
               <legend>Checkout or offer</legend>
               <div className="offer-options" aria-label="Checkout or offer type">
@@ -956,8 +1011,9 @@ export function RequestBuilder() {
                 </>
               ) : null}
             </fieldset>
+            )}
 
-            {!isOffer ? (
+            {!isCustomRequest && !isOffer ? (
               <div className="discount-panel">
                 <label className="field">
                   <span className="label">Discount code <small>Optional</small></span>
@@ -1053,6 +1109,8 @@ export function RequestBuilder() {
                       ? isOffer
                         ? "Sending offer"
                         : "Preparing checkout"
+                      : isCustomRequest
+                        ? "Send custom request"
                       : isOffer
                         ? "Send offer for review"
                         : "Pay securely with Stripe"}

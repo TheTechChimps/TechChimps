@@ -2,6 +2,7 @@ import {
   Bell,
   Bot,
   CalendarCheck,
+  CreditCard,
   Download,
   FileText,
   FolderKanban,
@@ -24,6 +25,7 @@ import { CustomerInboxConsole } from "@/components/admin/customer-inbox-console"
 import { DailyMaintenancePanel } from "@/components/admin/daily-maintenance-panel";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
+import { PaymentHub } from "@/components/admin/payment-hub";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { activityTimeline, automationFlows, crmStats, emailTemplates, pipelineColumns } from "@/data/dashboard";
 import { ADMIN_SESSION_COOKIE, getAdminSessionFromToken, isAdminCookieAuthenticated } from "@/lib/admin-session";
@@ -53,10 +55,11 @@ const adminModules = [
 
 const adminQuickLinks = [
   { href: "#support", icon: MessageSquareReply, label: "Live support", meta: "Join waiting chats" },
+  { href: "#payments", icon: CreditCard, label: "Payments", meta: "Paid and refunds" },
   { href: "#customers", icon: UserRoundCheck, label: "Customers", meta: "Inbox and messages" },
   { href: "#prompts", icon: Sparkles, label: "Prompts", meta: "Build-ready briefs" },
-  { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily safety checks" },
-  { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Track current work" }
+  { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily safety checks", mobileHidden: true },
+  { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Track current work", mobileHidden: true }
 ];
 
 export default async function AdminPage() {
@@ -107,7 +110,7 @@ export default async function AdminPage() {
                 const Icon = item.icon;
 
                 return (
-                  <a href={item.href} key={item.href}>
+                  <a className={item.mobileHidden ? "admin-mobile-nav-hidden" : undefined} href={item.href} key={item.href}>
                     <Icon aria-hidden size={18} />
                     <span>
                       {item.label}
@@ -122,7 +125,7 @@ export default async function AdminPage() {
       </section>
 
       <section className="section-tight">
-        <div className="container grid grid-4">
+        <div className="container grid grid-4 admin-stat-grid">
           {crmStats.map((stat) => (
             <Card className="stat-card" key={stat.label}>
               <StatusIndicator label={stat.label} tone={stat.tone as "good" | "active" | "warning"} />
@@ -132,7 +135,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section-tight" id="automation">
+      <section className="section-tight admin-mobile-secondary" id="automation">
         <div className="container">
           <Card className="integration-panel">
             <div>
@@ -154,14 +157,14 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight admin-mobile-secondary">
         <div className="container admin-ops-grid">
           <DailyMaintenancePanel />
           <QaCleanupPanel />
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight admin-toolbar-section">
         <div className="container admin-toolbar">
           <label className="field search-field">
             <span className="label">Search clients, projects, invoices, or notes</span>
@@ -185,6 +188,12 @@ export default async function AdminPage() {
         </div>
       </section>
 
+      <section className="section-tight" id="payments">
+        <div className="container">
+          <PaymentHub />
+        </div>
+      </section>
+
       <section className="section-tight" id="customers">
         <div className="container">
           <CustomerInboxConsole />
@@ -197,7 +206,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section-tight">
+      <section className="section-tight admin-reference-section">
         <div className="container">
           <div className="admin-module-grid">
             {adminModules.map((module) => (
@@ -209,7 +218,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section" id="pipeline">
+      <section className="section admin-reference-section" id="pipeline">
         <div className="container">
           <div className="section-header">
             <span className="eyebrow">Kanban project tracking</span>
@@ -233,7 +242,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section className="section admin-systems">
+      <section className="section admin-systems admin-reference-section">
         <div className="container grid grid-3">
           <Card>
             <Bell aria-hidden size={24} />

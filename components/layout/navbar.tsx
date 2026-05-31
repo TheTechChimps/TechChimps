@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AdminLink } from "@/components/admin/admin-link";
 import { ButtonLink } from "@/components/ui/button";
-import { serviceCategories, services } from "@/data/services";
+import { publicServices, serviceCategories } from "@/data/services";
 import { formatPrice } from "@/lib/utils";
 
 const navItems = [
@@ -20,7 +20,7 @@ const navItems = [
 
 const serviceGroups = serviceCategories.map((category) => ({
   category,
-  items: services.filter((service) => service.category === category)
+  items: publicServices.filter((service) => service.category === category)
 }));
 
 const mobileNavItems = navItems.filter((item) => item.href !== "/find-us" && item.href !== "/portal");

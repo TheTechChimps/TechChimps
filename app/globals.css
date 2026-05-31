@@ -3952,7 +3952,7 @@ img {
 .admin-quick-nav {
   display: grid;
   gap: 0.55rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .admin-quick-nav a {
@@ -3997,6 +3997,208 @@ img {
   display: grid;
   gap: var(--space-2);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.payment-hub {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.payment-hub-header,
+.payment-detail-top,
+.refund-actions,
+.refund-actions form {
+  align-items: center;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.payment-hub-header,
+.payment-detail-top {
+  justify-content: space-between;
+}
+
+.payment-hub-header h2 {
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1.05;
+  margin: 0.4rem 0 0;
+}
+
+.payment-hub-metrics,
+.payment-hub-grid,
+.payment-facts {
+  display: grid;
+}
+
+.payment-hub-metrics {
+  gap: var(--space-1);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.payment-hub-metrics > div,
+.payment-facts > div,
+.refund-balance {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+}
+
+.payment-hub-metrics span,
+.payment-facts dt,
+.refund-balance span,
+.refund-balance small {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.payment-hub-metrics strong,
+.refund-balance strong {
+  color: var(--text);
+  font-size: 1.15rem;
+}
+
+.payment-hub-grid {
+  gap: var(--space-2);
+  grid-template-columns: minmax(14rem, 0.7fr) minmax(18rem, 1.3fr);
+}
+
+.payment-ledger,
+.payment-detail {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.payment-ledger {
+  align-content: start;
+  max-height: 34rem;
+  overflow-y: auto;
+}
+
+.payment-ledger button {
+  align-items: center;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 0.2rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.payment-ledger button.active,
+.payment-ledger button:hover,
+.payment-ledger button:focus-visible {
+  background: color-mix(in srgb, var(--brand) 12%, var(--bg-soft));
+  border-color: color-mix(in srgb, var(--brand) 48%, var(--border));
+  box-shadow: 0 0 0 3px rgb(46 230 190 / 11%);
+}
+
+.payment-ledger span,
+.payment-ledger small {
+  display: block;
+  min-width: 0;
+}
+
+.payment-ledger small,
+.payment-detail p {
+  color: var(--text-muted);
+}
+
+.payment-ledger small {
+  font-size: 0.74rem;
+  margin-top: 0.16rem;
+}
+
+.payment-ledger b {
+  color: var(--brand-strong);
+}
+
+.payment-detail {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+
+.payment-detail h3 {
+  color: var(--text);
+  font-size: 1.35rem;
+  margin: 0.35rem 0 0;
+}
+
+.payment-detail p {
+  margin: 0.2rem 0 0;
+}
+
+.payment-facts {
+  gap: var(--space-1);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.payment-facts dt {
+  align-items: center;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.payment-facts dd {
+  color: var(--text);
+  font-weight: 900;
+  margin: 0;
+}
+
+.refund-actions {
+  align-items: end;
+  justify-content: flex-end;
+}
+
+.refund-actions form {
+  align-items: end;
+}
+
+.refund-amount-input {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.refund-amount-input svg {
+  color: var(--text-muted);
+  left: 0.7rem;
+  pointer-events: none;
+  position: absolute;
+}
+
+.refund-amount-input .input {
+  padding-left: 2rem;
+}
+
+.custom-review-note {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--brand) 10%, var(--bg-soft));
+  border: 1px solid color-mix(in srgb, var(--brand) 38%, var(--border));
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.custom-review-note svg {
+  color: var(--honey);
+  flex: 0 0 auto;
+}
+
+.custom-review-note p {
+  color: var(--text-muted);
+  margin: 0.35rem 0 0;
 }
 
 .qa-cleanup-panel {
@@ -4568,6 +4770,50 @@ img {
   .kanban {
     grid-template-columns: repeat(4, 16rem);
   }
+
+  .admin-command-section {
+    position: static;
+  }
+
+  .admin-command-center,
+  .payment-hub-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-command-center {
+    padding: var(--space-1);
+  }
+
+  .admin-quick-nav {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
+  }
+
+  .admin-quick-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-quick-nav a {
+    flex: 0 0 8.6rem;
+    min-height: 3.55rem;
+    padding: 0.55rem;
+  }
+
+  .admin-mobile-secondary,
+  .admin-toolbar-section,
+  .admin-reference-section {
+    display: none;
+  }
+
+  .admin-quick-nav a.admin-mobile-nav-hidden {
+    display: none;
+  }
+
+  .admin-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 560px) {
@@ -4784,12 +5030,84 @@ img {
   }
 
   .admin-quick-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
   }
 
   .admin-quick-nav a {
+    flex: 0 0 8.6rem;
     min-height: 3.55rem;
     padding: 0.55rem;
+  }
+
+  .admin-mobile-secondary,
+  .admin-toolbar-section,
+  .admin-reference-section {
+    display: none;
+  }
+
+  .payment-hub-header,
+  .payment-detail-top,
+  .refund-actions,
+  .refund-actions form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .payment-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-hub-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .payment-hub-metrics > div {
+    padding: 0.6rem;
+  }
+
+  .payment-hub-metrics span {
+    font-size: 0.68rem;
+  }
+
+  .payment-hub-metrics strong {
+    font-size: 1rem;
+  }
+
+  .payment-ledger {
+    max-height: 14rem;
+  }
+
+  .refund-actions .button,
+  .refund-actions form,
+  .refund-actions .field {
+    width: 100%;
+  }
+
+  .hero-next-hint span,
+  .trust-row div {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .footer-grid,
+  .footer-links,
+  .footer-contact {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .footer-links a,
+  .footer-contact a,
+  .footer-contact span {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .footer-bottom {
+    text-align: center;
   }
 
   .intake-steps {

@@ -223,12 +223,33 @@ export async function connectOfferToLiveChat(order: OrderRecord) {
   await runOrderAutomation(order, "offer.waiting_review");
 }
 
+export async function connectCustomRequestToLiveChat(order: OrderRecord) {
+  await appendLiveChatMessage({
+    sessionId: order.chatSessionId,
+    role: "system",
+    priority: "waiting",
+    body: `${liveSupportFullHandoffMessage} Your custom request ${order.reference} is safely in the queue for review.`
+  });
+
+  await appendLiveChatMessage({
+    sessionId: order.chatSessionId,
+    role: "visitor",
+    author: order.contactName || "Website visitor",
+    priority: "waiting",
+    body: order.goals || "I need help shaping a custom TechChimps project."
+  });
+
+  await runOrderAutomation(order, "custom_request.waiting_review");
+}
+
 export async function connectPaidOrderToLiveChat(order: OrderRecord, stripeSession?: Stripe.Checkout.Session) {
   if (order.chatConnectedAt) return order;
 
   const paidOrder = await updateOrder(order.reference, (current) => ({
     ...current,
     status: "paid_waiting_support",
+    paymentCurrency: stripeSession?.currency ?? current.paymentCurrency ?? "gbp",
+    paymentMethod: stripeSession?.payment_method_types?.join(", ") || current.paymentMethod || "Stripe Checkout",
     stripePaymentStatus: stripeSession?.payment_status ?? current.stripePaymentStatus ?? "paid",
     paidAt: current.paidAt ?? now(),
     chatConnectedAt: now()

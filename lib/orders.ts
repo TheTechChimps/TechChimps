@@ -8,6 +8,7 @@ export type OrderStatus =
   | "quote_saved"
   | "offer_waiting_review"
   | "offer_declined"
+  | "custom_request_waiting_review"
   | "checkout_started"
   | "payment_pending"
   | "paid_waiting_support"
@@ -53,6 +54,13 @@ export type AutomationResult = {
   createdAt: string;
 };
 
+export type OrderRefund = {
+  id: string;
+  amount: number;
+  createdAt: string;
+  status: string;
+};
+
 export type OrderRecord = {
   reference: string;
   status: OrderStatus;
@@ -85,6 +93,8 @@ export type OrderRecord = {
   contactEmail: string;
   chatSessionId: string;
   stripeSessionId?: string;
+  paymentMethod?: string;
+  paymentCurrency?: string;
   uploadBatchId?: string;
   uploadedFiles?: {
     key: string;
@@ -94,6 +104,9 @@ export type OrderRecord = {
   }[];
   stripePaymentStatus?: string;
   paidAt?: string;
+  refundedAmount?: number;
+  refundStatus?: "partial" | "full";
+  refunds?: OrderRefund[];
   chatConnectedAt?: string;
   automationLog: AutomationResult[];
   createdAt: string;
@@ -137,6 +150,7 @@ export function getServiceBySlug(slug: string): Service | undefined {
 }
 
 export function calculateServiceEstimate(input: Pick<OrderInput, "deliverySpeed" | "goals" | "serviceAnswers" | "timeline">, service: Service) {
+  if (service.slug === "custom-request") return 0;
   if (service.priceSuffix) return service.price;
 
   const timelineMultiplier = timelineMultipliers[input.timeline] ?? 1;
@@ -270,5 +284,10 @@ export async function addAutomationResult(reference: string, result: Omit<Automa
 
 export async function getWaitingOrders() {
   const orders = await listOrders();
-  return orders.filter((order) => order.status === "paid_waiting_support" || order.status === "offer_waiting_review");
+  return orders.filter(
+    (order) =>
+      order.status === "paid_waiting_support" ||
+      order.status === "offer_waiting_review" ||
+      order.status === "custom_request_waiting_review"
+  );
 }

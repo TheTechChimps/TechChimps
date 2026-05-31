@@ -8,7 +8,7 @@ import {
   Wrench
 } from "lucide-react";
 
-export type ServiceCategory = "Quick Launch" | "Websites" | "Web Apps" | "Windows Apps" | "Discord" | "Care";
+export type ServiceCategory = "Quick Launch" | "Websites" | "Web Apps" | "Windows Apps" | "Discord" | "Care" | "Custom Request";
 
 export type Service = {
   slug: string;
@@ -25,6 +25,19 @@ export type Service = {
 };
 
 export const services: Service[] = [
+  {
+    slug: "custom-request",
+    category: "Custom Request",
+    name: "Something Else",
+    price: 0,
+    timeline: "Agreed after review",
+    summary: "A reviewed custom request for a product, fix, automation, integration, or idea that is not listed yet.",
+    beginnerExplanation:
+      "Choose this when none of the listed services quite fit. Tell us the idea in plain English and we will shape the simplest route with you before asking for payment.",
+    includes: ["Human scope review", "Live support handoff", "Clear next step", "Friendly custom quote"],
+    outcomes: ["No idea gets lost", "Get the right route", "Only pay after review"],
+    icon: Wrench
+  },
   {
     slug: "creator-link-hub",
     category: "Quick Launch",
@@ -297,3 +310,5 @@ export const serviceCategories: ServiceCategory[] = [
   "Discord",
   "Care"
 ];
+
+export const publicServices = services.filter((service) => service.slug !== "custom-request");

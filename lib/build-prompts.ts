@@ -29,6 +29,13 @@ function clean(value?: string | number | null) {
 
 function categoryGuidance(order: OrderRecord) {
   switch (order.serviceCategory) {
+    case "Custom Request":
+      return [
+        "Shape the simplest complete product that solves the customer's real goal.",
+        "Use the customer's plain-English description as the source of truth and make practical assumptions where details are missing.",
+        "Keep the implementation focused, launchable, and easy for a non-technical customer to understand.",
+        "Record important assumptions clearly in the handoff."
+      ];
     case "Quick Launch":
       return [
         "Make the first screen instantly clear and conversion-focused.",

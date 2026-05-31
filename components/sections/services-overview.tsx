@@ -1,4 +1,4 @@
-import { serviceCategories, services, type ServiceCategory } from "@/data/services";
+import { publicServices, serviceCategories, type ServiceCategory } from "@/data/services";
 import { Card } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 
@@ -8,7 +8,8 @@ const categorySummaries: Record<ServiceCategory, string> = {
   "Web Apps": "Build a useful browser tool.",
   "Windows Apps": "Speed up PC tasks.",
   Discord: "Automate your community.",
-  Care: "Keep everything healthy."
+  Care: "Keep everything healthy.",
+  "Custom Request": "Shape something different with us."
 };
 
 export function ServicesOverview() {
@@ -22,7 +23,7 @@ export function ServicesOverview() {
         </Reveal>
         <Stagger className="grid grid-3">
           {serviceCategories.map((category) => {
-            const categoryServices = services.filter((service) => service.category === category);
+            const categoryServices = publicServices.filter((service) => service.category === category);
             const Icon = categoryServices[0]?.icon;
 
             return (

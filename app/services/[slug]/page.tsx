@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusIndicator } from "@/components/ui/status-indicator";
-import { services } from "@/data/services";
+import { publicServices } from "@/data/services";
 import { createMetadata } from "@/lib/seo";
 import { formatPrice } from "@/lib/utils";
 
 export function generateStaticParams() {
-  return services.map((service) => ({ slug: service.slug }));
+  return publicServices.map((service) => ({ slug: service.slug }));
 }
 
 export async function generateMetadata({
@@ -18,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((item) => item.slug === slug);
+  const service = publicServices.find((item) => item.slug === slug);
 
   if (!service) {
     return createMetadata({ title: "Service not found" });
@@ -34,7 +34,7 @@ export async function generateMetadata({
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const service = services.find((item) => item.slug === slug);
+  const service = publicServices.find((item) => item.slug === slug);
 
   if (!service) notFound();
 

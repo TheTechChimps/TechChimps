@@ -210,7 +210,13 @@ export function LiveChatConsole() {
               ) : null}
               <div className="waiting-order-actions">
                 <button onClick={() => joinPaymentChat(order)} type="button">
-                  {order.chatSessionId === activeSession ? "Chat open" : "Join payment chat"}
+                  {order.chatSessionId === activeSession
+                    ? "Chat open"
+                    : order.status === "custom_request_waiting_review"
+                      ? "Join custom request"
+                      : order.status === "offer_waiting_review"
+                        ? "Join offer chat"
+                        : "Join payment chat"}
                 </button>
                 {order.offerMode !== "standard" && order.status === "offer_waiting_review" ? (
                   <>

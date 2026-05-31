@@ -1,5 +1,5 @@
 import { ArrowUpRight, Clock3 } from "lucide-react";
-import { services, serviceCategories } from "@/data/services";
+import { publicServices, serviceCategories } from "@/data/services";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
@@ -20,7 +20,7 @@ export function Pricing() {
             value: category,
             content: (
               <div className="grid grid-3 pricing-grid">
-                {services
+                {publicServices
                   .filter((service) => service.category === category)
                   .map((service) => {
                     const Icon = service.icon;

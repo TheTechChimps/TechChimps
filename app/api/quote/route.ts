@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectOfferToLiveChat, runOrderAutomation } from "@/lib/automation";
+import { connectCustomRequestToLiveChat, connectOfferToLiveChat, runOrderAutomation } from "@/lib/automation";
 import { addInboxMessage, ensureCustomerForOrder } from "@/lib/accounts";
 import { saveBuildPromptForOrder } from "@/lib/build-prompts";
 import { createOrder, parseOfferAmount, type OrderInput } from "@/lib/orders";
@@ -13,16 +13,29 @@ export async function POST(request: Request) {
   }
 
   const isOffer = payload.offerMode && payload.offerMode !== "standard";
+  const isCustomRequest = payload.serviceType === "custom-request";
 
-  if (isOffer && !parseOfferAmount(payload.offerAmount)) {
+  if (isOffer && !isCustomRequest && !parseOfferAmount(payload.offerAmount)) {
     return NextResponse.json({ error: "A custom offer amount is required." }, { status: 400 });
   }
 
-  const order = await createOrder(payload, isOffer ? "offer_waiting_review" : "quote_saved");
+  const order = await createOrder(
+    payload,
+    isCustomRequest ? "custom_request_waiting_review" : isOffer ? "offer_waiting_review" : "quote_saved"
+  );
   await saveBuildPromptForOrder(order);
   const customer = await ensureCustomerForOrder(order);
 
-  if (isOffer) {
+  if (isCustomRequest) {
+    await addInboxMessage({
+      userId: customer.id,
+      author: "Studio support",
+      subject: "Your custom request is in live support",
+      body: `We received your idea. ${liveSupportHandoffMessage} ${liveSupportEtaMessage}`,
+      projectReference: order.reference
+    });
+    await connectCustomRequestToLiveChat(order);
+  } else if (isOffer) {
     await addInboxMessage({
       userId: customer.id,
       author: "Studio support",

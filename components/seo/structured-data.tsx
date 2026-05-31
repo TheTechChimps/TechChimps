@@ -1,4 +1,4 @@
-import { services } from "@/data/services";
+import { publicServices } from "@/data/services";
 
 export function StructuredData() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.com";
@@ -20,7 +20,7 @@ export function StructuredData() {
       "automation services UK",
       "custom software development"
     ],
-    makesOffer: services.map((service) => ({
+    makesOffer: publicServices.map((service) => ({
       "@type": "Offer",
       name: service.name,
       price: service.price,

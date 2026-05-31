@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { services } from "@/data/services";
+import { publicServices } from "@/data/services";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.example";
@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: route === "/request" ? 0.9 : 0.7
     })),
-    ...services.map((service) => ({
+    ...publicServices.map((service) => ({
       url: `${baseUrl}/services/${service.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
