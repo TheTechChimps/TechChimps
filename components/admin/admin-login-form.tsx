@@ -22,12 +22,13 @@ export function AdminLoginForm({ adminEmail = "techchimps@proton.me", configured
       method: "POST"
     });
 
+    const payload = (await response.json().catch(() => ({}))) as { error?: string; requiresPasswordChange?: boolean };
+
     if (response.ok) {
-      window.location.href = "/admin";
+      window.location.href = payload.requiresPasswordChange ? "/admin/change-password" : "/admin";
       return;
     }
 
-    const payload = (await response.json().catch(() => ({}))) as { error?: string };
     setError(payload.error ?? "Admin login failed.");
     setSubmitting(false);
   };

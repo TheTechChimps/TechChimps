@@ -1,7 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import { ADMIN_SESSION_COOKIE, getConfiguredAdminSummary, isAdminConfigured, isAdminCookieAuthenticated } from "@/lib/admin-session";
+import {
+  ADMIN_SESSION_COOKIE,
+  getAdminSessionFromToken,
+  getConfiguredAdminSummary,
+  isAdminConfigured,
+  isAdminCookieAuthenticated
+} from "@/lib/admin-session";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -12,6 +18,12 @@ export const metadata = createMetadata({
 
 export default async function AdminLoginPage() {
   const cookieStore = await cookies();
+  const user = getAdminSessionFromToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+
+  if (user?.passwordChangeRequired) {
+    redirect("/admin/change-password");
+  }
+
   if (isAdminCookieAuthenticated(cookieStore.get(ADMIN_SESSION_COOKIE)?.value)) {
     redirect("/admin");
   }

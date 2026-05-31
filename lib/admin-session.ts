@@ -10,6 +10,7 @@ export type AdminRole = "owner" | "support" | "viewer";
 export type AdminSessionUser = {
   email: string;
   name: string;
+  passwordChangeRequired?: boolean;
   role: AdminRole;
 };
 
@@ -22,6 +23,7 @@ type AdminPayload = {
   exp: number;
   iat: number;
   name: string;
+  passwordChangeRequired?: boolean;
   role: AdminRole | "admin";
 };
 
@@ -128,6 +130,7 @@ export function createAdminSessionToken(user?: AdminSessionUser) {
       exp: issuedAt + SESSION_SECONDS,
       iat: issuedAt,
       name: sessionUser.name,
+      passwordChangeRequired: sessionUser.passwordChangeRequired,
       role: sessionUser.role
     } satisfies AdminPayload)
   );
@@ -178,6 +181,7 @@ export function getAdminSessionFromToken(token?: string | null): AdminSessionUse
     return {
       email: parsed.email || "admin@techchimps.com",
       name: parsed.name || "TechChimps Admin",
+      passwordChangeRequired: Boolean(parsed.passwordChangeRequired),
       role: parsed.role === "admin" ? "owner" : normalizeAdminRole(parsed.role)
     };
   } catch {
@@ -186,7 +190,8 @@ export function getAdminSessionFromToken(token?: string | null): AdminSessionUse
 }
 
 export function verifyAdminSessionToken(token?: string | null) {
-  return Boolean(getAdminSessionFromToken(token));
+  const user = getAdminSessionFromToken(token);
+  return Boolean(user && !user.passwordChangeRequired);
 }
 
 export function getAdminSessionForRequest(request: Request) {
@@ -194,7 +199,8 @@ export function getAdminSessionForRequest(request: Request) {
 }
 
 export function isAdminRequestAuthenticated(request: Request) {
-  return Boolean(getAdminSessionForRequest(request));
+  const user = getAdminSessionForRequest(request);
+  return Boolean(user && !user.passwordChangeRequired);
 }
 
 export function isAdminCookieAuthenticated(cookieValue?: string) {

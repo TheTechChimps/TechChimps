@@ -38,11 +38,16 @@ const adminModules = [
 export default async function AdminPage() {
   const cookieStore = await cookies();
   const adminCookie = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
+  const adminUser = getAdminSessionFromToken(adminCookie);
+
+  if (adminUser?.passwordChangeRequired) {
+    redirect("/admin/change-password");
+  }
+
   if (!isAdminCookieAuthenticated(adminCookie)) {
     redirect("/admin/login");
   }
 
-  const adminUser = getAdminSessionFromToken(adminCookie);
   const integrationStatuses = getIntegrationReadiness();
 
   return (
