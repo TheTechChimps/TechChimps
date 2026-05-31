@@ -11,6 +11,10 @@ import type { LiveChatMessage } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
 import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
+function customerFacingAuthor(author: string) {
+  return author === "Studio support" ? "TechChimps" : author;
+}
+
 export function LiveSupportWidget({
   defaultOpen = false,
   sessionId
@@ -206,7 +210,7 @@ export function LiveSupportWidget({
           <div aria-live="polite" className="chat-thread">
             {messages.map((message) => (
               <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
-                <strong>{message.author}</strong>
+                <strong>{customerFacingAuthor(message.author)}</strong>
                 <MessageText body={message.body} />
                 <time dateTime={message.createdAt}>
                   {new Date(message.createdAt).toLocaleTimeString("en-GB", {

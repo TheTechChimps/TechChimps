@@ -57,6 +57,10 @@ function initials(name: string) {
   );
 }
 
+function customerFacingAuthor(author: string) {
+  return author === "Studio support" ? "TechChimps" : author;
+}
+
 export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { contactEmail?: string }) {
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activeTab, setActiveTab] = useState<PortalTab>("chats");
@@ -235,7 +239,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             <article className={message.readAt ? "inbox-message" : "inbox-message unread"} key={message.id}>
               <div>
                 <strong>{message.subject}</strong>
-                <span>{message.author}</span>
+                <span>{customerFacingAuthor(message.author)}</span>
               </div>
               <MessageText body={message.body} />
               <footer>
@@ -319,7 +323,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             {activeChatThread?.messages.length ? (
               activeChatThread.messages.map((message) => (
                 <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
-                  <strong>{message.author}</strong>
+                  <strong>{customerFacingAuthor(message.author)}</strong>
                   <MessageText body={message.body} />
                   <time dateTime={message.createdAt}>
                     {new Date(message.createdAt).toLocaleString("en-GB", {
@@ -332,7 +336,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             ) : (
               <div className="portal-chat-empty">
                 <MessageCircle aria-hidden size={22} />
-                <p className="helper">No messages yet. Send one below and it goes straight into the TechChimps team inbox.</p>
+                <p className="helper">No messages yet. Send one below and the TechChimps team will see it here.</p>
               </div>
             )}
           </div>

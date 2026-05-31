@@ -39,16 +39,24 @@ function getCopy(pathname: string) {
 export function HelperMonkey() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("techchimps-helper-hidden") === "true";
-  });
+  const [hidden, setHidden] = useState(false);
   const copy = useMemo(() => getCopy(pathname), [pathname]);
 
   useEffect(() => {
-    const isSmallScreen = window.matchMedia("(max-width: 720px)").matches;
-    const timer = window.setTimeout(() => setOpen(!isSmallScreen), 2200);
-    return () => window.clearTimeout(timer);
+    const hiddenTimer = window.setTimeout(() => {
+      setHidden(window.localStorage.getItem("techchimps-helper-hidden") === "true");
+    }, 0);
+
+    const openTimer = window.setTimeout(() => {
+      const dismissed = window.localStorage.getItem("techchimps-helper-hidden") === "true";
+      const isSmallScreen = window.matchMedia("(max-width: 720px)").matches;
+      if (!dismissed) setOpen(!isSmallScreen);
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(hiddenTimer);
+      window.clearTimeout(openTimer);
+    };
   }, []);
 
   if (hidden || pathname.startsWith("/admin") || pathname.startsWith("/checkout")) return null;

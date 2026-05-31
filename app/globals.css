@@ -5507,6 +5507,44 @@ img {
     width: 100%;
   }
 
+  .portal-hero .container,
+  .portal-dashboard-head,
+  .portal-auth-layout,
+  .portal-tab-shell,
+  .portal-tab-panel {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .portal-dashboard-head > div,
+  .portal-auth-layout > div,
+  .portal-tab-panel > *,
+  .portal-chat-card,
+  .portal-chat-panel,
+  .portal-account-card,
+  .portal-inbox-card,
+  .portal-orders-card {
+    max-width: min(100%, 22.5rem);
+    width: 100%;
+  }
+
+  .portal-actions,
+  .portal-trust-list,
+  .portal-nav-row {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .portal-nav-row a,
+  .portal-nav-row button {
+    flex-basis: 100%;
+  }
+
+  .portal-card-top {
+    justify-items: center;
+    width: 100%;
+  }
+
   .portal-chat-list {
     max-height: none;
     padding-right: 0;
@@ -5522,10 +5560,37 @@ img {
     justify-content: center;
   }
 
+  .portal-chat-list .support-conversation,
+  .imessage-list .support-conversation {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .portal-chat-list .conversation-avatar {
+    justify-self: center;
+  }
+
+  .portal-chat-list .conversation-main,
+  .portal-chat-list .conversation-meta {
+    justify-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .portal-chat-list .conversation-main small,
+  .portal-chat-list .conversation-meta small {
+    max-width: 100%;
+    text-align: center;
+  }
+
   .portal-chat-thread {
     max-height: 22rem;
     min-height: 14rem;
     width: 100%;
+  }
+
+  .portal-chat-thread .chat-bubble {
+    text-align: left;
   }
 
   .imessage-grid {
