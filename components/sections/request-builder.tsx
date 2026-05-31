@@ -395,7 +395,6 @@ export function RequestBuilder() {
     form.budget,
     form.timeline,
     selectedDeliverySpeed,
-    form.completionDate,
     form.goals.length > 12 ? form.goals : "",
     ...requiredQuestionAnswers,
     form.contactName,
@@ -408,12 +407,20 @@ export function RequestBuilder() {
   const activeStepIndex = Math.max(0, intakeSteps.findIndex((step) => step.id === activeStep));
   const serviceStepReady = form.goals.trim().length > 12;
   const briefStepReady = answeredRequiredQuestionCount >= requiredQuestionCount;
-  const timingStepReady = Boolean(form.budget && form.timeline && selectedDeliverySpeed && form.completionDate);
+  const timingStepReady = Boolean(form.budget && form.timeline && selectedDeliverySpeed);
   const contactStepReady =
     form.contactName.trim().length > 1 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) &&
     (!isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0 && form.offerReason.trim().length > 10));
   const currentQuestionReady = !currentQuestion || currentQuestion.required === false || currentQuestionAnswer.length >= 3;
+  const finishHelp =
+    form.contactName.trim().length <= 1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
+      ? "Add your name and email, then we can open checkout or review your offer."
+      : isOffer && (!Number.isFinite(offeredAmount) || offeredAmount <= 0)
+        ? "Add the amount you would like to offer so we can review it fairly."
+        : isOffer && form.offerReason.trim().length <= 10
+          ? "Add a short reason for your offer so we understand what you need."
+          : "Everything needed is ready. We will connect you to live support after this step.";
   const canContinue =
     activeStep === "service"
       ? serviceStepReady
@@ -681,7 +688,7 @@ export function RequestBuilder() {
                       const answered = getServiceAnswer(question).trim().length > 0;
                       return (
                         <button
-                          aria-label={`${question.label}${answered ? ", answered" : ""}`}
+                          aria-label={`Go to question ${index + 1}: ${question.label}${answered ? ", answered" : ""}`}
                           className={`${index === currentQuestionIndex ? "active" : ""} ${answered ? "answered" : ""}`}
                           key={question.id}
                           onClick={() => setActiveQuestionIndex(index)}
@@ -772,7 +779,7 @@ export function RequestBuilder() {
                   type="date"
                   value={form.completionDate}
                 />
-                <span className="helper">We confirm the date before work starts.</span>
+                <span className="helper">Optional. Pick a date if you have one; we confirm timing before work starts.</span>
               </label>
             </div>
                 </div>
@@ -791,34 +798,30 @@ export function RequestBuilder() {
             <fieldset className="offer-panel">
               <legend>Checkout or offer</legend>
               <div className="offer-options" aria-label="Checkout or offer type">
-                <label className={form.offerMode === "standard" ? "offer-option active" : "offer-option"}>
-                  <input
-                    checked={form.offerMode === "standard"}
-                    name="offerMode"
-                    onChange={() => update("offerMode", "standard")}
-                    type="radio"
-                    value="standard"
-                  />
+                <button
+                  aria-pressed={form.offerMode === "standard"}
+                  className={form.offerMode === "standard" ? "offer-option active" : "offer-option"}
+                  onClick={() => update("offerMode", "standard")}
+                  type="button"
+                >
                   <CreditCard aria-hidden size={18} />
                   <span>
                     Pay securely
                     <small>Go straight to Stripe Checkout</small>
                   </span>
-                </label>
-                <label className={form.offerMode !== "standard" ? "offer-option active" : "offer-option"}>
-                  <input
-                    checked={form.offerMode !== "standard"}
-                    name="offerMode"
-                    onChange={() => update("offerMode", "custom")}
-                    type="radio"
-                    value="custom"
-                  />
+                </button>
+                <button
+                  aria-pressed={form.offerMode !== "standard"}
+                  className={form.offerMode !== "standard" ? "offer-option active" : "offer-option"}
+                  onClick={() => update("offerMode", "custom")}
+                  type="button"
+                >
                   <HandCoins aria-hidden size={18} />
                   <span>
                     Make an offer
                     <small>Custom or discounted request</small>
                   </span>
-                </label>
+                </button>
               </div>
 
               {isOffer ? (
@@ -897,6 +900,10 @@ export function RequestBuilder() {
               </span>
               <input aria-label="Upload project examples" multiple onChange={(event) => updateFiles(event.target.files)} type="file" />
             </label>
+
+                  <p aria-live="polite" className="finish-help">
+                    {finishHelp}
+                  </p>
 
                   <div className="handoff-note">
                     <Lightbulb aria-hidden size={20} />
