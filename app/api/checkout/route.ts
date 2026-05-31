@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { addInboxMessage, ensureCustomerForOrder } from "@/lib/accounts";
 import { saveBuildPromptForOrder } from "@/lib/build-prompts";
 import { createHostedCheckoutSession } from "@/lib/checkout";
-import { createOrder, saveOrder, type OrderInput } from "@/lib/orders";
+import { createOrder, findActiveCustomerTicket, saveOrder, type OrderInput } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,18 @@ export async function POST(request: Request) {
 
   if (payload.offerMode && payload.offerMode !== "standard") {
     return NextResponse.json({ error: "Custom and discounted offers need review before payment." }, { status: 400 });
+  }
+
+  const activeTicket = await findActiveCustomerTicket(payload.contactEmail);
+  if (activeTicket) {
+    return NextResponse.json({
+      chatSessionId: activeTicket.chatSessionId,
+      duplicateOpenTicket: true,
+      message:
+        "You already have an open TechChimps ticket, so we opened that live chat instead of creating a duplicate.",
+      reference: activeTicket.reference,
+      status: activeTicket.status
+    });
   }
 
   const stripe = getStripe();

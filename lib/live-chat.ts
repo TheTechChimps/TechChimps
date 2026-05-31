@@ -153,3 +153,9 @@ export async function deleteLiveChatSessions(sessionIds: string[]) {
   await writeJson(CHAT_STORE, CHAT_KEY, nextMessages);
   return messages.length - nextMessages.length;
 }
+
+export async function deleteAllLiveChatMessages() {
+  const messages = (await readJson<LiveChatMessage[]>(CHAT_STORE, CHAT_KEY)) ?? [];
+  await writeJson(CHAT_STORE, CHAT_KEY, []);
+  return messages.length;
+}

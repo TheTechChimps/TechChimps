@@ -363,6 +363,7 @@ export function RequestBuilder() {
   const [reference, setReference] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [handoffNotice, setHandoffNotice] = useState("");
   const [activeStep, setActiveStep] = useState<IntakeStepId>("service");
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [handoffSessionId, setHandoffSessionId] = useState("");
@@ -530,6 +531,7 @@ export function RequestBuilder() {
     if (!canSubmit) return;
 
     setStatus("saving");
+    setHandoffNotice("");
     const uploadResult = await uploadProjectFiles(uploadBatchId, selectedFiles);
 
     if (!uploadResult.ok) {
@@ -571,6 +573,19 @@ export function RequestBuilder() {
     if (result.ok && result.data) {
       setReference(result.data.reference);
       setHandoffSessionId(result.data.chatSessionId);
+      if (result.data.duplicateOpenTicket) {
+        setStatus("sent");
+        setModalMessage(
+          result.data.message ??
+            "You already have an open TechChimps ticket, so we opened that live chat instead of creating a duplicate."
+        );
+        setHandoffNotice(
+          result.data.message ??
+            "You already have an open TechChimps ticket, so we opened that live chat instead of creating a duplicate."
+        );
+        setModalOpen(true);
+        return;
+      }
       if (!needsReview && "url" in result.data && result.data.url) {
         setStatus("redirecting");
         window.location.assign(result.data.url);
@@ -1074,7 +1089,16 @@ export function RequestBuilder() {
           </p>
         </div>
       </Modal>
-      {handoffSessionId ? <LiveSupportWidget defaultOpen sessionId={handoffSessionId} /> : null}
+      {handoffNotice ? (
+        <div className="container">
+          <div className="ticket-redirect-notice" role="status">
+            <MessageCircle aria-hidden size={18} />
+            <span>{handoffNotice}</span>
+          </div>
+        </div>
+      ) : null}
+
+      <LiveSupportWidget defaultOpen={Boolean(handoffSessionId)} sessionId={handoffSessionId || undefined} />
     </section>
   );
 }

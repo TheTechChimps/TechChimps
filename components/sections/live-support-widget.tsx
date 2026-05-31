@@ -39,6 +39,16 @@ export function LiveSupportWidget({
   const loadedOnceRef = useRef(false);
   const latestAgentMessageIdRef = useRef("");
 
+  useEffect(() => {
+    if (!defaultOpen) return;
+    const openTimer = window.setTimeout(() => {
+      setOpen(true);
+      setMinimized(false);
+    }, 0);
+
+    return () => window.clearTimeout(openTimer);
+  }, [defaultOpen, sessionId]);
+
   const loadMessages = useCallback(async () => {
     if (!activeSessionId) return;
     const response = await fetch(`/api/live-chat?sessionId=${encodeURIComponent(activeSessionId)}`, { cache: "no-store" });
@@ -63,6 +73,7 @@ export function LiveSupportWidget({
   useEffect(() => {
     const update = window.setTimeout(() => {
       if (sessionId) {
+        window.localStorage.setItem("techchimps-live-chat-session", sessionId);
         setActiveSessionId(sessionId);
         return;
       }

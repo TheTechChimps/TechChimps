@@ -1,4 +1,3 @@
-import { LiveSupportWidget } from "@/components/sections/live-support-widget";
 import { RequestBuilder } from "@/components/sections/request-builder";
 import { createMetadata } from "@/lib/seo";
 
@@ -13,7 +12,6 @@ export default function RequestPage() {
   return (
     <main>
       <RequestBuilder />
-      <LiveSupportWidget />
     </main>
   );
 }

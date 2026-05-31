@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Loader2, MessageSquareReply, Send, Volume2, VolumeX, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, MessageSquareReply, Search, Send, Volume2, VolumeX, XCircle } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,54 @@ import { StatusIndicator } from "@/components/ui/status-indicator";
 import type { LiveChatMessage, LiveChatSessionSummary } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
 import type { OrderRecord } from "@/lib/orders";
+
+type ConversationFilter = "all" | "custom" | "general" | "offers" | "paid" | "waiting";
+
+type ConversationRow = {
+  category: ConversationFilter;
+  customerName: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  messageCount: number;
+  order?: OrderRecord;
+  priority: LiveChatSessionSummary["priority"];
+  reference: string;
+  serviceName: string;
+  sessionId: string;
+  unreadVisitorMessages: number;
+};
+
+function humanStatus(value: string) {
+  return value.replaceAll("_", " ");
+}
+
+function categoryFor(order: OrderRecord | undefined, session: LiveChatSessionSummary | undefined): ConversationFilter {
+  if (order?.status === "custom_request_waiting_review") return "custom";
+  if (order?.status === "offer_waiting_review") return "offers";
+  if (order?.status === "paid_waiting_support" || session?.priority === "payment") return "paid";
+  if (session?.unreadVisitorMessages || session?.priority === "waiting") return "waiting";
+  return "general";
+}
+
+function categoryLabel(category: ConversationFilter) {
+  return {
+    all: "All",
+    custom: "Custom",
+    general: "General",
+    offers: "Offers",
+    paid: "Paid",
+    waiting: "Waiting"
+  }[category];
+}
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "TC";
+}
 
 export function LiveChatConsole() {
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
@@ -20,6 +68,8 @@ export function LiveChatConsole() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [reviewingReference, setReviewingReference] = useState("");
   const [reviewNotice, setReviewNotice] = useState("");
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<ConversationFilter>("all");
   const activeChatRef = useRef<HTMLDivElement>(null);
   const loadedOnceRef = useRef(false);
   const lastVisitorSignalRef = useRef("");
@@ -29,6 +79,9 @@ export function LiveChatConsole() {
       fetch("/api/live-chat", { cache: "no-store" }),
       fetch("/api/orders?waiting=true", { cache: "no-store" })
     ]);
+    let nextSessions: LiveChatSessionSummary[] = [];
+    let nextOrders: OrderRecord[] = [];
+
     if (chatResponse.ok) {
       const data = (await chatResponse.json()) as { messages: LiveChatMessage[]; sessions: LiveChatSessionSummary[] };
       const latestVisitorMessage = [...data.messages].reverse().find((message) => message.role === "visitor");
@@ -37,9 +90,7 @@ export function LiveChatConsole() {
         .map((session) => `${session.sessionId}:${session.lastMessageAt}:${session.messageCount}`)
         .sort()
         .join("|");
-      const alertSignal = latestVisitorMessage
-        ? `${latestVisitorMessage.id}:${latestWaitingSignal}`
-        : latestWaitingSignal;
+      const alertSignal = latestVisitorMessage ? `${latestVisitorMessage.id}:${latestWaitingSignal}` : latestWaitingSignal;
 
       if (soundEnabled && loadedOnceRef.current && alertSignal && alertSignal !== lastVisitorSignalRef.current) {
         void playGentleChimpChime();
@@ -47,14 +98,18 @@ export function LiveChatConsole() {
 
       if (alertSignal) lastVisitorSignalRef.current = alertSignal;
       loadedOnceRef.current = true;
+      nextSessions = data.sessions;
       setMessages(data.messages);
       setSessions(data.sessions);
-      setActiveSession((current) => current || data.sessions[0]?.sessionId || "");
     }
+
     if (orderResponse.ok) {
       const data = (await orderResponse.json()) as { orders: OrderRecord[] };
+      nextOrders = data.orders;
       setWaitingOrders(data.orders);
     }
+
+    setActiveSession((current) => current || nextSessions[0]?.sessionId || nextOrders[0]?.chatSessionId || "");
   }, [soundEnabled]);
 
   useEffect(() => {
@@ -71,36 +126,74 @@ export function LiveChatConsole() {
     };
   }, [loadMessages]);
 
+  const conversationRows = useMemo(() => {
+    const orderMap = new Map(waitingOrders.map((order) => [order.chatSessionId, order]));
+    const rows = sessions.map((session): ConversationRow => {
+      const order = orderMap.get(session.sessionId);
+      const category = categoryFor(order, session);
+
+      return {
+        category,
+        customerName: order?.contactName || session.customerName,
+        lastMessage: session.lastMessage,
+        lastMessageAt: session.lastMessageAt,
+        messageCount: session.messageCount,
+        order,
+        priority: session.priority,
+        reference: order?.reference || session.sessionId.replace(/^order-/, "").toUpperCase(),
+        serviceName: order?.serviceName || (category === "general" ? "General support" : categoryLabel(category)),
+        sessionId: session.sessionId,
+        unreadVisitorMessages: session.unreadVisitorMessages
+      };
+    });
+
+    for (const order of waitingOrders) {
+      if (rows.some((row) => row.sessionId === order.chatSessionId)) continue;
+      rows.push({
+        category: categoryFor(order, undefined),
+        customerName: order.contactName || "Customer",
+        lastMessage: order.goals || order.offerReason || "Waiting for support.",
+        lastMessageAt: order.updatedAt,
+        messageCount: 0,
+        order,
+        priority: "waiting",
+        reference: order.reference,
+        serviceName: order.serviceName,
+        sessionId: order.chatSessionId,
+        unreadVisitorMessages: 1
+      });
+    }
+
+    return rows.sort((a, b) => {
+      const priorityScore = (row: ConversationRow) =>
+        row.priority === "payment" ? 0 : row.unreadVisitorMessages || row.priority === "waiting" ? 1 : 2;
+      const priorityDiff = priorityScore(a) - priorityScore(b);
+      if (priorityDiff) return priorityDiff;
+      return b.lastMessageAt.localeCompare(a.lastMessageAt);
+    });
+  }, [sessions, waitingOrders]);
+
+  const filteredRows = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return conversationRows.filter((row) => {
+      const matchesFilter = filter === "all" || row.category === filter || (filter === "waiting" && row.unreadVisitorMessages > 0);
+      const searchable = `${row.customerName} ${row.serviceName} ${row.reference} ${row.lastMessage}`.toLowerCase();
+      return matchesFilter && (!normalizedQuery || searchable.includes(normalizedQuery));
+    });
+  }, [conversationRows, filter, query]);
+
   const activeMessages = useMemo(
     () => (activeSession ? messages.filter((message) => message.sessionId === activeSession) : []),
     [activeSession, messages]
   );
-  const activeWaitingOrder = waitingOrders.find((order) => order.chatSessionId === activeSession);
-  const activeSessionSummary =
-    sessions.find((session) => session.sessionId === activeSession) ??
-    (activeWaitingOrder
-      ? {
-          customerName: activeWaitingOrder.contactName || "Customer",
-          lastMessage: `${activeWaitingOrder.serviceName} - ${activeWaitingOrder.reference}`,
-          lastMessageAt: activeWaitingOrder.updatedAt,
-          messageCount: activeMessages.length,
-          priority: "waiting" as const,
-          sessionId: activeWaitingOrder.chatSessionId,
-          unreadVisitorMessages: 1
-        }
-      : null);
-  const waitingChatCount = useMemo(() => {
-    const waitingSessionIds = new Set<string>();
-    waitingOrders.forEach((order) => waitingSessionIds.add(order.chatSessionId));
-    sessions
-      .filter((session) => session.unreadVisitorMessages || session.priority !== "normal")
-      .forEach((session) => waitingSessionIds.add(session.sessionId));
-    return waitingSessionIds.size;
-  }, [sessions, waitingOrders]);
+  const activeRow = conversationRows.find((row) => row.sessionId === activeSession) ?? null;
+  const activeWaitingOrder = activeRow?.order ?? waitingOrders.find((order) => order.chatSessionId === activeSession);
+  const waitingChatCount = conversationRows.filter((row) => row.unreadVisitorMessages || row.priority !== "normal").length;
+  const filters: ConversationFilter[] = ["all", "waiting", "custom", "offers", "paid", "general"];
 
-  const joinPaymentChat = (order: OrderRecord) => {
+  const openConversation = (sessionId: string) => {
     void primeNotificationSound();
-    setActiveSession(order.chatSessionId);
+    setActiveSession(sessionId);
     window.requestAnimationFrame(() => {
       activeChatRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -126,12 +219,12 @@ export function LiveChatConsole() {
       },
       method: "POST"
     });
-    const data = (await response.json().catch(() => ({}))) as { error?: string; url?: string };
+    const data = (await response.json().catch(() => ({}))) as { error?: string };
 
     if (response.ok) {
       setReviewNotice(
         action === "accept"
-          ? "Offer accepted. The secure Stripe payment link is now in the customer's live chat and portal inbox."
+          ? "Offer accepted. The secure Stripe payment link is now in the customer's live chat and account inbox."
           : "Offer declined. The customer has received a friendly live chat reply."
       );
       await loadMessages();
@@ -168,22 +261,15 @@ export function LiveChatConsole() {
   };
 
   return (
-    <Card className="live-chat-console">
+    <Card className="live-chat-console imessage-console">
       <div className="chat-console-header">
         <div>
           <span className="eyebrow">
-            <MessageSquareReply size={15} /> Live support inbox
+            <MessageSquareReply size={15} /> Live messages
           </span>
-          <h2>Reply to website visitors in real time.</h2>
+          <h2>One clean inbox for customer chats.</h2>
         </div>
-        <StatusIndicator
-          label={
-            waitingChatCount
-              ? `${waitingChatCount} waiting`
-              : `${sessions.length} open chats`
-          }
-          tone={waitingChatCount ? "warning" : "active"}
-        />
+        <StatusIndicator label={waitingChatCount ? `${waitingChatCount} need reply` : `${conversationRows.length} conversations`} tone={waitingChatCount ? "warning" : "active"} />
         <button
           aria-label={soundEnabled ? "Turn admin chat sound off" : "Turn admin chat sound on"}
           className="icon-button"
@@ -197,135 +283,150 @@ export function LiveChatConsole() {
         </button>
       </div>
 
-      {waitingOrders.length ? (
-        <div className="waiting-orders" aria-live="polite">
-          {waitingOrders.slice(0, 3).map((order) => (
-            <div className={order.chatSessionId === activeSession ? "active" : ""} key={order.reference}>
-              <strong>{order.contactName || "Customer"} is waiting</strong>
-              <span>
-                {order.serviceName} - {order.reference}
-              </span>
-              {order.offerMode !== "standard" && order.status === "offer_waiting_review" ? (
-                <span className="waiting-offer-amount">Offer: £{order.amount.toFixed(2)}</span>
-              ) : null}
-              <div className="waiting-order-actions">
-                <button onClick={() => joinPaymentChat(order)} type="button">
-                  {order.chatSessionId === activeSession
-                    ? "Chat open"
-                    : order.status === "custom_request_waiting_review"
-                      ? "Join custom request"
-                      : order.status === "offer_waiting_review"
-                        ? "Join offer chat"
-                        : "Join payment chat"}
-                </button>
-                {order.offerMode !== "standard" && order.status === "offer_waiting_review" ? (
-                  <>
-                    <button
-                      className="offer-accept"
-                      disabled={reviewingReference === order.reference}
-                      onClick={() => void reviewOffer(order, "accept")}
-                      type="button"
-                    >
-                      <CheckCircle2 aria-hidden size={15} />
-                      Accept
-                    </button>
-                    <button
-                      className="offer-decline"
-                      disabled={reviewingReference === order.reference}
-                      onClick={() => void reviewOffer(order, "decline")}
-                      type="button"
-                    >
-                      <XCircle aria-hidden size={15} />
-                      Decline
-                    </button>
-                  </>
-                ) : null}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
       {reviewNotice ? <p className="support-notice">{reviewNotice}</p> : null}
 
-      <div className="support-session-grid">
-        <div className="support-session-list" aria-label="Live support queue">
-          {sessions.length ? (
-            sessions.map((session) => (
-              <button
-                className={session.sessionId === activeSession ? "active" : ""}
-                key={session.sessionId}
-                onClick={() => {
-                  void primeNotificationSound();
-                  setActiveSession(session.sessionId);
-                }}
-                type="button"
-              >
-                <span>
-                  <strong>{session.customerName}</strong>
-                  <small>{session.lastMessage}</small>
-                </span>
-                <StatusIndicator
-                  label={session.priority === "payment" ? "Paid" : session.unreadVisitorMessages ? "Waiting" : "Open"}
-                  tone={session.priority === "payment" || session.unreadVisitorMessages ? "warning" : "active"}
-                />
-              </button>
-            ))
-          ) : (
-            <p className="helper">No active chats yet. New visitors and paid customers will appear here automatically.</p>
-          )}
-        </div>
-
-        <div className="support-active-chat" ref={activeChatRef}>
-          <div className="portal-card-top">
-            <span className="eyebrow">
-              {activeSessionSummary ? activeSessionSummary.customerName : "No chat selected"}
+      <div className="support-session-grid imessage-grid">
+        <aside className="support-conversation-sidebar" aria-label="Conversation list">
+          <label className="search-field support-search">
+            <span className="label">Find a chat</span>
+            <span>
+              <Search aria-hidden size={16} />
+              <input
+                className="input"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Name, service, reference..."
+                value={query}
+              />
             </span>
-            {activeSessionSummary ? (
+          </label>
+
+          <div className="support-filter-bar" aria-label="Conversation filters">
+            {filters.map((item) => (
+              <button className={filter === item ? "active" : ""} key={item} onClick={() => setFilter(item)} type="button">
+                {categoryLabel(item)}
+              </button>
+            ))}
+          </div>
+
+          <div className="support-session-list imessage-list">
+            {filteredRows.length ? (
+              filteredRows.map((row) => (
+                <button
+                  className={row.sessionId === activeSession ? "active support-conversation" : "support-conversation"}
+                  key={row.sessionId}
+                  onClick={() => openConversation(row.sessionId)}
+                  type="button"
+                >
+                  <span className="conversation-avatar">{initials(row.customerName)}</span>
+                  <span className="conversation-main">
+                    <strong>{row.customerName}</strong>
+                    <small>{row.serviceName}</small>
+                    <small>{row.lastMessage}</small>
+                  </span>
+                  <span className="conversation-meta">
+                    <small>{row.reference}</small>
+                    <StatusIndicator
+                      label={row.priority === "payment" ? "Paid" : row.unreadVisitorMessages ? "Reply" : categoryLabel(row.category)}
+                      tone={row.priority === "payment" || row.unreadVisitorMessages ? "warning" : "active"}
+                    />
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="helper">No matching chats. New visitors and customers appear here automatically.</p>
+            )}
+          </div>
+        </aside>
+
+        <div className="support-active-chat imessage-active" ref={activeChatRef}>
+          <div className="portal-card-top imessage-chat-head">
+            <div>
+              <span className="eyebrow">{activeRow ? categoryLabel(activeRow.category) : "No chat selected"}</span>
+              <h3>{activeRow?.customerName ?? "Choose a conversation"}</h3>
+              {activeRow ? (
+                <p>
+                  {activeRow.serviceName} {activeRow.reference ? `- ${activeRow.reference}` : ""}
+                </p>
+              ) : null}
+            </div>
+            {activeRow ? (
               <StatusIndicator
-                label={activeSessionSummary.priority === "payment" ? "Payment handoff" : "Live queue"}
-                tone={activeSessionSummary.priority === "payment" ? "warning" : "active"}
+                label={activeRow.priority === "payment" ? "Payment handoff" : activeRow.unreadVisitorMessages ? "Needs reply" : "Open"}
+                tone={activeRow.priority === "payment" || activeRow.unreadVisitorMessages ? "warning" : "active"}
               />
             ) : null}
           </div>
 
-      <div aria-live="polite" className="chat-thread admin-chat-thread">
-        {activeMessages.length ? (
-          activeMessages.map((message) => (
-            <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
-              <strong>{message.author}</strong>
-              <MessageText body={message.body} />
-              <time dateTime={message.createdAt}>
-                {new Date(message.createdAt).toLocaleTimeString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })}
-              </time>
+          {activeWaitingOrder ? (
+            <div className="active-ticket-card">
+              <div>
+                <strong>{activeWaitingOrder.serviceName}</strong>
+                <span>{humanStatus(activeWaitingOrder.status)}</span>
+              </div>
+              {activeWaitingOrder.offerMode !== "standard" && activeWaitingOrder.status === "offer_waiting_review" ? (
+                <div className="waiting-order-actions">
+                  <span className="waiting-offer-amount">Offer: GBP {activeWaitingOrder.amount.toFixed(2)}</span>
+                  <button
+                    className="offer-accept"
+                    disabled={reviewingReference === activeWaitingOrder.reference}
+                    onClick={() => void reviewOffer(activeWaitingOrder, "accept")}
+                    type="button"
+                  >
+                    <CheckCircle2 aria-hidden size={15} />
+                    Accept
+                  </button>
+                  <button
+                    className="offer-decline"
+                    disabled={reviewingReference === activeWaitingOrder.reference}
+                    onClick={() => void reviewOffer(activeWaitingOrder, "decline")}
+                    type="button"
+                  >
+                    <XCircle aria-hidden size={15} />
+                    Decline
+                  </button>
+                </div>
+              ) : null}
             </div>
-          ))
-        ) : (
-          <p className="helper">
-            {activeWaitingOrder
-              ? `${activeWaitingOrder.contactName || "Customer"} is waiting. Send a reply below to join this live support thread.`
-              : "Select a chat from the queue to join it."}
-          </p>
-        )}
-      </div>
+          ) : null}
 
-      <form className="chat-form" onSubmit={sendReply}>
-        <label className="field">
-          <span className="label">Admin reply</span>
-          <textarea
-            aria-label="Admin live chat reply"
-            className="textarea chat-textarea"
-            onChange={(event) => setReply(event.target.value)}
-            placeholder="Type your reply to the visitor..."
-            value={reply}
-          />
-        </label>
-        <Button disabled={sending || !reply.trim() || !activeSession} icon={sending ? Loader2 : Send} type="submit">
-          {sending ? "Sending reply" : "Send reply"}
-        </Button>
-      </form>
+          <div aria-live="polite" className="chat-thread admin-chat-thread imessage-thread">
+            {activeMessages.length ? (
+              activeMessages.map((message) => (
+                <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
+                  <strong>{message.author}</strong>
+                  <MessageText body={message.body} />
+                  <time dateTime={message.createdAt}>
+                    {new Date(message.createdAt).toLocaleTimeString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </time>
+                </div>
+              ))
+            ) : (
+              <p className="helper">
+                {activeWaitingOrder
+                  ? `${activeWaitingOrder.contactName || "Customer"} is waiting. Send a reply below to join this live support thread.`
+                  : "Select a chat from the list to join it."}
+              </p>
+            )}
+          </div>
+
+          <form className="chat-form imessage-compose" onSubmit={sendReply}>
+            <label className="field">
+              <span className="label">Reply</span>
+              <textarea
+                aria-label="Admin live chat reply"
+                className="textarea chat-textarea"
+                onChange={(event) => setReply(event.target.value)}
+                placeholder="Type your reply..."
+                value={reply}
+              />
+            </label>
+            <Button disabled={sending || !reply.trim() || !activeSession} icon={sending ? Loader2 : Send} type="submit">
+              {sending ? "Sending" : "Send"}
+            </Button>
+          </form>
         </div>
       </div>
     </Card>

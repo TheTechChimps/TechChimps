@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { adminUnauthorized, isAdminRequestAuthenticated } from "@/lib/admin-session";
 import {
   appendLiveChatMessage,
+  deleteAllLiveChatMessages,
   getLiveChatMessages,
   getLiveChatSessions,
   isVisibleLiveChatMessage,
   type LiveChatRole
 } from "@/lib/live-chat";
+import { archiveWaitingOrders } from "@/lib/orders";
 
 export const dynamic = "force-dynamic";
 
@@ -49,4 +51,21 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ message });
+}
+
+export async function DELETE(request: Request) {
+  if (!isAdminRequestAuthenticated(request)) {
+    return adminUnauthorized();
+  }
+
+  const { searchParams } = new URL(request.url);
+  const archiveTickets = searchParams.get("archiveTickets") === "true";
+  const deletedMessages = await deleteAllLiveChatMessages();
+  const archivedTickets = archiveTickets ? await archiveWaitingOrders() : 0;
+
+  return NextResponse.json({
+    archivedTickets,
+    deletedMessages,
+    ok: true
+  });
 }

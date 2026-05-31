@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectCustomRequestToLiveChat, connectOfferToLiveChat, runOrderAutomation } from "@/lib/automation";
 import { addInboxMessage, ensureCustomerForOrder } from "@/lib/accounts";
 import { saveBuildPromptForOrder } from "@/lib/build-prompts";
-import { createOrder, parseOfferAmount, type OrderInput } from "@/lib/orders";
+import { createOrder, findActiveCustomerTicket, parseOfferAmount, type OrderInput } from "@/lib/orders";
 import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
 export async function POST(request: Request) {
@@ -17,6 +17,21 @@ export async function POST(request: Request) {
 
   if (isOffer && !isCustomRequest && !parseOfferAmount(payload.offerAmount)) {
     return NextResponse.json({ error: "A custom offer amount is required." }, { status: 400 });
+  }
+
+  if (isCustomRequest || isOffer) {
+    const activeTicket = await findActiveCustomerTicket(payload.contactEmail);
+
+    if (activeTicket) {
+      return NextResponse.json({
+        chatSessionId: activeTicket.chatSessionId,
+        duplicateOpenTicket: true,
+        message:
+          "You already have an open TechChimps ticket, so we opened that live chat instead of creating a duplicate.",
+        reference: activeTicket.reference,
+        status: activeTicket.status
+      });
+    }
   }
 
   const order = await createOrder(

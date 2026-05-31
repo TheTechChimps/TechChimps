@@ -46,6 +46,17 @@ type PortalData = {
 type AuthMode = "login" | "register";
 type PortalTab = "chats" | "orders" | "inbox" | "account";
 
+function initials(name: string) {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "TC"
+  );
+}
+
 export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { contactEmail?: string }) {
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activeTab, setActiveTab] = useState<PortalTab>("chats");
@@ -256,7 +267,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
   );
 
   const renderChats = () => (
-    <Card className="portal-chat-card">
+    <Card className="portal-chat-card imessage-console">
       <div className="portal-card-top">
         <div>
           <span className="eyebrow">
@@ -267,27 +278,28 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
         <StatusIndicator label={`${data?.chatThreads.length ?? 0} active`} tone="active" />
       </div>
 
-      <div className="portal-chat-layout">
-        <div className="portal-chat-list" aria-label="Your chat threads">
+      <div className="portal-chat-layout imessage-grid">
+        <div className="portal-chat-list imessage-list" aria-label="Your chat threads">
           {data?.chatThreads.map((thread) => (
             <button
               aria-pressed={activeChatThread?.sessionId === thread.sessionId}
-              className={activeChatThread?.sessionId === thread.sessionId ? "active" : ""}
+              className={activeChatThread?.sessionId === thread.sessionId ? "active support-conversation" : "support-conversation"}
               key={thread.sessionId}
               onClick={() => openOrderChat(thread.sessionId)}
               type="button"
             >
-              <span>
+              <span className="conversation-avatar">{initials(thread.label)}</span>
+              <span className="conversation-main">
                 <strong>{thread.label}</strong>
                 <small>{thread.kind === "order" ? thread.orderReference : "Support"}</small>
+                <small>{thread.lastMessage}</small>
               </span>
-              <small>{thread.lastMessage}</small>
             </button>
           ))}
         </div>
 
-        <div className="portal-chat-panel">
-          <div className="portal-card-top">
+        <div className="portal-chat-panel imessage-active">
+          <div className="portal-card-top imessage-chat-head">
             <div>
               <strong>{activeChatThread?.label ?? "General support"}</strong>
               {activeChatThread?.lastMessageAt ? (

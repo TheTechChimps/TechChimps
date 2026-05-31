@@ -37,12 +37,16 @@ export type ApiResult<T> = {
 
 export type QuoteResponse = {
   chatSessionId: string;
+  duplicateOpenTicket?: boolean;
+  message?: string;
   reference: string;
   status: string;
 };
 
 export type CheckoutResponse = {
   chatSessionId: string;
+  duplicateOpenTicket?: boolean;
+  message?: string;
   reference: string;
   sessionId?: string;
   setupRequired?: boolean;

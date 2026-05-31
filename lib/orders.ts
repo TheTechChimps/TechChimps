@@ -291,3 +291,30 @@ export async function getWaitingOrders() {
       order.status === "custom_request_waiting_review"
   );
 }
+
+export async function findActiveCustomerTicket(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) return null;
+
+  const orders = await getWaitingOrders();
+  return (
+    orders.find((order) => order.contactEmail.trim().toLowerCase() === normalizedEmail) ?? null
+  );
+}
+
+export async function archiveWaitingOrders() {
+  const waitingOrders = await getWaitingOrders();
+  const now = new Date().toISOString();
+
+  await Promise.all(
+    waitingOrders.map((order) =>
+      updateOrder(order.reference, (current) => ({
+        ...current,
+        chatConnectedAt: current.chatConnectedAt ?? now,
+        status: "support_connected"
+      }))
+    )
+  );
+
+  return waitingOrders.length;
+}
