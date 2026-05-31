@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CheckCircle2,
   FileText,
   Inbox,
   KeyRound,
@@ -450,13 +449,13 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             </p>
             <div className="portal-trust-list">
               <span>
-                <ShieldCheck aria-hidden size={18} /> Stays signed in
+                <MessageCircle aria-hidden size={18} /> Continue chats
               </span>
               <span>
-                <MessageCircle aria-hidden size={18} /> Previous chats
+                <FileText aria-hidden size={18} /> Track requests
               </span>
               <span>
-                <CheckCircle2 aria-hidden size={18} /> Orders linked by email
+                <ReceiptText aria-hidden size={18} /> Receipts & updates
               </span>
             </div>
           </div>
@@ -526,7 +525,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             <button className="text-button" onClick={() => setAuthMode(authMode === "login" ? "register" : "login")} type="button">
               {authMode === "login" ? "Create or claim an account" : "Already have a password? Log in"}
             </button>
-            <p className="helper">Your account stays signed in for 180 days on this device unless you log out.</p>
+            <p className="helper">Use your account to manage chats, requests, receipts, and project updates.</p>
           </Card>
         </div>
       </section>
@@ -603,7 +602,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
                   <UserRound size={15} /> Account details
                 </span>
                 <h2>{data.user.email}</h2>
-                <p>Your orders and messages are matched by this email. This device stays signed in for 180 days.</p>
+                <p>Manage the chats, requests, receipts, and project updates connected to this email.</p>
                 <div className="portal-trust-list">
                   <span>
                     <ShieldCheck aria-hidden size={18} /> {data.user.hasPassword ? "Password protected" : "Claimable account"}
