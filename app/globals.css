@@ -581,6 +581,12 @@ img {
   font-weight: 800;
 }
 
+.label small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 .input,
 .select,
 .textarea {
@@ -2260,6 +2266,37 @@ img {
   font-size: 0.78rem;
   font-weight: 700;
   margin-top: 0.15rem;
+}
+
+.discount-panel {
+  background:
+    linear-gradient(145deg, rgb(255 216 79 / 10%), rgb(46 230 190 / 8%)),
+    color-mix(in srgb, var(--surface) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--honey) 22%, var(--border));
+  border-radius: 0.85rem;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.discount-note {
+  border-radius: 0.72rem;
+  font-size: 0.86rem;
+  font-weight: 850;
+  margin: 0;
+  padding: 0.72rem 0.82rem;
+}
+
+.discount-note.success {
+  background: color-mix(in srgb, var(--brand) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, var(--border));
+  color: var(--text);
+}
+
+.discount-note.warning {
+  background: color-mix(in srgb, var(--honey) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--honey) 28%, var(--border));
+  color: var(--text-muted);
 }
 
 .form-error {

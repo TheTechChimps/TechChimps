@@ -74,6 +74,9 @@ export async function POST(request: Request) {
     metadata: {
       chatSessionId: order.chatSessionId,
       deliverySpeed: order.deliverySpeed,
+      discountAmount: order.discountAmount ? String(order.discountAmount) : "",
+      discountCode: order.discountCode ?? "",
+      discountPercent: order.discountPercent ? String(order.discountPercent) : "",
       orderReference: order.reference,
       serviceSlug: order.serviceSlug,
       source: "techchimps-site"

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 import { createCheckoutSession, submitQuoteRequest, uploadProjectFiles } from "@/lib/api";
+import { applyDiscount, normalizeDiscountCode } from "@/lib/discount-codes";
 import { clamp, formatPrice } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { services, type Service, type ServiceCategory } from "@/data/services";
@@ -34,6 +35,7 @@ type BuilderState = {
   serviceAnswers: Record<string, string>;
   contactName: string;
   contactEmail: string;
+  discountCode: string;
   offerMode: "standard" | "custom" | "discount";
   offerAmount: string;
   offerReason: string;
@@ -50,6 +52,7 @@ const initialState: BuilderState = {
   serviceAnswers: {},
   contactName: "",
   contactEmail: "",
+  discountCode: "",
   offerMode: "standard",
   offerAmount: "",
   offerReason: ""
@@ -382,6 +385,8 @@ export function RequestBuilder() {
     selectedService.priceSuffix,
     structuredAnswers
   ]);
+  const discountPreview = useMemo(() => applyDiscount(estimate, form.discountCode), [estimate, form.discountCode]);
+  const hasDiscountCode = form.discountCode.trim().length > 0;
 
   const requiredQuestionAnswers = selectedQuestions
     .filter((question) => question.required !== false)
@@ -399,8 +404,7 @@ export function RequestBuilder() {
     ...requiredQuestionAnswers,
     form.contactName,
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) ? form.contactEmail : "",
-    !isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0) ? "offer-amount" : "",
-    !isOffer || form.offerReason.trim().length > 10 ? "offer-reason" : ""
+    !isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0) ? "offer-amount" : ""
   ];
   const progress = clamp(Math.round((requiredFields.filter(Boolean).length / requiredFields.length) * 100), 0, 100);
   const canSubmit = progress >= 100;
@@ -411,15 +415,15 @@ export function RequestBuilder() {
   const contactStepReady =
     form.contactName.trim().length > 1 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail) &&
-    (!isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0 && form.offerReason.trim().length > 10));
+    (!isOffer || (Number.isFinite(offeredAmount) && offeredAmount > 0));
   const currentQuestionReady = !currentQuestion || currentQuestion.required === false || currentQuestionAnswer.length >= 3;
   const finishHelp =
     form.contactName.trim().length <= 1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)
       ? "Add your name and email, then we can open checkout or review your offer."
       : isOffer && (!Number.isFinite(offeredAmount) || offeredAmount <= 0)
         ? "Add the amount you would like to offer so we can review it fairly."
-        : isOffer && form.offerReason.trim().length <= 10
-          ? "Add a short reason for your offer so we understand what you need."
+        : !isOffer && hasDiscountCode && !discountPreview.code
+          ? "That discount code is not recognised yet, but you can still continue at the normal price."
           : "Everything needed is ready. We will connect you to live support after this step.";
   const canContinue =
     activeStep === "service"
@@ -503,6 +507,7 @@ export function RequestBuilder() {
       ...form,
       attachmentNames: form.attachmentNames,
       deliverySpeed: selectedDeliverySpeed,
+      discountCode: isOffer ? "" : normalizeDiscountCode(form.discountCode),
       estimate,
       serviceAnswers: structuredAnswers,
       uploadBatchId,
@@ -559,6 +564,12 @@ export function RequestBuilder() {
               {isOffer && Number.isFinite(offeredAmount) && offeredAmount > 0 ? (
                 <p>
                   Your proposed offer is <strong>{formatPrice(offeredAmount)}</strong>. It will be reviewed before a payment link is issued.
+                </p>
+              ) : null}
+              {!isOffer && discountPreview.code ? (
+                <p>
+                  Discount <strong>{discountPreview.code}</strong> applied. Checkout total:{" "}
+                  <strong>{formatPrice(discountPreview.amount)}</strong>.
                 </p>
               ) : null}
               {form.completionDate ? (
@@ -855,7 +866,7 @@ export function RequestBuilder() {
                     </label>
                   </div>
                   <label className="field">
-                    <span className="label">Offer reason</span>
+                    <span className="label">Offer reason <small>Optional</small></span>
                     <input
                       aria-label="Offer reason"
                       className="input"
@@ -863,11 +874,37 @@ export function RequestBuilder() {
                       placeholder="Budget, repeat work, charity, simple scope..."
                       value={form.offerReason}
                     />
-                    <span className="helper">A short reason helps us answer fairly.</span>
+                    <span className="helper">Optional, but it helps us review your offer faster.</span>
                   </label>
                 </>
               ) : null}
             </fieldset>
+
+            {!isOffer ? (
+              <div className="discount-panel">
+                <label className="field">
+                  <span className="label">Discount code <small>Optional</small></span>
+                  <input
+                    aria-label="Discount code"
+                    autoCapitalize="characters"
+                    className="input"
+                    onChange={(event) => update("discountCode", normalizeDiscountCode(event.target.value))}
+                    placeholder="Enter your code before checkout"
+                    value={form.discountCode}
+                  />
+                  <span className="helper">Add a customer code here before we send you to Stripe Checkout.</span>
+                </label>
+                {hasDiscountCode ? (
+                  <p className={discountPreview.code ? "discount-note success" : "discount-note warning"}>
+                    {discountPreview.code
+                      ? `${discountPreview.code} applied: ${discountPreview.percentOff}% off. New checkout total ${formatPrice(
+                          discountPreview.amount
+                        )}.`
+                      : "Code not recognised. You can still continue at the normal price, or check the code and try again."}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="form-grid">
               <label className="field">

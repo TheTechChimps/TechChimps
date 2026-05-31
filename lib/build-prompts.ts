@@ -124,6 +124,12 @@ export function generateBuildPrompt(order: OrderRecord) {
       : `${order.offerMode === "discount" ? "Discounted" : "Custom"} offer: ${formatPrice(order.offerAmount ?? order.amount)}. Reason: ${
           order.offerReason || "No reason provided"
         }`;
+  const priceText = order.discountCode
+    ? `${formatPrice(order.amount, order.priceSuffix)} after ${order.discountCode} (${formatPrice(
+        order.discountAmount ?? 0,
+        order.priceSuffix
+      )} off from ${formatPrice(order.originalAmount ?? order.baseAmount, order.priceSuffix)})`
+    : formatPrice(order.amount, order.priceSuffix);
   const uploadText = order.uploadedFiles?.length
     ? order.uploadedFiles.map((file) => `- ${file.name} (${Math.round(file.size / 1024)}KB, ${file.type})`).join("\n")
     : order.attachmentNames.length
@@ -142,7 +148,7 @@ PROJECT SNAPSHOT
 - Service: ${order.serviceName}
 - Category: ${order.serviceCategory}
 - Status: ${order.status.replaceAll("_", " ")}
-- Price/estimate: ${formatPrice(order.amount, order.priceSuffix)}
+- Price/estimate: ${priceText}
 - Base estimate: ${formatPrice(order.baseAmount, order.priceSuffix)}
 - Offer/payment mode: ${offerText}
 - Budget comfort: ${clean(order.budget)}

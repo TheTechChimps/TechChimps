@@ -15,6 +15,7 @@ export type QuotePayload = {
   contactName: string;
   contactEmail: string;
   estimate: number;
+  discountCode?: string;
   offerMode: "standard" | "custom" | "discount";
   offerAmount: string;
   offerReason: string;

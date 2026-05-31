@@ -1,4 +1,5 @@
 import { services, type Service } from "@/data/services";
+import { applyDiscount } from "@/lib/discount-codes";
 import { listJson, readJson, writeJson } from "@/lib/storage";
 
 export type OfferMode = "standard" | "custom" | "discount";
@@ -23,6 +24,7 @@ export type OrderInput = {
   contactName: string;
   contactEmail: string;
   estimate?: number;
+  discountCode?: string;
   offerMode?: OfferMode;
   offerAmount?: string;
   offerReason?: string;
@@ -57,6 +59,10 @@ export type OrderRecord = {
   serviceCategory: string;
   amount: number;
   baseAmount: number;
+  discountAmount?: number;
+  discountCode?: string;
+  discountPercent?: number;
+  originalAmount?: number;
   isSubscription: boolean;
   priceSuffix?: string;
   offerMode: OfferMode;
@@ -119,12 +125,13 @@ export function getServiceBySlug(slug: string): Service | undefined {
   return services.find((service) => service.slug === slug);
 }
 
-export function calculateServiceEstimate(input: Pick<OrderInput, "deliverySpeed" | "goals" | "timeline">, service: Service) {
+export function calculateServiceEstimate(input: Pick<OrderInput, "deliverySpeed" | "goals" | "serviceAnswers" | "timeline">, service: Service) {
   if (service.priceSuffix) return service.price;
 
   const timelineMultiplier = timelineMultipliers[input.timeline] ?? 1;
   const deliveryMultiplier = deliveryMultipliers[input.deliverySpeed || "standard"] ?? 1;
-  const customComplexity = input.goals.length > 220 ? 80 : input.goals.length > 100 ? 40 : 0;
+  const detailLength = input.goals.length + (input.serviceAnswers?.reduce((total, answer) => total + answer.answer.length, 0) ?? 0);
+  const customComplexity = detailLength > 650 ? 90 : detailLength > 360 ? 55 : detailLength > 180 ? 25 : 0;
 
   return Math.round((service.price * timelineMultiplier * deliveryMultiplier + customComplexity) / 5) * 5;
 }
@@ -146,7 +153,9 @@ export function createOrderRecord(input: OrderInput, status: OrderStatus): Order
   const offerMode = input.offerMode ?? "standard";
   const offerAmount = parseOfferAmount(input.offerAmount);
   const baseAmount = calculateServiceEstimate(input, service);
-  const amount = offerMode === "standard" ? baseAmount : offerAmount ?? baseAmount;
+  const undiscountedAmount = offerMode === "standard" ? baseAmount : offerAmount ?? baseAmount;
+  const discount = offerMode === "standard" ? applyDiscount(undiscountedAmount, input.discountCode) : applyDiscount(undiscountedAmount);
+  const amount = discount.amount;
   const reference = generateReference();
   const now = new Date().toISOString();
 
@@ -158,6 +167,10 @@ export function createOrderRecord(input: OrderInput, status: OrderStatus): Order
     serviceCategory: service.category,
     amount,
     baseAmount,
+    discountAmount: discount.discountAmount || undefined,
+    discountCode: discount.code,
+    discountPercent: discount.percentOff || undefined,
+    originalAmount: discount.discountAmount ? discount.originalAmount : undefined,
     isSubscription: Boolean(service.priceSuffix),
     priceSuffix: service.priceSuffix,
     offerMode,
