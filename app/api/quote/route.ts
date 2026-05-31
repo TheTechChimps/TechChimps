@@ -3,6 +3,7 @@ import { connectOfferToLiveChat, runOrderAutomation } from "@/lib/automation";
 import { addInboxMessage, ensureCustomerForOrder } from "@/lib/accounts";
 import { saveBuildPromptForOrder } from "@/lib/build-prompts";
 import { createOrder, parseOfferAmount, type OrderInput } from "@/lib/orders";
+import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
 export async function POST(request: Request) {
   const payload = (await request.json().catch(() => null)) as OrderInput | null;
@@ -25,8 +26,8 @@ export async function POST(request: Request) {
     await addInboxMessage({
       userId: customer.id,
       author: "Studio support",
-      subject: "Your custom offer is waiting for review",
-      body: `We received your ${order.serviceName} offer. We will review it and reply here or through live support.`,
+      subject: "Your custom offer is in live support",
+      body: `We received your ${order.serviceName} offer. ${liveSupportHandoffMessage} ${liveSupportEtaMessage}`,
       projectReference: order.reference
     });
     await connectOfferToLiveChat(order);

@@ -25,6 +25,7 @@ import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { LiveSupportWidget } from "@/components/sections/live-support-widget";
+import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
 type BuilderState = {
   attachmentNames: string[];
@@ -431,7 +432,7 @@ export function RequestBuilder() {
         ? "Add the amount you would like to offer so we can review it fairly."
         : !isOffer && hasDiscountCode && !discountPreview.code
           ? "That discount code is not recognised yet, but you can still continue at the normal price."
-          : "Everything needed is ready. We will connect you to live support after this step.";
+          : `${liveSupportHandoffMessage} ${liveSupportEtaMessage}`;
   const canContinue =
     activeStep === "service"
       ? serviceStepReady
@@ -1015,7 +1016,7 @@ export function RequestBuilder() {
                   <div className="handoff-note">
                     <Lightbulb aria-hidden size={20} />
                     <p>
-                      Once this is sent, you are added to live support with the team. Ask anything, send extra details, or tell us if
+                      {liveSupportHandoffMessage} {liveSupportEtaMessage} Ask anything, send extra details, or tell us if
                       something feels wrong. You should never be scared to reach out for help or let us know if you are unhappy with something.
                     </p>
                   </div>

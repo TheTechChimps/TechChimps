@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { LiveSupportWidget } from "@/components/sections/live-support-widget";
 import { Card } from "@/components/ui/card";
 import { StatusIndicator } from "@/components/ui/status-indicator";
+import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
 type ConnectState = {
   chatSessionId?: string;
@@ -72,10 +73,10 @@ export function CheckoutSuccessClient({
         <div className="container split">
           <div>
             <span className="eyebrow">Payment handoff</span>
-            <h1 className="title">Payment received. You are being added to live support.</h1>
+            <h1 className="title">Payment received. You are in live support.</h1>
             <p className="subtitle">
-              Your order is being linked to the TechChimps team automatically. You can ask questions, send extra details,
-              and get a clear next step without needing to work anything out alone.
+              {liveSupportHandoffMessage} {liveSupportEtaMessage} You can ask questions, send extra details, and get a
+              clear next step without needing to work anything out alone.
             </p>
           </div>
           <Card className="checkout-status-card">
@@ -95,7 +96,7 @@ export function CheckoutSuccessClient({
             <h2>{state.reference ?? "Order reference pending"}</h2>
             <p>
               {state.status === "connected"
-                ? "Your support thread is open and the team has been notified that you are waiting. Please never be scared to reach out for help or tell us if you are unhappy with something."
+                ? `${liveSupportHandoffMessage} ${liveSupportEtaMessage} Please never be scared to reach out for help or tell us if you are unhappy with something.`
                 : state.error ?? "Stripe is confirming the payment event. This page will keep the handoff clear."}
             </p>
           </Card>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import type { LiveChatMessage } from "@/lib/live-chat";
+import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
 export function LiveSupportWidget({
   defaultOpen = false,
@@ -116,7 +117,9 @@ export function LiveSupportWidget({
         <div className="support-modal live-chat">
           <div className="chat-status-row">
             <StatusIndicator label="Live chat connected" tone="good" />
-            <span>You are in the support queue. TechChimps can reply here, help you get started, and fix anything that feels off.</span>
+            <span>
+              {liveSupportHandoffMessage} {liveSupportEtaMessage}
+            </span>
           </div>
           <div aria-live="polite" className="chat-thread">
             {messages.map((message) => (

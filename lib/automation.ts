@@ -12,6 +12,7 @@ import {
 } from "@/lib/orders";
 import { getStorageMode } from "@/lib/storage";
 import { getStripe } from "@/lib/stripe";
+import { liveSupportFullHandoffMessage } from "@/lib/support-copy";
 import { formatPrice } from "@/lib/utils";
 
 type IntegrationStatus = {
@@ -208,9 +209,7 @@ export async function connectOfferToLiveChat(order: OrderRecord) {
     sessionId: order.chatSessionId,
     role: "system",
     priority: "waiting",
-    body: `Custom offer ${order.reference} is waiting for review. ${order.contactName || "A visitor"} offered ${
-      order.offerAmount ? formatPrice(order.offerAmount) : "a custom amount"
-    } for ${order.serviceName}.`
+    body: `${liveSupportFullHandoffMessage} Your custom offer ${order.reference} is safely in the queue for review.`
   });
 
   await appendLiveChatMessage({
@@ -241,7 +240,7 @@ export async function connectPaidOrderToLiveChat(order: OrderRecord, stripeSessi
     sessionId: connectedOrder.chatSessionId,
     role: "system",
     priority: "payment",
-    body: `Payment confirmed for ${connectedOrder.reference}. A live support thread is now open and the studio has been notified.`
+    body: `${liveSupportFullHandoffMessage} Payment is confirmed for ${connectedOrder.reference}.`
   });
 
   await appendLiveChatMessage({
@@ -262,7 +261,7 @@ export async function connectPaidOrderToLiveChat(order: OrderRecord, stripeSessi
     userId: customer.id,
     author: "Studio support",
     subject: "Payment confirmed",
-    body: `Payment is confirmed for ${connectedOrder.serviceName}. Your support thread is open and we are ready to guide the next step.`,
+    body: `Payment is confirmed for ${connectedOrder.serviceName}. ${liveSupportFullHandoffMessage}`,
     projectReference: connectedOrder.reference
   });
 
