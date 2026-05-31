@@ -1,6 +1,5 @@
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { AdminLink } from "@/components/admin/admin-link";
 import { CustomerAccountLink } from "@/components/portal/customer-account-link";
 import { getContactEmail } from "@/lib/contact";
 
@@ -26,7 +25,6 @@ export function Footer() {
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/refunds">Refunds</Link>
-          <AdminLink />
         </div>
         <div className="footer-contact">
           <span>

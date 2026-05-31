@@ -4,7 +4,6 @@ import { ChevronDown, Menu, MessageCircle, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { AdminLink } from "@/components/admin/admin-link";
 import { CustomerAccountLink } from "@/components/portal/customer-account-link";
 import { ButtonLink } from "@/components/ui/button";
 import { publicServices, serviceCategories } from "@/data/services";
@@ -169,7 +168,6 @@ export function Navbar() {
               </details>
             ))}
           </div>
-          <AdminLink label="Admin" onNavigate={closeMenus} />
         </div>
       ) : null}
     </header>

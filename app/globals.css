@@ -1185,6 +1185,19 @@ img {
   transform: translateY(0.2rem);
 }
 
+@media (min-width: 921px) {
+  .hero-proof {
+    flex-wrap: nowrap;
+  }
+
+  .hero-proof span {
+    flex: 0 0 auto;
+    font-size: 0.86rem;
+    padding: 0.48rem 0.64rem;
+    white-space: nowrap;
+  }
+}
+
 .hero-studio {
   background:
     linear-gradient(150deg, rgb(255 255 255 / 12%), transparent 24%, rgb(46 230 190 / 8%) 54%, rgb(0 0 0 / 18%)),
@@ -2748,6 +2761,22 @@ img {
   color: color-mix(in srgb, var(--text-muted) 86%, var(--brand));
   font-size: 0.9rem;
   font-weight: 850;
+}
+
+@media (min-width: 921px) {
+  .footer-grid,
+  .footer-links,
+  .footer-contact {
+    text-align: left;
+  }
+
+  .footer-links {
+    justify-items: start;
+  }
+
+  .footer-links a {
+    justify-content: flex-start;
+  }
 }
 
 .modal-backdrop {

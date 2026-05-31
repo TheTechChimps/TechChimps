@@ -4,7 +4,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/motion";
 
 const proof = [
-  { label: "From £49", icon: PoundSterling },
+  { label: "From \u00a349", icon: PoundSterling },
   { label: "Guided brief", icon: ShieldCheck },
   { label: "Secure checkout", icon: CreditCard },
   { label: "Live support", icon: MessageCircle }
