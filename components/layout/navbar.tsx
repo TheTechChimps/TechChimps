@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { AdminLink } from "@/components/admin/admin-link";
+import { CustomerAccountLink } from "@/components/portal/customer-account-link";
 import { ButtonLink } from "@/components/ui/button";
 import { publicServices, serviceCategories } from "@/data/services";
 import { formatPrice } from "@/lib/utils";
@@ -14,8 +15,7 @@ const navItems = [
   { href: "/services", label: "Services" },
   { href: "/pricing", label: "Pricing" },
   { href: "/find-us", label: "Find us" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/portal", label: "Login" }
+  { href: "/faq", label: "FAQ" }
 ];
 
 const serviceGroups = serviceCategories.map((category) => ({
@@ -23,7 +23,7 @@ const serviceGroups = serviceCategories.map((category) => ({
   items: publicServices.filter((service) => service.category === category)
 }));
 
-const mobileNavItems = navItems.filter((item) => item.href !== "/find-us" && item.href !== "/portal");
+const mobileNavItems = navItems.filter((item) => item.href !== "/find-us");
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -61,6 +61,7 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
+          <CustomerAccountLink onNavigate={() => setMegaOpen(false)} />
         </div>
 
         <div className="nav-actions">
@@ -143,9 +144,7 @@ export function Navbar() {
             <Link href="/request" onClick={closeMenus}>
               Request
             </Link>
-            <Link href="/portal" onClick={closeMenus}>
-              Client portal
-            </Link>
+            <CustomerAccountLink onNavigate={closeMenus} />
             <Link href="/find-us" onClick={closeMenus}>
               Find us
             </Link>

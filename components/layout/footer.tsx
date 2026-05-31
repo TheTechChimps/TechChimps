@@ -1,6 +1,7 @@
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { AdminLink } from "@/components/admin/admin-link";
+import { CustomerAccountLink } from "@/components/portal/customer-account-link";
 import { getContactEmail } from "@/lib/contact";
 
 export function Footer() {
@@ -21,7 +22,7 @@ export function Footer() {
           <Link href="/request">Custom request</Link>
           <Link href="/process">Steps</Link>
           <Link href="/faq">FAQ</Link>
-          <Link href="/portal">Client portal</Link>
+          <CustomerAccountLink />
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/refunds">Refunds</Link>
