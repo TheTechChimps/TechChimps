@@ -27,9 +27,11 @@ import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { PaymentHub } from "@/components/admin/payment-hub";
 import { StatusIndicator } from "@/components/ui/status-indicator";
-import { activityTimeline, automationFlows, crmStats, emailTemplates, pipelineColumns } from "@/data/dashboard";
+import { activityTimeline, automationFlows, emailTemplates, pipelineColumns } from "@/data/dashboard";
 import { ADMIN_SESSION_COOKIE, getAdminSessionFromToken, isAdminCookieAuthenticated } from "@/lib/admin-session";
 import { getIntegrationReadiness } from "@/lib/automation";
+import { getLiveChatSessions } from "@/lib/live-chat";
+import { getWaitingOrders, listOrders, type OrderRecord } from "@/lib/orders";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -54,13 +56,36 @@ const adminModules = [
 ];
 
 const adminQuickLinks = [
-  { href: "#support", icon: MessageSquareReply, label: "Live support", meta: "Join waiting chats" },
-  { href: "#payments", icon: CreditCard, label: "Payments", meta: "Paid and refunds" },
-  { href: "#customers", icon: UserRoundCheck, label: "Customers", meta: "Inbox and messages" },
-  { href: "#prompts", icon: Sparkles, label: "Prompts", meta: "Build-ready briefs" },
-  { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily safety checks", mobileHidden: true },
-  { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Track current work", mobileHidden: true }
+  { href: "#support", icon: MessageSquareReply, label: "Reply to chats", meta: "Customers waiting" },
+  { href: "#payments", icon: CreditCard, label: "Payment hub", meta: "Refunds and receipts" },
+  { href: "#customers", icon: UserRoundCheck, label: "Customer inbox", meta: "Send updates" },
+  { href: "#prompts", icon: Sparkles, label: "Build prompts", meta: "One-shot briefs" },
+  { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily checks", mobileHidden: true },
+  { href: "#pipeline", icon: Gauge, label: "Pipeline", meta: "Current work", mobileHidden: true }
 ];
+
+function plural(value: number, singular: string, pluralLabel = `${singular}s`) {
+  return `${value} ${value === 1 ? singular : pluralLabel}`;
+}
+
+function hasPaid(order: OrderRecord) {
+  return Boolean(order.paidAt || order.stripePaymentStatus === "paid" || order.status === "paid_waiting_support" || order.status === "support_connected");
+}
+
+function buildAdminSummary({
+  needReplyCount,
+  paidWaitingCount,
+  reviewCount
+}: {
+  needReplyCount: number;
+  paidWaitingCount: number;
+  reviewCount: number;
+}) {
+  if (needReplyCount) return `${plural(needReplyCount, "chat")} need a reply.`;
+  if (paidWaitingCount) return `${plural(paidWaitingCount, "paid customer")} ready for handoff.`;
+  if (reviewCount) return `${plural(reviewCount, "offer")} waiting for review.`;
+  return "No urgent customer actions right now.";
+}
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
@@ -76,6 +101,21 @@ export default async function AdminPage() {
   }
 
   const integrationStatuses = getIntegrationReadiness();
+  const [orders, waitingOrders, liveSessions] = await Promise.all([listOrders(), getWaitingOrders(), getLiveChatSessions()]);
+  const needReplyCount = liveSessions.filter((session) => session.unreadVisitorMessages || session.priority !== "normal").length;
+  const reviewCount = waitingOrders.filter(
+    (order) => order.status === "offer_waiting_review" || order.status === "custom_request_waiting_review"
+  ).length;
+  const paidOrders = orders.filter(hasPaid);
+  const paidWaitingCount = waitingOrders.filter((order) => order.status === "paid_waiting_support").length;
+  const refundablePayments = paidOrders.filter((order) => order.stripeSessionId && order.amount > (order.refundedAmount ?? 0)).length;
+  const adminStats = [
+    { label: "Need reply", value: String(needReplyCount), tone: needReplyCount ? "warning" : "good" },
+    { label: "Review offers", value: String(reviewCount), tone: reviewCount ? "warning" : "good" },
+    { label: "Paid orders", value: String(paidOrders.length), tone: paidOrders.length ? "active" : "good" },
+    { label: "Refundable", value: String(refundablePayments), tone: refundablePayments ? "active" : "good" }
+  ];
+  const adminSummary = buildAdminSummary({ needReplyCount, paidWaitingCount, reviewCount });
 
   return (
     <main>
@@ -102,8 +142,8 @@ export default async function AdminPage() {
               <span className="eyebrow">
                 <Gauge size={15} /> Today at a glance
               </span>
-              <strong>One active customer is waiting in support.</strong>
-              <span>Use the quick links to jump straight into the part of the studio you need.</span>
+              <strong>{adminSummary}</strong>
+              <span>Jump straight to replies, offers, payments, refunds, prompts, or customer updates.</span>
             </div>
             <nav aria-label="Admin quick navigation" className="admin-quick-nav">
               {adminQuickLinks.map((item) => {
@@ -126,7 +166,7 @@ export default async function AdminPage() {
 
       <section className="section-tight">
         <div className="container grid grid-4 admin-stat-grid">
-          {crmStats.map((stat) => (
+          {adminStats.map((stat) => (
             <Card className="stat-card" key={stat.label}>
               <StatusIndicator label={stat.label} tone={stat.tone as "good" | "active" | "warning"} />
               <strong>{stat.value}</strong>
