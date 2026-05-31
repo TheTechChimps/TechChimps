@@ -7,6 +7,7 @@ export type OfferMode = "standard" | "custom" | "discount";
 export type OrderStatus =
   | "quote_saved"
   | "offer_waiting_review"
+  | "offer_declined"
   | "checkout_started"
   | "payment_pending"
   | "paid_waiting_support"
@@ -68,6 +69,9 @@ export type OrderRecord = {
   priceSuffix?: string;
   offerMode: OfferMode;
   offerAmount?: number;
+  offerCheckoutUrl?: string;
+  offerDecision?: "accepted" | "declined";
+  offerDecisionAt?: string;
   offerReason?: string;
   attachmentNames: string[];
   budget: string;

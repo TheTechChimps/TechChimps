@@ -25,6 +25,16 @@ export type LiveChatSessionSummary = {
 const CHAT_STORE = "techchimps-live-chat";
 const CHAT_KEY = "messages";
 
+export function isVisibleLiveChatMessage(message: LiveChatMessage) {
+  if (message.role === "system") return false;
+
+  return !(
+    message.role === "visitor" &&
+    message.sessionId.startsWith("order-") &&
+    message.body.includes("and is waiting for live support.")
+  );
+}
+
 function welcomeMessage(sessionId: string): LiveChatMessage {
   return {
     id: `welcome-${sessionId}`,
@@ -68,17 +78,22 @@ export async function getLiveChatSessions() {
   };
 
   return Array.from(sessions.entries())
-    .map(([sessionId, sessionMessages]): LiveChatSessionSummary => {
-      const sorted = sessionMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    .map(([sessionId, sessionMessages]): LiveChatSessionSummary | null => {
+      const sorted = sessionMessages
+        .filter(isVisibleLiveChatMessage)
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+      if (!sorted.length) return null;
+
       const lastMessage = sorted[sorted.length - 1];
       const lastAgentIndex = sorted.map((message) => message.role).lastIndexOf("agent");
-      const unreadVisitorMessages = sorted
+      const unreadMessages = sorted
         .slice(lastAgentIndex + 1)
-        .filter((message) => message.role === "visitor" || message.priority === "payment" || message.priority === "waiting").length;
+        .filter((message) => message.role === "visitor");
+      const unreadVisitorMessages = unreadMessages.length;
       const visitor = sorted.find((message) => message.role === "visitor");
-      const priority = sorted.some((message) => message.priority === "payment")
+      const priority = unreadMessages.some((message) => message.priority === "payment")
         ? "payment"
-        : sorted.some((message) => message.priority === "waiting") || unreadVisitorMessages
+        : unreadMessages.some((message) => message.priority === "waiting") || unreadVisitorMessages
           ? "waiting"
           : "normal";
 
@@ -92,6 +107,7 @@ export async function getLiveChatSessions() {
         messageCount: sorted.length
       };
     })
+    .filter((session): session is LiveChatSessionSummary => Boolean(session))
     .sort((a, b) => {
       const priorityDifference = priorityWeight[a.priority] - priorityWeight[b.priority];
       if (priorityDifference) return priorityDifference;

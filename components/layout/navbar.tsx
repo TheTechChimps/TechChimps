@@ -100,8 +100,12 @@ export function Navbar() {
             </div>
             <div className="mega-services">
               {serviceGroups.map((group) => (
-                <div className="mega-category" key={group.category}>
-                  <strong>{group.category}</strong>
+                <details className="mega-category" key={group.category}>
+                  <summary>
+                    <span>{group.category}</span>
+                    <small>{group.items.length} options</small>
+                    <ChevronDown aria-hidden size={16} />
+                  </summary>
                   <div>
                     {group.items.map((service) => {
                       const Icon = service.icon;
@@ -121,7 +125,7 @@ export function Navbar() {
                       );
                     })}
                   </div>
-                </div>
+                </details>
               ))}
             </div>
           </div>
@@ -149,15 +153,21 @@ export function Navbar() {
           <div className="mobile-service-menu">
             <span>Services</span>
             {serviceGroups.map((group) => (
-              <div key={group.category}>
-                <strong>{group.category}</strong>
-                {group.items.map((service) => (
-                  <Link href={`/services/${service.slug}`} key={service.slug} onClick={closeMenus}>
-                    {service.name}
-                    <small>{formatPrice(service.price, service.priceSuffix)}</small>
-                  </Link>
-                ))}
-              </div>
+              <details key={group.category}>
+                <summary>
+                  <strong>{group.category}</strong>
+                  <small>{group.items.length} options</small>
+                  <ChevronDown aria-hidden size={16} />
+                </summary>
+                <div>
+                  {group.items.map((service) => (
+                    <Link href={`/services/${service.slug}`} key={service.slug} onClick={closeMenus}>
+                      {service.name}
+                      <small>{formatPrice(service.price, service.priceSuffix)}</small>
+                    </Link>
+                  ))}
+                </div>
+              </details>
             ))}
           </div>
           <AdminLink label="Admin" onNavigate={closeMenus} />

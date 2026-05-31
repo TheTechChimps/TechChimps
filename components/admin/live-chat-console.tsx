@@ -1,9 +1,10 @@
 "use client";
 
-import { Loader2, MessageSquareReply, Send, Volume2, VolumeX } from "lucide-react";
+import { CheckCircle2, Loader2, MessageSquareReply, Send, Volume2, VolumeX, XCircle } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { MessageText } from "@/components/ui/message-text";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import type { LiveChatMessage, LiveChatSessionSummary } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
@@ -17,6 +18,8 @@ export function LiveChatConsole() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [reviewingReference, setReviewingReference] = useState("");
+  const [reviewNotice, setReviewNotice] = useState("");
   const activeChatRef = useRef<HTMLDivElement>(null);
   const loadedOnceRef = useRef(false);
   const lastVisitorSignalRef = useRef("");
@@ -103,6 +106,41 @@ export function LiveChatConsole() {
     });
   };
 
+  const reviewOffer = async (order: OrderRecord, action: "accept" | "decline") => {
+    const confirmed = window.confirm(
+      action === "accept"
+        ? `Accept ${order.contactName || "this customer"}'s offer and send a secure payment link for ${order.amount}?`
+        : `Decline ${order.contactName || "this customer"}'s offer and send a friendly reply?`
+    );
+    if (!confirmed) return;
+
+    setReviewingReference(order.reference);
+    setReviewNotice("");
+    const response = await fetch("/api/admin/offers", {
+      body: JSON.stringify({
+        action,
+        reference: order.reference
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+    const data = (await response.json().catch(() => ({}))) as { error?: string; url?: string };
+
+    if (response.ok) {
+      setReviewNotice(
+        action === "accept"
+          ? "Offer accepted. The secure Stripe payment link is now in the customer's live chat and portal inbox."
+          : "Offer declined. The customer has received a friendly live chat reply."
+      );
+      await loadMessages();
+    } else {
+      setReviewNotice(data.error ?? "The offer could not be updated. Please try again.");
+    }
+    setReviewingReference("");
+  };
+
   const sendReply = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!reply.trim() || !activeSession) return;
@@ -167,13 +205,41 @@ export function LiveChatConsole() {
               <span>
                 {order.serviceName} - {order.reference}
               </span>
-              <button onClick={() => joinPaymentChat(order)} type="button">
-                {order.chatSessionId === activeSession ? "Chat open" : "Join payment chat"}
-              </button>
+              {order.offerMode !== "standard" && order.status === "offer_waiting_review" ? (
+                <span className="waiting-offer-amount">Offer: £{order.amount.toFixed(2)}</span>
+              ) : null}
+              <div className="waiting-order-actions">
+                <button onClick={() => joinPaymentChat(order)} type="button">
+                  {order.chatSessionId === activeSession ? "Chat open" : "Join payment chat"}
+                </button>
+                {order.offerMode !== "standard" && order.status === "offer_waiting_review" ? (
+                  <>
+                    <button
+                      className="offer-accept"
+                      disabled={reviewingReference === order.reference}
+                      onClick={() => void reviewOffer(order, "accept")}
+                      type="button"
+                    >
+                      <CheckCircle2 aria-hidden size={15} />
+                      Accept
+                    </button>
+                    <button
+                      className="offer-decline"
+                      disabled={reviewingReference === order.reference}
+                      onClick={() => void reviewOffer(order, "decline")}
+                      type="button"
+                    >
+                      <XCircle aria-hidden size={15} />
+                      Decline
+                    </button>
+                  </>
+                ) : null}
+              </div>
             </div>
           ))}
         </div>
       ) : null}
+      {reviewNotice ? <p className="support-notice">{reviewNotice}</p> : null}
 
       <div className="support-session-grid">
         <div className="support-session-list" aria-label="Live support queue">
@@ -221,7 +287,7 @@ export function LiveChatConsole() {
           activeMessages.map((message) => (
             <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
               <strong>{message.author}</strong>
-              <p>{message.body}</p>
+              <MessageText body={message.body} />
               <time dateTime={message.createdAt}>
                 {new Date(message.createdAt).toLocaleTimeString("en-GB", {
                   hour: "2-digit",

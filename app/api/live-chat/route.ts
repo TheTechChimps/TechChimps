@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { adminUnauthorized, isAdminRequestAuthenticated } from "@/lib/admin-session";
-import { appendLiveChatMessage, getLiveChatMessages, getLiveChatSessions, type LiveChatRole } from "@/lib/live-chat";
+import {
+  appendLiveChatMessage,
+  getLiveChatMessages,
+  getLiveChatSessions,
+  isVisibleLiveChatMessage,
+  type LiveChatRole
+} from "@/lib/live-chat";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    messages: await getLiveChatMessages(sessionId),
+    messages: (await getLiveChatMessages(sessionId)).filter(isVisibleLiveChatMessage),
     sessions: isAdmin ? await getLiveChatSessions() : []
   });
 }

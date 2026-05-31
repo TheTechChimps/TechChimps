@@ -22,6 +22,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { MessageText } from "@/components/ui/message-text";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { formatPrice } from "@/lib/utils";
 import type { CustomerInboxMessage, PublicCustomerAccount } from "@/lib/accounts";
@@ -177,7 +178,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
                 <strong>{message.subject}</strong>
                 <span>{message.author}</span>
               </div>
-              <p>{message.body}</p>
+              <MessageText body={message.body} />
               <footer>
                 <time dateTime={message.createdAt}>
                   {new Date(message.createdAt).toLocaleString("en-GB", {

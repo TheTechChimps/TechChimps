@@ -1,4 +1,4 @@
-import { ArrowRight, CreditCard, PoundSterling, ShieldCheck } from "lucide-react";
+import { ArrowRight, CreditCard, MessageCircle, PoundSterling, ShieldCheck } from "lucide-react";
 import { HeroStudio } from "@/components/sections/hero-studio";
 import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/motion";
@@ -6,7 +6,8 @@ import { Reveal } from "@/components/ui/motion";
 const proof = [
   { label: "From £49", icon: PoundSterling },
   { label: "Guided brief", icon: ShieldCheck },
-  { label: "Secure checkout", icon: CreditCard }
+  { label: "Secure checkout", icon: CreditCard },
+  { label: "Live support", icon: MessageCircle }
 ];
 
 export function Hero() {
@@ -48,6 +49,7 @@ export function Hero() {
         <span>Choose service</span>
         <span>Answer smart questions</span>
         <span>Pay or make an offer</span>
+        <span>Chat with the team</span>
       </div>
     </section>
   );

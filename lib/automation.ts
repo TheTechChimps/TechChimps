@@ -245,8 +245,7 @@ export async function connectPaidOrderToLiveChat(order: OrderRecord, stripeSessi
 
   await appendLiveChatMessage({
     sessionId: connectedOrder.chatSessionId,
-    role: "visitor",
-    author: connectedOrder.contactName || "Paid customer",
+    role: "system",
     priority: "waiting",
     body: `${connectedOrder.contactName || "A customer"} paid ${formatPrice(
       connectedOrder.amount,
@@ -313,7 +312,7 @@ export async function runSelfHealingSweep() {
   const healed: string[] = [];
 
   for (const order of orders) {
-    if (order.status === "checkout_started" && order.stripeSessionId && stripe) {
+    if ((order.status === "checkout_started" || order.status === "payment_pending") && order.stripeSessionId && stripe) {
       const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
       const updated = await markStripeSessionPaid(session);
       if (updated?.status === "paid_waiting_support") healed.push(order.reference);

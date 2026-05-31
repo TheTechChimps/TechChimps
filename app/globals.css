@@ -835,15 +835,42 @@ img {
   padding: var(--space-1);
 }
 
-.mega-category > strong {
+.mega-category > summary {
+  align-items: center;
   color: var(--text);
+  cursor: pointer;
+  display: grid;
   font-size: 0.9rem;
-  padding: 0 0.25rem;
+  font-weight: 900;
+  gap: 0.35rem;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  list-style: none;
+  padding: 0.25rem;
+}
+
+.mega-category > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mega-category > summary small {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.mega-category > summary svg {
+  color: var(--brand);
+  transition: transform 180ms ease;
+}
+
+.mega-category[open] > summary svg {
+  transform: rotate(180deg);
 }
 
 .mega-category > div {
   display: grid;
   gap: 0.35rem;
+  margin-top: 0.45rem;
 }
 
 .mega-service-link {
@@ -962,15 +989,44 @@ img {
   text-transform: uppercase;
 }
 
-.mobile-service-menu div {
+.mobile-service-menu details {
+  background: color-mix(in srgb, var(--surface) 68%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--border));
+  border-radius: var(--radius-sm);
+}
+
+.mobile-service-menu summary {
+  align-items: center;
+  cursor: pointer;
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  list-style: none;
+  padding: 0.55rem 0.62rem;
+}
+
+.mobile-service-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-service-menu summary svg {
+  color: var(--brand);
+  transition: transform 180ms ease;
+}
+
+.mobile-service-menu details[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.mobile-service-menu details > div {
   display: grid;
   gap: 0.2rem;
+  padding: 0 0.32rem 0.32rem;
 }
 
 .mobile-service-menu strong {
   color: var(--text);
   font-size: 0.88rem;
-  padding: 0.45rem 0.3rem 0.1rem;
 }
 
 .mobile-service-menu a {
@@ -2831,6 +2887,19 @@ img {
   margin: 0;
 }
 
+.message-link {
+  color: var(--brand-strong);
+  font-weight: 900;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--brand) 54%, transparent);
+  text-underline-offset: 0.18rem;
+}
+
+.message-link:hover,
+.message-link:focus-visible {
+  color: var(--honey);
+}
+
 .chat-bubble time {
   color: var(--text-muted);
   font-size: 0.75rem;
@@ -3976,7 +4045,7 @@ img {
 }
 
 .integration-grid div,
-.waiting-orders div {
+.waiting-orders > div {
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -3985,7 +4054,7 @@ img {
   padding: 0.85rem;
 }
 
-.waiting-orders div.active {
+.waiting-orders > div.active {
   background: color-mix(in srgb, var(--brand) 12%, var(--bg-soft));
   border-color: color-mix(in srgb, var(--brand) 48%, var(--border));
 }
@@ -4011,8 +4080,50 @@ img {
   width: fit-content;
 }
 
-.waiting-orders div.active button {
+.waiting-orders > div.active button {
   background: color-mix(in srgb, var(--honey) 60%, var(--brand));
+}
+
+.waiting-orders .waiting-offer-amount {
+  color: var(--honey);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.waiting-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.waiting-orders .offer-accept,
+.waiting-orders .offer-decline {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.28rem;
+}
+
+.waiting-orders .offer-accept {
+  background: color-mix(in srgb, var(--brand) 78%, var(--surface));
+}
+
+.waiting-orders .offer-decline {
+  background: color-mix(in srgb, #ff7b7b 74%, var(--surface));
+  color: #1c0808;
+}
+
+.waiting-orders > div.active .offer-accept {
+  background: color-mix(in srgb, var(--brand) 78%, var(--surface));
+}
+
+.waiting-orders > div.active .offer-decline {
+  background: color-mix(in srgb, #ff7b7b 74%, var(--surface));
+  color: #1c0808;
+}
+
+.waiting-orders button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .integration-grid span,

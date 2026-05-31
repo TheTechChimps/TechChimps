@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { MessageText } from "@/components/ui/message-text";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import type { LiveChatMessage } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
@@ -195,7 +196,7 @@ export function LiveSupportWidget({
             {messages.map((message) => (
               <div className={`chat-bubble chat-bubble-${message.role}`} key={message.id}>
                 <strong>{message.author}</strong>
-                <p>{message.body}</p>
+                <MessageText body={message.body} />
                 <time dateTime={message.createdAt}>
                   {new Date(message.createdAt).toLocaleTimeString("en-GB", {
                     hour: "2-digit",

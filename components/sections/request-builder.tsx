@@ -19,7 +19,7 @@ import { createCheckoutSession, submitQuoteRequest, uploadProjectFiles } from "@
 import { applyDiscount, normalizeDiscountCode } from "@/lib/discount-codes";
 import { clamp, formatPrice } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { services, type Service, type ServiceCategory } from "@/data/services";
+import { serviceCategories, services, type Service, type ServiceCategory } from "@/data/services";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
@@ -675,10 +675,16 @@ export function RequestBuilder() {
                 }}
                 value={form.serviceType}
               >
-                {services.map((service) => (
-                  <option key={service.slug} value={service.slug}>
-                    {service.name} - from {formatPrice(service.price, service.priceSuffix)}
-                  </option>
+                {serviceCategories.map((category) => (
+                  <optgroup key={category} label={category}>
+                    {services
+                      .filter((service) => service.category === category)
+                      .map((service) => (
+                        <option key={service.slug} value={service.slug}>
+                          {service.name} - from {formatPrice(service.price, service.priceSuffix)}
+                        </option>
+                      ))}
+                  </optgroup>
                 ))}
               </select>
             </label>
