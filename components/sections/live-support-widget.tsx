@@ -158,7 +158,7 @@ export function LiveSupportWidget({
     <>
       {!open ? (
         <button aria-label="Open friendly support prompt" className="support-widget" onClick={openChat} type="button">
-          <Image alt="" height={40} src="/images/techchimps-logo-square-small.png" width={40} />
+          <Image alt="TechChimps live support logo" height={40} src="/images/techchimps-logo-square-small.png" width={40} />
           <span>
             Need help?
             <small>Live TechChimps chat</small>
@@ -170,7 +170,7 @@ export function LiveSupportWidget({
       {open && minimized ? (
         <div className="support-mini-panel" role="status">
           <button aria-label="Reopen live chat" className="support-mini-main" onClick={() => setMinimized(false)} type="button">
-            <Image alt="" height={36} src="/images/techchimps-logo-square-small.png" width={36} />
+            <Image alt="TechChimps live support logo" height={36} src="/images/techchimps-logo-square-small.png" width={36} />
             <span>
               Live chat
               <small>{messages[messages.length - 1]?.body ?? "We are here if you need us."}</small>

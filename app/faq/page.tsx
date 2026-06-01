@@ -4,7 +4,7 @@ import { LiveSupportWidget } from "@/components/sections/live-support-widget";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "FAQ",
+  title: "FAQ for Websites, Apps and Bots",
   description: "Plain-English answers about TechChimps pricing, timelines, payments, care plans, and custom software requests.",
   path: "/faq",
   keywords: ["beginner-friendly websites", "affordable web design UK", "custom software development"]

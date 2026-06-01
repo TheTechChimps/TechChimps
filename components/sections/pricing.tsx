@@ -11,7 +11,7 @@ export function Pricing() {
       <div className="container">
         <div className="section-header center">
           <span className="eyebrow">Lowest prices on the market</span>
-          <h2 className="title">Simple prices from {formatPrice(49)}.</h2>
+          <h1 className="title">Simple prices from {formatPrice(49)}.</h1>
           <p className="subtitle">Choose a service, choose delivery speed, then pay or make an offer.</p>
         </div>
         <Tabs

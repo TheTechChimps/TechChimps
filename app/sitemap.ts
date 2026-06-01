@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 import { publicServices } from "@/data/services";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.example";
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.com").replace(/\/$/, "");
   const now = new Date();
-  const staticRoutes = ["/services", "/pricing", "/find-us", "/process", "/faq", "/request", "/portal", "/privacy", "/terms", "/refunds"];
+  const staticRoutes = ["/services", "/pricing", "/find-us", "/process", "/faq", "/request", "/privacy", "/terms", "/refunds"];
 
   return [
     {

@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 const bananaDrops = [
   { delay: "-1s", duration: "18s", left: "4%", rotate: "-18deg", size: "26px" },
   { delay: "-9s", duration: "24s", left: "10%", rotate: "16deg", size: "18px" },
@@ -35,4 +37,3 @@ export function BananaRain() {
     </div>
   );
 }
-import type { CSSProperties } from "react";

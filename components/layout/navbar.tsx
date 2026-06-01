@@ -38,7 +38,7 @@ export function Navbar() {
       <nav aria-label="Main navigation" className="navbar container">
         <Link aria-label="TechChimps home" className="brand" href="/" onClick={closeMenus}>
           <span className="brand-mark">
-            <Image alt="" height={40} priority src="/images/techchimps-logo-square-small.png" width={40} />
+            <Image alt="TechChimps logo" height={40} priority src="/images/techchimps-logo-square-small.png" width={40} />
           </span>
           <span>
             <strong>TechChimps</strong>

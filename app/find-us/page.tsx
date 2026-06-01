@@ -133,8 +133,8 @@ export default function FindUsPage() {
             </div>
           </div>
 
-          <div aria-hidden className="find-us-brand-card">
-            <Image alt="" height={220} src="/images/techchimps-logo-square.png" width={220} />
+          <div className="find-us-brand-card">
+            <Image alt="TechChimps glossy monkey and banana logo" height={220} src="/images/techchimps-logo-square.png" width={220} />
             <strong>TechChimps</strong>
             <span>Powered by bananas</span>
           </div>

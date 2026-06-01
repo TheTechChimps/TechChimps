@@ -619,7 +619,7 @@ export function RequestBuilder() {
       <div className="container split request-layout">
         <div>
           <span className="eyebrow">Guided build brief</span>
-          <h2 className="title">Tell us the dream product.</h2>
+          <h1 className="title">Tell us the dream product.</h1>
           <p className="subtitle">Choose a service, answer smart questions or give us creative control, then pay or make an offer.</p>
         </div>
 

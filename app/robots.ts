@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.example";
+  const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.com");
 
   return {
     rules: {
@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin", "/portal"]
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl
+    sitemap: new URL("/sitemap.xml", siteUrl).toString(),
+    host: siteUrl.host
   };
 }

@@ -37,7 +37,7 @@ export function SplashScreen() {
         <span className="splash-orbit splash-orbit-one" />
         <span className="splash-orbit splash-orbit-two" />
         <div className="splash-logo">
-          <Image alt="" height={116} priority src="/images/techchimps-logo-square.png" width={116} />
+          <Image alt="TechChimps glossy monkey and banana logo" height={116} priority src="/images/techchimps-logo-square.png" width={116} />
         </div>
         <div className="splash-copy">
           <span>TechChimps</span>

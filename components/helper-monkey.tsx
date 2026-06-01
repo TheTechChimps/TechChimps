@@ -74,7 +74,7 @@ export function HelperMonkey() {
   return (
     <aside aria-label="TechChimps helper monkey" className={`helper-monkey ${open ? "open" : ""}`}>
       <button aria-label="Open TechChimps helper" className="helper-monkey-avatar" onClick={() => setOpen((value) => !value)} type="button">
-        <Image alt="" height={72} priority src="/images/techchimps-logo-circle-small.png" width={72} />
+        <Image alt="TechChimps helper monkey logo" height={72} src="/images/techchimps-logo-circle-small.png" width={72} />
         <span aria-hidden />
       </button>
 

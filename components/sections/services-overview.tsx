@@ -18,7 +18,7 @@ export function ServicesOverview() {
       <div className="container">
         <Reveal className="section-header">
           <span className="eyebrow">Choose a tech service</span>
-          <h2 className="title">Choose one thing. We make it simple.</h2>
+          <h1 className="title">Choose one thing. We make it simple.</h1>
           <p className="subtitle">Every option is individual, clear, and beginner friendly.</p>
         </Reveal>
         <Stagger className="grid grid-3">

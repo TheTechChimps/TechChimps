@@ -7,7 +7,7 @@ export function Faq() {
       <div className="container split">
         <div className="section-header">
           <span className="eyebrow">FAQ</span>
-          <h2 className="title">Quick answers.</h2>
+          <h1 className="title">Quick answers.</h1>
           <p className="subtitle">Short, plain answers before you start.</p>
         </div>
         <Accordion items={faqs} />
