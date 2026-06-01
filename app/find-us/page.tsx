@@ -151,12 +151,14 @@ export default function FindUsPage() {
                   href={social.href}
                   key={social.name}
                   aria-label={`Open TechChimps on ${social.name}`}
+                  rel="noreferrer"
                   style={
                     {
                       "--social-accent": social.accent,
                       "--social-surface": social.surface
                     } as CSSProperties
                   }
+                  target="_blank"
                 >
                   <span className="find-us-icon">
                     <SocialLogo name={social.name} />

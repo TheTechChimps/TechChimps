@@ -18,34 +18,40 @@ export async function GET(request: Request) {
     (order) => order.contactEmail.trim().toLowerCase() === session.account.email.trim().toLowerCase()
   );
   const supportSessionId = `customer-${session.account.id}`;
-  const chatThreads = await Promise.all(
-    [
-      {
-        kind: "support" as const,
-        label: "General support",
-        orderReference: "",
-        sessionId: supportSessionId,
-        status: "Open"
-      },
-      ...customerOrders.map((order) => ({
-        kind: "order" as const,
-        label: `${order.serviceName} - ${order.reference}`,
-        orderReference: order.reference,
-        sessionId: order.chatSessionId,
-        status: order.status.replaceAll("_", " ")
-      }))
-    ].map(async (thread) => {
-      const threadMessages = (await getLiveChatMessages(thread.sessionId)).filter(isVisibleLiveChatMessage);
-      const lastMessage = threadMessages.at(-1);
+  const chatThreads = (
+    await Promise.all(
+      [
+        {
+          kind: "support" as const,
+          label: "General support",
+          orderReference: "",
+          sessionId: supportSessionId,
+          status: "Open"
+        },
+        ...customerOrders.map((order) => ({
+          kind: "order" as const,
+          label: `${order.serviceName} - ${order.reference}`,
+          orderReference: order.reference,
+          sessionId: order.chatSessionId,
+          status: order.status.replaceAll("_", " ")
+        }))
+      ].map(async (thread) => {
+        const threadMessages = (await getLiveChatMessages(thread.sessionId)).filter(isVisibleLiveChatMessage);
+        const lastMessage = threadMessages.at(-1);
 
-      return {
-        ...thread,
-        lastMessage: lastMessage?.body ?? "No messages yet. Start the conversation here.",
-        lastMessageAt: lastMessage?.createdAt ?? "",
-        messages: threadMessages
-      };
-    })
-  );
+        return {
+          ...thread,
+          lastMessage: lastMessage?.body ?? "No messages yet. Start the conversation here.",
+          lastMessageAt: lastMessage?.createdAt ?? "",
+          messages: threadMessages
+        };
+      })
+    )
+  ).sort((a, b) => {
+    if (a.lastMessageAt || b.lastMessageAt) return b.lastMessageAt.localeCompare(a.lastMessageAt);
+    if (a.kind !== b.kind) return a.kind === "order" ? -1 : 1;
+    return a.label.localeCompare(b.label);
+  });
 
   return NextResponse.json({
     chatThreads,
