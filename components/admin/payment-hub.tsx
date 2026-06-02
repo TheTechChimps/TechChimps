@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, CreditCard, Loader2, PoundSterling, ReceiptText, RotateCcw } from "lucide-react";
+import { CalendarCheck, ChevronDown, CreditCard, Loader2, PoundSterling, ReceiptText, RotateCcw } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -38,6 +38,12 @@ function getRemainingAmount(order: OrderRecord) {
   return Math.max(0, order.amount - (order.refundedAmount ?? 0));
 }
 
+function paymentStatus(order: OrderRecord) {
+  if (order.refundStatus === "full") return "Refunded";
+  if (order.refundStatus === "partial") return "Part refunded";
+  return "Paid";
+}
+
 export function PaymentHub() {
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [selectedReference, setSelectedReference] = useState("");
@@ -53,7 +59,7 @@ export function PaymentHub() {
       const paidOrders = data.orders.filter((order) => Boolean(order.paidAt || order.stripePaymentStatus === "paid"));
       setOrders(paidOrders);
       setSelectedReference((current) =>
-        paidOrders.some((order) => order.reference === current) ? current : paidOrders[0]?.reference ?? ""
+        paidOrders.some((order) => order.reference === current) ? current : ""
       );
     }
     setLoading(false);
@@ -73,21 +79,21 @@ export function PaymentHub() {
     () => orders.find((order) => order.reference === selectedReference),
     [orders, selectedReference]
   );
-  const remainingAmount = selectedOrder ? getRemainingAmount(selectedOrder) : 0;
   const totalPaid = orders.reduce((total, order) => total + order.amount, 0);
   const totalRefunded = orders.reduce((total, order) => total + (order.refundedAmount ?? 0), 0);
 
-  const submitRefund = async (mode: "full" | "partial") => {
-    if (!selectedOrder) return;
+  const submitRefund = async (mode: "full" | "partial", order = selectedOrder) => {
+    if (!order) return;
 
+    const remainingAmount = getRemainingAmount(order);
     const amount = mode === "full" ? remainingAmount : Number(partialAmount);
     if (!Number.isFinite(amount) || amount <= 0 || amount > remainingAmount) {
-      setNotice(`Enter an amount between £0.01 and ${formatMoney(remainingAmount)}.`);
+      setNotice(`Enter an amount between GBP 0.01 and ${formatMoney(remainingAmount)}.`);
       return;
     }
 
     const confirmed = window.confirm(
-      `Refund ${formatMoney(amount)} to ${selectedOrder.contactName || "this customer"} for ${selectedOrder.reference}? This sends a real Stripe refund to the original payment method.`
+      `Refund ${formatMoney(amount)} to ${order.contactName || "this customer"} for ${order.reference}? This sends a real Stripe refund to the original payment method.`
     );
     if (!confirmed) return;
 
@@ -96,9 +102,9 @@ export function PaymentHub() {
     const response = await fetch("/api/admin/refunds", {
       body: JSON.stringify({
         amount: mode === "partial" ? amount : undefined,
-        confirmReference: selectedOrder.reference,
+        confirmReference: order.reference,
         mode,
-        reference: selectedOrder.reference,
+        reference: order.reference,
         requestId: crypto.randomUUID()
       }),
       headers: {
@@ -123,9 +129,9 @@ export function PaymentHub() {
     setSubmitting("");
   };
 
-  const submitPartialRefund = (event: FormEvent<HTMLFormElement>) => {
+  const submitPartialRefund = (event: FormEvent<HTMLFormElement>, order: OrderRecord) => {
     event.preventDefault();
-    void submitRefund("partial");
+    void submitRefund("partial", order);
   };
 
   return (
@@ -135,7 +141,7 @@ export function PaymentHub() {
           <span className="eyebrow">
             <ReceiptText aria-hidden size={15} /> Payment hub
           </span>
-          <h2>Payments, dates, and refunds in one place.</h2>
+          <h2>Compact payment records with refunds tucked inside.</h2>
         </div>
         <StatusIndicator label={`${orders.length} paid orders`} tone={orders.length ? "active" : "good"} />
       </div>
@@ -157,112 +163,112 @@ export function PaymentHub() {
 
       {loading ? (
         <p className="helper">Loading Stripe payment records...</p>
-      ) : selectedOrder ? (
-        <div className="payment-hub-grid">
-          <div className="payment-ledger" aria-label="Paid customer orders">
-            {orders.map((order) => (
-              <button
-                aria-pressed={order.reference === selectedReference}
-                className={order.reference === selectedReference ? "active" : ""}
+      ) : orders.length ? (
+        <div className="payment-accordion-list" aria-label="Paid customer orders">
+          {orders.map((order) => {
+            const isOpen = order.reference === selectedReference;
+            const remainingAmount = getRemainingAmount(order);
+
+            return (
+              <details
+                className="payment-accordion-item"
                 key={order.reference}
-                onClick={() => {
-                  setSelectedReference(order.reference);
-                  setPartialAmount("");
-                  setNotice("");
+                onToggle={(event) => {
+                  if (event.currentTarget.open) {
+                    setSelectedReference(order.reference);
+                    setPartialAmount("");
+                    setNotice("");
+                  } else if (selectedReference === order.reference) {
+                    setSelectedReference("");
+                  }
                 }}
-                type="button"
+                open={isOpen}
               >
-                <span>
-                  <strong>{order.contactName || "Customer"}</strong>
-                  <small>{order.serviceName}</small>
-                  <small>{order.reference}</small>
-                </span>
-                <b>{formatMoney(order.amount)}</b>
-              </button>
-            ))}
-          </div>
+                <summary>
+                  <span className="payment-summary-main">
+                    <strong>{order.contactName || "Customer"}</strong>
+                    <small>{order.serviceName}</small>
+                  </span>
+                  <span className="payment-summary-meta">
+                    <b>{formatMoney(order.amount)}</b>
+                    <small>{order.reference}</small>
+                  </span>
+                  <StatusIndicator label={paymentStatus(order)} tone={order.refundStatus ? "warning" : "good"} />
+                  <ChevronDown aria-hidden size={18} />
+                </summary>
 
-          <div className="payment-detail">
-            <div className="payment-detail-top">
-              <div>
-                <span className="eyebrow">Selected payment</span>
-                <h3>{selectedOrder.contactName || "Customer"}</h3>
-                <p>{selectedOrder.serviceName}</p>
-              </div>
-              <StatusIndicator
-                label={selectedOrder.refundStatus === "full" ? "Refunded" : selectedOrder.refundStatus === "partial" ? "Part refunded" : "Paid"}
-                tone={selectedOrder.refundStatus ? "warning" : "good"}
-              />
-            </div>
+                <div className="payment-accordion-body">
+                  <dl className="payment-facts">
+                    <div>
+                      <dt><PoundSterling aria-hidden size={15} /> Paid</dt>
+                      <dd>{formatMoney(order.amount)}</dd>
+                    </div>
+                    <div>
+                      <dt><CreditCard aria-hidden size={15} /> Method</dt>
+                      <dd>{order.paymentMethod || "Stripe Checkout"}</dd>
+                    </div>
+                    <div>
+                      <dt><CalendarCheck aria-hidden size={15} /> Paid on</dt>
+                      <dd>{formatDateTime(order.paidAt)}</dd>
+                    </div>
+                    <div>
+                      <dt><CalendarCheck aria-hidden size={15} /> Estimated completion</dt>
+                      <dd>{formatDate(order.completionDate)}</dd>
+                    </div>
+                  </dl>
 
-            <dl className="payment-facts">
-              <div>
-                <dt><PoundSterling aria-hidden size={15} /> Paid</dt>
-                <dd>{formatMoney(selectedOrder.amount)}</dd>
-              </div>
-              <div>
-                <dt><CreditCard aria-hidden size={15} /> Method</dt>
-                <dd>{selectedOrder.paymentMethod || "Stripe Checkout"}</dd>
-              </div>
-              <div>
-                <dt><CalendarCheck aria-hidden size={15} /> Paid on</dt>
-                <dd>{formatDateTime(selectedOrder.paidAt)}</dd>
-              </div>
-              <div>
-                <dt><CalendarCheck aria-hidden size={15} /> Estimated completion</dt>
-                <dd>{formatDate(selectedOrder.completionDate)}</dd>
-              </div>
-            </dl>
+                  <div className="refund-balance">
+                    <span>Refundable balance</span>
+                    <strong>{formatMoney(remainingAmount)}</strong>
+                    {order.refundedAmount ? <small>{formatMoney(order.refundedAmount)} already returned</small> : null}
+                  </div>
 
-            <div className="refund-balance">
-              <span>Refundable balance</span>
-              <strong>{formatMoney(remainingAmount)}</strong>
-              {selectedOrder.refundedAmount ? <small>{formatMoney(selectedOrder.refundedAmount)} already returned</small> : null}
-            </div>
-
-            {remainingAmount > 0 ? (
-              <div className="refund-actions">
-                <Button
-                  disabled={Boolean(submitting)}
-                  icon={submitting === "full" ? Loader2 : RotateCcw}
-                  onClick={() => void submitRefund("full")}
-                  type="button"
-                >
-                  {submitting === "full" ? "Refunding" : "Full refund"}
-                </Button>
-                <form onSubmit={submitPartialRefund}>
-                  <label className="field">
-                    <span className="label">Partial amount</span>
-                    <span className="refund-amount-input">
-                      <PoundSterling aria-hidden size={16} />
-                      <input
-                        aria-label="Partial refund amount in pounds"
-                        className="input"
-                        inputMode="decimal"
-                        max={remainingAmount}
-                        min="0.01"
-                        onChange={(event) => setPartialAmount(event.target.value)}
-                        placeholder="0.00"
-                        step="0.01"
-                        type="number"
-                        value={partialAmount}
-                      />
-                    </span>
-                  </label>
-                  <Button
-                    disabled={Boolean(submitting) || !partialAmount}
-                    icon={submitting === "partial" ? Loader2 : PoundSterling}
-                    type="submit"
-                    variant="secondary"
-                  >
-                    {submitting === "partial" ? "Refunding" : "Partial refund"}
-                  </Button>
-                </form>
-              </div>
-            ) : (
-              <p className="helper">This payment has already been refunded in full.</p>
-            )}
-          </div>
+                  {remainingAmount > 0 ? (
+                    <div className="refund-actions">
+                      <Button
+                        disabled={Boolean(submitting)}
+                        icon={submitting === "full" ? Loader2 : RotateCcw}
+                        onClick={() => void submitRefund("full", order)}
+                        type="button"
+                      >
+                        {submitting === "full" ? "Refunding" : "Full refund"}
+                      </Button>
+                      <form onSubmit={(event) => submitPartialRefund(event, order)}>
+                        <label className="field">
+                          <span className="label">Partial amount</span>
+                          <span className="refund-amount-input">
+                            <PoundSterling aria-hidden size={16} />
+                            <input
+                              aria-label="Partial refund amount in pounds"
+                              className="input"
+                              inputMode="decimal"
+                              max={remainingAmount}
+                              min="0.01"
+                              onChange={(event) => setPartialAmount(event.target.value)}
+                              placeholder="0.00"
+                              step="0.01"
+                              type="number"
+                              value={partialAmount}
+                            />
+                          </span>
+                        </label>
+                        <Button
+                          disabled={Boolean(submitting) || !partialAmount}
+                          icon={submitting === "partial" ? Loader2 : PoundSterling}
+                          type="submit"
+                          variant="secondary"
+                        >
+                          {submitting === "partial" ? "Refunding" : "Partial refund"}
+                        </Button>
+                      </form>
+                    </div>
+                  ) : (
+                    <p className="helper">This payment has already been refunded in full.</p>
+                  )}
+                </div>
+              </details>
+            );
+          })}
         </div>
       ) : (
         <p className="helper">Paid customer orders will appear here automatically after Stripe confirms checkout.</p>

@@ -382,85 +382,93 @@ export function CustomerListConsole() {
                           const canRefund = Boolean(order.stripeSessionId && isPaid(order) && remainingAmount > 0);
 
                           return (
-                            <article key={order.reference}>
-                              <div className="customer-order-topline">
-                                <strong>{order.serviceName}</strong>
+                            <details className="customer-order-accordion" key={order.reference}>
+                              <summary>
+                                <span className="customer-order-title">
+                                  <strong>{order.serviceName}</strong>
+                                  <small>{order.reference}</small>
+                                </span>
+                                <span className="customer-order-money">{formatMoney(order.amount)}</span>
                                 <StatusIndicator label={humanStatus(order.status)} tone={isPaid(order) ? "good" : "active"} />
-                              </div>
-                              <dl className="customer-payment-facts">
-                                <div>
-                                  <dt>Reference</dt>
-                                  <dd>{order.reference}</dd>
-                                </div>
-                                <div>
-                                  <dt>Amount</dt>
-                                  <dd>{formatMoney(order.amount)}</dd>
-                                </div>
-                                <div>
-                                  <dt>Paid</dt>
-                                  <dd>{formatDateTime(order.paidAt)}</dd>
-                                </div>
-                                <div>
-                                  <dt>ETA</dt>
-                                  <dd>{formatDate(order.completionDate)}</dd>
-                                </div>
-                                <div>
-                                  <dt>Refundable</dt>
-                                  <dd>{formatMoney(remainingAmount)}</dd>
-                                </div>
-                                <div>
-                                  <dt>Method</dt>
-                                  <dd>{order.paymentMethod || "Stripe Checkout"}</dd>
-                                </div>
-                              </dl>
-                              {canRefund ? (
-                                <div className="customer-refund-row">
-                                  <Button
-                                    disabled={refundingReference === order.reference}
-                                    icon={refundingReference === order.reference ? Loader2 : RotateCcw}
-                                    onClick={() => void submitRefund(order, "full")}
-                                    type="button"
-                                  >
-                                    Full refund
-                                  </Button>
-                                  <form
-                                    onSubmit={(event) => {
-                                      event.preventDefault();
-                                      void submitRefund(order, "partial");
-                                    }}
-                                  >
-                                    <span className="refund-amount-input">
-                                      <PoundSterling aria-hidden size={15} />
-                                      <input
-                                        aria-label={`Partial refund for ${order.reference}`}
-                                        className="input"
-                                        inputMode="decimal"
-                                        max={remainingAmount}
-                                        min="0.01"
-                                        onChange={(event) =>
-                                          setPartialAmounts((current) => ({
-                                            ...current,
-                                            [order.reference]: event.target.value
-                                          }))
-                                        }
-                                        placeholder="0.00"
-                                        step="0.01"
-                                        type="number"
-                                        value={partialAmounts[order.reference] ?? ""}
-                                      />
-                                    </span>
+                                <ChevronDown aria-hidden size={17} />
+                              </summary>
+
+                              <div className="customer-order-body">
+                                <dl className="customer-payment-facts">
+                                  <div>
+                                    <dt>Reference</dt>
+                                    <dd>{order.reference}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Amount</dt>
+                                    <dd>{formatMoney(order.amount)}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Paid</dt>
+                                    <dd>{formatDateTime(order.paidAt)}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>ETA</dt>
+                                    <dd>{formatDate(order.completionDate)}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Refundable</dt>
+                                    <dd>{formatMoney(remainingAmount)}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Method</dt>
+                                    <dd>{order.paymentMethod || "Stripe Checkout"}</dd>
+                                  </div>
+                                </dl>
+                                {canRefund ? (
+                                  <div className="customer-refund-row">
                                     <Button
-                                      disabled={refundingReference === order.reference || !partialAmounts[order.reference]}
-                                      icon={CreditCard}
-                                      type="submit"
-                                      variant="secondary"
+                                      disabled={refundingReference === order.reference}
+                                      icon={refundingReference === order.reference ? Loader2 : RotateCcw}
+                                      onClick={() => void submitRefund(order, "full")}
+                                      type="button"
                                     >
-                                      Partial
+                                      Full refund
                                     </Button>
-                                  </form>
-                                </div>
-                              ) : null}
-                            </article>
+                                    <form
+                                      onSubmit={(event) => {
+                                        event.preventDefault();
+                                        void submitRefund(order, "partial");
+                                      }}
+                                    >
+                                      <span className="refund-amount-input">
+                                        <PoundSterling aria-hidden size={15} />
+                                        <input
+                                          aria-label={`Partial refund for ${order.reference}`}
+                                          className="input"
+                                          inputMode="decimal"
+                                          max={remainingAmount}
+                                          min="0.01"
+                                          onChange={(event) =>
+                                            setPartialAmounts((current) => ({
+                                              ...current,
+                                              [order.reference]: event.target.value
+                                            }))
+                                          }
+                                          placeholder="0.00"
+                                          step="0.01"
+                                          type="number"
+                                          value={partialAmounts[order.reference] ?? ""}
+                                        />
+                                      </span>
+                                      <Button
+                                        disabled={refundingReference === order.reference || !partialAmounts[order.reference]}
+                                        icon={CreditCard}
+                                        type="submit"
+                                        variant="secondary"
+                                      >
+                                        Partial
+                                      </Button>
+                                    </form>
+                                  </div>
+                                ) : null}
+                              </div>
+                            </details>
                           );
                         })}
                       </div>
