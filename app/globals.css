@@ -2402,6 +2402,82 @@ img {
   color: var(--text-muted);
 }
 
+.discount-code-manager {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.discount-code-form {
+  align-items: end;
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: minmax(8rem, 0.8fr) minmax(7rem, 0.45fr) minmax(9rem, 0.9fr) minmax(12rem, 1.2fr) auto;
+}
+
+.discount-code-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.discount-code-row {
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: clip;
+}
+
+.discount-code-row summary {
+  align-items: center;
+  cursor: pointer;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  list-style: none;
+  padding: 0.75rem;
+}
+
+.discount-code-row summary::-webkit-details-marker {
+  display: none;
+}
+
+.discount-code-row[open] summary svg:last-child {
+  transform: rotate(180deg);
+}
+
+.discount-code-row summary span,
+.discount-code-row-body {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.discount-code-row summary span:last-of-type {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.discount-code-row small,
+.discount-code-row-body,
+.discount-code-row-body p {
+  color: var(--text-muted);
+}
+
+.discount-code-row b {
+  color: var(--brand-strong);
+}
+
+.discount-code-row-body {
+  border-top: 1px solid var(--border);
+  padding: var(--space-1);
+}
+
+.discount-code-row-body div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
 .form-error {
   color: var(--coral);
   font-weight: 850;
@@ -3935,6 +4011,31 @@ img {
   margin: 0;
 }
 
+.chat-head-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+}
+
+.end-chat-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.chat-ended-notice {
+  background: color-mix(in srgb, var(--honey) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--honey) 30%, var(--border));
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 850;
+  margin: 0;
+  padding: 0.75rem;
+}
+
 .customer-console-grid {
   align-items: start;
   display: grid;
@@ -4515,7 +4616,7 @@ img {
 .admin-quick-nav {
   display: grid;
   gap: 0.55rem;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .admin-quick-nav a {
@@ -5556,6 +5657,20 @@ img {
 
   .payment-accordion-item summary {
     grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .discount-code-form,
+  .discount-code-row summary {
+    grid-template-columns: 1fr;
+  }
+
+  .discount-code-form {
+    align-items: stretch;
+  }
+
+  .discount-code-row summary span:last-of-type,
+  .chat-head-actions {
+    justify-content: flex-start;
   }
 
   .payment-accordion-item summary .status,

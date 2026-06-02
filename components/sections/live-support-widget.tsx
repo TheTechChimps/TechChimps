@@ -1,13 +1,13 @@
 "use client";
 
-import { LifeBuoy, Loader2, Maximize2, Minimize2, Send, Volume2, VolumeX, X } from "lucide-react";
+import { Archive, LifeBuoy, Loader2, Maximize2, Minimize2, Send, Volume2, VolumeX, X } from "lucide-react";
 import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { MessageText } from "@/components/ui/message-text";
 import { StatusIndicator } from "@/components/ui/status-indicator";
-import type { LiveChatMessage } from "@/lib/live-chat";
+import type { LiveChatMessage, LiveChatSessionMeta } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
 import { liveSupportEtaMessage, liveSupportHandoffMessage } from "@/lib/support-copy";
 
@@ -36,6 +36,7 @@ export function LiveSupportWidget({
     return next;
   });
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
+  const [sessionMeta, setSessionMeta] = useState<LiveChatSessionMeta | null>(null);
   const [body, setBody] = useState("");
   const [author, setAuthor] = useState("");
   const [sending, setSending] = useState(false);
@@ -57,7 +58,7 @@ export function LiveSupportWidget({
     if (!activeSessionId) return;
     const response = await fetch(`/api/live-chat?sessionId=${encodeURIComponent(activeSessionId)}`, { cache: "no-store" });
     if (!response.ok) return;
-    const data = (await response.json()) as { messages: LiveChatMessage[] };
+    const data = (await response.json()) as { messages: LiveChatMessage[]; session?: LiveChatSessionMeta };
     const latestAgentMessage = [...data.messages].reverse().find((message) => message.role === "agent");
 
     if (
@@ -72,6 +73,7 @@ export function LiveSupportWidget({
     if (latestAgentMessage) latestAgentMessageIdRef.current = latestAgentMessage.id;
     loadedOnceRef.current = true;
     setMessages(data.messages);
+    setSessionMeta(data.session ?? null);
   }, [activeSessionId, soundEnabled]);
 
   useEffect(() => {
@@ -128,9 +130,48 @@ export function LiveSupportWidget({
     setMinimized(false);
   };
 
+  const chatEnded = sessionMeta?.status === "ended";
+
+  const startNewChat = () => {
+    const next = `visitor-${crypto.randomUUID()}`;
+    window.localStorage.setItem("techchimps-live-chat-session", next);
+    setActiveSessionId(next);
+    setMessages([]);
+    setSessionMeta(null);
+    setBody("");
+    setOpen(true);
+    setMinimized(false);
+  };
+
+  const endChat = async () => {
+    if (!activeSessionId || chatEnded) return;
+
+    const confirmed = window.confirm("End this live chat and save it as previous chat history?");
+    if (!confirmed) return;
+
+    const response = await fetch("/api/live-chat", {
+      body: JSON.stringify({
+        action: "end",
+        author: author || "Website visitor",
+        role: "visitor",
+        sessionId: activeSessionId
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "PATCH"
+    });
+
+    if (response.ok) {
+      const data = (await response.json()) as { messages: LiveChatMessage[]; session?: LiveChatSessionMeta };
+      setMessages(data.messages);
+      setSessionMeta(data.session ?? null);
+    }
+  };
+
   const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!body.trim()) return;
+    if (!body.trim() || chatEnded) return;
 
     void primeNotificationSound();
     setSending(true);
@@ -200,11 +241,18 @@ export function LiveSupportWidget({
             <button aria-label="Minimise live chat" className="icon-button" onClick={() => setMinimized(true)} type="button">
               <Minimize2 aria-hidden size={17} />
             </button>
+            {!chatEnded ? (
+              <button aria-label="End live chat" className="icon-button" onClick={() => void endChat()} type="button">
+                <Archive aria-hidden size={17} />
+              </button>
+            ) : null}
           </div>
           <div className="chat-status-row">
-            <StatusIndicator label="Live chat connected" tone="good" />
+            <StatusIndicator label={chatEnded ? "Previous chat" : "Live chat connected"} tone="good" />
             <span>
-              {liveSupportHandoffMessage} {liveSupportEtaMessage}
+              {chatEnded
+                ? "This chat is closed and saved. You can start a new chat if you need anything else."
+                : `${liveSupportHandoffMessage} ${liveSupportEtaMessage}`}
             </span>
           </div>
           <div aria-live="polite" className="chat-thread">
@@ -237,14 +285,21 @@ export function LiveSupportWidget({
               <textarea
                 aria-label="Chat message"
                 className="textarea chat-textarea"
+                disabled={chatEnded}
                 onChange={(event) => setBody(event.target.value)}
-                placeholder="Hi, I need help choosing the right option..."
+                placeholder={chatEnded ? "This previous chat is read-only." : "Hi, I need help choosing the right option..."}
                 value={body}
               />
             </label>
-            <Button disabled={sending || !body.trim()} icon={sending ? Loader2 : Send} type="submit">
-              {sending ? "Sending" : "Send live message"}
-            </Button>
+            {chatEnded ? (
+              <Button icon={LifeBuoy} onClick={startNewChat} type="button" variant="secondary">
+                Start new chat
+              </Button>
+            ) : (
+              <Button disabled={sending || !body.trim()} icon={sending ? Loader2 : Send} type="submit">
+                {sending ? "Sending" : "Send live message"}
+              </Button>
+            )}
           </form>
           <p className="helper">
             Messages go straight into the TechChimps support inbox. Ask anything, send extra details, or tell us if something is not right.

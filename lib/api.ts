@@ -53,6 +53,20 @@ export type CheckoutResponse = {
   url?: string;
 };
 
+export type DiscountValidationResponse = {
+  discount: {
+    amount: number;
+    code?: string;
+    description?: string;
+    discountAmount: number;
+    ineligibleReason?: string;
+    label?: string;
+    originalAmount: number;
+    percentOff: number;
+    valid: boolean;
+  };
+};
+
 export async function uploadProjectFiles(batchId: string, files: File[]): Promise<ApiResult<NonNullable<QuotePayload["uploadedFiles"]>>> {
   if (!files.length) {
     return { ok: true, data: [] };
@@ -129,5 +143,37 @@ export async function createCheckoutSession(payload: QuotePayload): Promise<ApiR
   return {
     ok: true,
     data
+  };
+}
+
+export async function validateDiscountCode({
+  amount,
+  code,
+  serviceType
+}: {
+  amount: number;
+  code: string;
+  serviceType: string;
+}): Promise<ApiResult<DiscountValidationResponse["discount"]>> {
+  const response = await fetch("/api/discount-codes/validate", {
+    body: JSON.stringify({ amount, code, serviceType }),
+    headers: {
+      "Content-Type": "application/json"
+    },
+    method: "POST"
+  });
+
+  const data = (await response.json().catch(() => ({}))) as DiscountValidationResponse & { error?: string };
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      error: data.error ?? "Discount code could not be checked."
+    };
+  }
+
+  return {
+    ok: true,
+    data: data.discount
   };
 }

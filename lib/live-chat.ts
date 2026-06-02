@@ -13,17 +13,31 @@ export type LiveChatMessage = {
 };
 
 export type LiveChatSessionSummary = {
+  endedAt?: string;
+  endedBy?: string;
+  endedByRole?: LiveChatRole;
   sessionId: string;
   customerName: string;
   lastMessage: string;
   lastMessageAt: string;
   priority: NonNullable<LiveChatMessage["priority"]>;
+  status: "open" | "ended";
   unreadVisitorMessages: number;
   messageCount: number;
 };
 
+export type LiveChatSessionMeta = {
+  endedAt?: string;
+  endedBy?: string;
+  endedByRole?: LiveChatRole;
+  sessionId: string;
+  status: "open" | "ended";
+  updatedAt: string;
+};
+
 const CHAT_STORE = "techchimps-live-chat";
 const CHAT_KEY = "messages";
+const SESSION_META_KEY = "sessions";
 
 export function isVisibleLiveChatMessage(message: LiveChatMessage) {
   if (message.role === "system") return false;
@@ -54,15 +68,79 @@ export async function getLiveChatMessages(sessionId?: string) {
   }));
 
   if (!sessionId) {
-    return messages.length ? messages.slice(-150) : [welcomeMessage("site-visitor")];
+    return messages.length ? messages.slice(-500) : [welcomeMessage("site-visitor")];
   }
 
   const sessionMessages = messages.filter((message) => message.sessionId === sessionId).slice(-100);
   return sessionMessages.length ? sessionMessages : [welcomeMessage(sessionId)];
 }
 
+export async function getLiveChatSessionMetas() {
+  return (await readJson<LiveChatSessionMeta[]>(CHAT_STORE, SESSION_META_KEY)) ?? [];
+}
+
+export async function getLiveChatSessionMeta(sessionId: string): Promise<LiveChatSessionMeta> {
+  const metas = await getLiveChatSessionMetas();
+  return (
+    metas.find((meta) => meta.sessionId === sessionId) ?? {
+      sessionId,
+      status: "open",
+      updatedAt: new Date().toISOString()
+    }
+  );
+}
+
+async function saveLiveChatSessionMeta(nextMeta: LiveChatSessionMeta) {
+  const metas = await getLiveChatSessionMetas();
+  const nextMetas = [
+    nextMeta,
+    ...metas.filter((meta) => meta.sessionId !== nextMeta.sessionId)
+  ].slice(0, 500);
+
+  await writeJson(CHAT_STORE, SESSION_META_KEY, nextMetas);
+  return nextMeta;
+}
+
+export async function endLiveChatSession({
+  endedBy = "TechChimps",
+  endedByRole = "agent",
+  sessionId
+}: {
+  endedBy?: string;
+  endedByRole?: LiveChatRole;
+  sessionId: string;
+}) {
+  const current = await getLiveChatSessionMeta(sessionId);
+  const endedAt = current.endedAt ?? new Date().toISOString();
+
+  return saveLiveChatSessionMeta({
+    ...current,
+    endedAt,
+    endedBy,
+    endedByRole,
+    sessionId,
+    status: "ended",
+    updatedAt: new Date().toISOString()
+  });
+}
+
+export async function reopenLiveChatSession(sessionId: string) {
+  const current = await getLiveChatSessionMeta(sessionId);
+
+  return saveLiveChatSessionMeta({
+    sessionId,
+    status: "open",
+    updatedAt: new Date().toISOString(),
+    endedAt: undefined,
+    endedBy: undefined,
+    endedByRole: current.endedByRole
+  });
+}
+
 export async function getLiveChatSessions() {
   const messages = (await readJson<LiveChatMessage[]>(CHAT_STORE, CHAT_KEY)) ?? [];
+  const metas = await getLiveChatSessionMetas();
+  const metaMap = new Map(metas.map((meta) => [meta.sessionId, meta]));
   const sessions = new Map<string, LiveChatMessage[]>();
 
   for (const message of messages) {
@@ -79,6 +157,8 @@ export async function getLiveChatSessions() {
 
   return Array.from(sessions.entries())
     .map(([sessionId, sessionMessages]): LiveChatSessionSummary | null => {
+      const meta = metaMap.get(sessionId);
+      const isEnded = meta?.status === "ended";
       const sorted = sessionMessages
         .filter(isVisibleLiveChatMessage)
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
@@ -86,23 +166,29 @@ export async function getLiveChatSessions() {
 
       const lastMessage = sorted[sorted.length - 1];
       const lastAgentIndex = sorted.map((message) => message.role).lastIndexOf("agent");
-      const unreadMessages = sorted
-        .slice(lastAgentIndex + 1)
-        .filter((message) => message.role === "visitor");
+      const unreadMessages = isEnded
+        ? []
+        : sorted.slice(lastAgentIndex + 1).filter((message) => message.role === "visitor");
       const unreadVisitorMessages = unreadMessages.length;
       const visitor = sorted.find((message) => message.role === "visitor");
-      const priority = unreadMessages.some((message) => message.priority === "payment")
-        ? "payment"
-        : unreadMessages.some((message) => message.priority === "waiting") || unreadVisitorMessages
-          ? "waiting"
-          : "normal";
+      const priority = isEnded
+        ? "normal"
+        : unreadMessages.some((message) => message.priority === "payment")
+          ? "payment"
+          : unreadMessages.some((message) => message.priority === "waiting") || unreadVisitorMessages
+            ? "waiting"
+            : "normal";
 
       return {
+        endedAt: meta?.endedAt,
+        endedBy: meta?.endedBy,
+        endedByRole: meta?.endedByRole,
         sessionId,
         customerName: visitor?.author || sessionId.replace(/^customer-|^visitor-|^order-/, "").slice(0, 28) || "Website visitor",
         lastMessage: lastMessage.body,
-        lastMessageAt: lastMessage.createdAt,
+        lastMessageAt: meta?.endedAt ?? lastMessage.createdAt,
         priority,
+        status: isEnded ? "ended" : "open",
         unreadVisitorMessages,
         messageCount: sorted.length
       };
@@ -150,12 +236,16 @@ export async function deleteLiveChatSessions(sessionIds: string[]) {
 
   const messages = (await readJson<LiveChatMessage[]>(CHAT_STORE, CHAT_KEY)) ?? [];
   const nextMessages = messages.filter((message) => !sessionSet.has(message.sessionId));
+  const metas = await getLiveChatSessionMetas();
+  const nextMetas = metas.filter((meta) => !sessionSet.has(meta.sessionId));
   await writeJson(CHAT_STORE, CHAT_KEY, nextMessages);
+  await writeJson(CHAT_STORE, SESSION_META_KEY, nextMetas);
   return messages.length - nextMessages.length;
 }
 
 export async function deleteAllLiveChatMessages() {
   const messages = (await readJson<LiveChatMessage[]>(CHAT_STORE, CHAT_KEY)) ?? [];
   await writeJson(CHAT_STORE, CHAT_KEY, []);
+  await writeJson(CHAT_STORE, SESSION_META_KEY, []);
   return messages.length;
 }

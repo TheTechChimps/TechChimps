@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Archive,
   FileText,
   Inbox,
   KeyRound,
@@ -25,6 +26,8 @@ import type { LiveChatMessage } from "@/lib/live-chat";
 import type { OrderRecord } from "@/lib/orders";
 
 type PortalChatThread = {
+  endedAt?: string;
+  isEnded?: boolean;
   kind: "order" | "support";
   label: string;
   lastMessage: string;
@@ -70,6 +73,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
   const [error, setError] = useState("");
   const [supportBody, setSupportBody] = useState("");
   const [supportStatus, setSupportStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [endingChat, setEndingChat] = useState("");
   const [form, setForm] = useState({
     email: "",
     name: "",
@@ -166,7 +170,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
 
   const sendChatMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!data || !supportBody.trim()) return;
+    if (!data || !supportBody.trim() || activeChatThread?.isEnded) return;
 
     const sessionId = activeChatThread?.sessionId ?? `customer-${data.user.id}`;
     setSupportStatus("sending");
@@ -212,6 +216,36 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
     setActiveChatSessionId(sessionId);
     setSupportStatus("idle");
     setActiveTab("chats");
+  };
+
+  const endActiveChat = async () => {
+    if (!data || !activeChatThread || activeChatThread.isEnded) return;
+
+    const confirmed = window.confirm("End this chat and save it as previous chat history?");
+    if (!confirmed) return;
+
+    setEndingChat(activeChatThread.sessionId);
+    setSupportStatus("idle");
+    const response = await fetch("/api/live-chat", {
+      body: JSON.stringify({
+        action: "end",
+        author: data.user.name || data.user.email,
+        role: "visitor",
+        sessionId: activeChatThread.sessionId
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "PATCH"
+    });
+
+    if (response.ok) {
+      await loadPortal();
+    } else {
+      setSupportStatus("error");
+    }
+
+    setEndingChat("");
   };
 
   const portalTabs: { icon: ElementType; label: string; value: PortalTab }[] = [
@@ -278,7 +312,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
           </span>
           <h2>Talk to the team</h2>
         </div>
-        <StatusIndicator label={`${data?.chatThreads.length ?? 0} active`} tone="active" />
+        <StatusIndicator label={`${data?.chatThreads.filter((thread) => !thread.isEnded).length ?? 0} active`} tone="active" />
       </div>
 
       <div className="portal-chat-layout imessage-grid">
@@ -294,9 +328,14 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
               <span className="conversation-avatar">{initials(thread.label)}</span>
               <span className="conversation-main">
                 <strong>{thread.label}</strong>
-                <small>{thread.kind === "order" ? thread.orderReference : "Support"}</small>
+                <small>{thread.isEnded ? "Previous chat" : thread.kind === "order" ? thread.orderReference : "Support"}</small>
                 <small>{thread.lastMessage}</small>
               </span>
+              {thread.isEnded ? (
+                <span className="conversation-meta">
+                  <StatusIndicator label="Previous" tone="good" />
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -315,7 +354,23 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
                 </span>
               ) : null}
             </div>
-            <StatusIndicator label={activeChatThread?.kind === "order" ? "Order chat" : "Support"} tone="good" />
+            <div className="chat-head-actions">
+              <StatusIndicator
+                label={activeChatThread?.isEnded ? "Previous" : activeChatThread?.kind === "order" ? "Order chat" : "Support"}
+                tone="good"
+              />
+              {activeChatThread && !activeChatThread.isEnded ? (
+                <button
+                  className="text-button end-chat-button"
+                  disabled={endingChat === activeChatThread.sessionId}
+                  onClick={() => void endActiveChat()}
+                  type="button"
+                >
+                  <Archive aria-hidden size={15} />
+                  {endingChat === activeChatThread.sessionId ? "Ending" : "End chat"}
+                </button>
+              ) : null}
+            </div>
           </div>
 
           <div aria-live="polite" className="chat-thread portal-chat-thread">
@@ -340,17 +395,24 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
             )}
           </div>
 
+          {activeChatThread?.isEnded ? (
+            <p className="chat-ended-notice">
+              This chat is closed and saved in your previous conversations. You can still read it here whenever you need it.
+            </p>
+          ) : null}
+
           <form className="customer-message-form" onSubmit={sendChatMessage}>
             <label className="field">
               <span className="label">Message</span>
               <textarea
                 aria-label="Customer chat message"
                 className="textarea chat-textarea"
+                disabled={activeChatThread?.isEnded}
                 onChange={(event) => {
                   setSupportStatus("idle");
                   setSupportBody(event.target.value);
                 }}
-                placeholder="Reply here, ask a question, or add extra details..."
+                placeholder={activeChatThread?.isEnded ? "This previous chat is read-only." : "Reply here, ask a question, or add extra details..."}
                 required
                 value={supportBody}
               />
@@ -359,7 +421,7 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
               <p className="support-notice">Sent. Your message is now visible to the team in live support.</p>
             ) : null}
             {supportStatus === "error" ? <p className="form-error">Message could not be sent. Try again or email us.</p> : null}
-            <Button disabled={supportStatus === "sending" || !supportBody.trim()} icon={supportStatus === "sending" ? Loader2 : Send} type="submit">
+            <Button disabled={supportStatus === "sending" || !supportBody.trim() || activeChatThread?.isEnded} icon={supportStatus === "sending" ? Loader2 : Send} type="submit">
               {supportStatus === "sending" ? "Sending" : "Send message"}
             </Button>
           </form>

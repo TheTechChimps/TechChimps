@@ -15,7 +15,7 @@ export async function createHostedCheckoutSession(
   const mode = order.isSubscription ? "subscription" : "payment";
 
   return stripe.checkout.sessions.create({
-    allow_promotion_codes: true,
+    allow_promotion_codes: false,
     cancel_url: `${siteUrl}/request?checkout=cancelled&order=${order.reference}`,
     client_reference_id: order.reference,
     customer_email: order.contactEmail,

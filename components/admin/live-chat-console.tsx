@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Loader2, MessageSquareReply, Search, Send, Volume2, VolumeX, XCircle } from "lucide-react";
+import { Archive, CheckCircle2, Loader2, MessageSquareReply, Search, Send, Volume2, VolumeX, XCircle } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,13 +10,15 @@ import type { LiveChatMessage, LiveChatSessionSummary } from "@/lib/live-chat";
 import { playGentleChimpChime, primeNotificationSound } from "@/lib/notification-sound";
 import type { OrderRecord } from "@/lib/orders";
 
-type ConversationFilter = "all" | "custom" | "general" | "offers" | "paid" | "waiting";
+type ConversationFilter = "all" | "custom" | "general" | "offers" | "paid" | "previous" | "waiting";
 
 type ConversationRow = {
   category: ConversationFilter;
   customerName: string;
   lastMessage: string;
   lastMessageAt: string;
+  endedAt?: string;
+  isEnded: boolean;
   messageCount: number;
   order?: OrderRecord;
   priority: LiveChatSessionSummary["priority"];
@@ -31,6 +33,7 @@ function humanStatus(value: string) {
 }
 
 function categoryFor(order: OrderRecord | undefined, session: LiveChatSessionSummary | undefined): ConversationFilter {
+  if (session?.status === "ended") return "previous";
   if (order?.status === "custom_request_waiting_review") return "custom";
   if (order?.status === "offer_waiting_review") return "offers";
   if (order?.status === "paid_waiting_support" || session?.priority === "payment") return "paid";
@@ -45,6 +48,7 @@ function categoryLabel(category: ConversationFilter) {
     general: "General",
     offers: "Offers",
     paid: "Paid",
+    previous: "Previous",
     waiting: "Waiting"
   }[category];
 }
@@ -68,6 +72,7 @@ export function LiveChatConsole() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [reviewingReference, setReviewingReference] = useState("");
   const [reviewNotice, setReviewNotice] = useState("");
+  const [endingSession, setEndingSession] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ConversationFilter>("all");
   const activeChatRef = useRef<HTMLDivElement>(null);
@@ -109,7 +114,7 @@ export function LiveChatConsole() {
       setWaitingOrders(data.orders);
     }
 
-    setActiveSession((current) => current || nextSessions[0]?.sessionId || nextOrders[0]?.chatSessionId || "");
+    setActiveSession((current) => current || nextSessions.find((session) => session.status !== "ended")?.sessionId || nextOrders[0]?.chatSessionId || "");
   }, [soundEnabled]);
 
   useEffect(() => {
@@ -135,6 +140,8 @@ export function LiveChatConsole() {
       return {
         category,
         customerName: order?.contactName || session.customerName,
+        endedAt: session.endedAt,
+        isEnded: session.status === "ended",
         lastMessage: session.lastMessage,
         lastMessageAt: session.lastMessageAt,
         messageCount: session.messageCount,
@@ -152,6 +159,7 @@ export function LiveChatConsole() {
       rows.push({
         category: categoryFor(order, undefined),
         customerName: order.contactName || "Customer",
+        isEnded: false,
         lastMessage: order.goals || order.offerReason || "Waiting for support.",
         lastMessageAt: order.updatedAt,
         messageCount: 0,
@@ -165,6 +173,7 @@ export function LiveChatConsole() {
     }
 
     return rows.sort((a, b) => {
+      if (a.isEnded !== b.isEnded) return a.isEnded ? 1 : -1;
       const priorityScore = (row: ConversationRow) =>
         row.priority === "payment" ? 0 : row.unreadVisitorMessages || row.priority === "waiting" ? 1 : 2;
       const priorityDiff = priorityScore(a) - priorityScore(b);
@@ -176,7 +185,10 @@ export function LiveChatConsole() {
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return conversationRows.filter((row) => {
-      const matchesFilter = filter === "all" || row.category === filter || (filter === "waiting" && row.unreadVisitorMessages > 0);
+      const matchesFilter =
+        filter === "previous"
+          ? row.isEnded
+          : !row.isEnded && (filter === "all" || row.category === filter || (filter === "waiting" && row.unreadVisitorMessages > 0));
       const searchable = `${row.customerName} ${row.serviceName} ${row.reference} ${row.lastMessage}`.toLowerCase();
       return matchesFilter && (!normalizedQuery || searchable.includes(normalizedQuery));
     });
@@ -188,8 +200,9 @@ export function LiveChatConsole() {
   );
   const activeRow = conversationRows.find((row) => row.sessionId === activeSession) ?? null;
   const activeWaitingOrder = activeRow?.order ?? waitingOrders.find((order) => order.chatSessionId === activeSession);
-  const waitingChatCount = conversationRows.filter((row) => row.unreadVisitorMessages || row.priority !== "normal").length;
-  const filters: ConversationFilter[] = ["all", "waiting", "custom", "offers", "paid", "general"];
+  const activeChatEnded = Boolean(activeRow?.isEnded);
+  const waitingChatCount = conversationRows.filter((row) => !row.isEnded && (row.unreadVisitorMessages || row.priority !== "normal")).length;
+  const filters: ConversationFilter[] = ["all", "waiting", "custom", "offers", "paid", "general", "previous"];
 
   const openConversation = (sessionId: string) => {
     void primeNotificationSound();
@@ -234,9 +247,41 @@ export function LiveChatConsole() {
     setReviewingReference("");
   };
 
+  const endConversation = async () => {
+    if (!activeSession || activeChatEnded) return;
+
+    const confirmed = window.confirm("End this live chat and move it into previous chats for both admin and customer?");
+    if (!confirmed) return;
+
+    setEndingSession(activeSession);
+    setReviewNotice("");
+    const response = await fetch("/api/live-chat", {
+      body: JSON.stringify({
+        action: "end",
+        author: "Studio support",
+        role: "agent",
+        sessionId: activeSession
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "PATCH"
+    });
+
+    if (response.ok) {
+      setReviewNotice("Chat ended and saved as previous history for the customer and admin.");
+      setFilter("previous");
+      await loadMessages();
+    } else {
+      setReviewNotice("Chat could not be ended. Please try again.");
+    }
+
+    setEndingSession("");
+  };
+
   const sendReply = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!reply.trim() || !activeSession) return;
+    if (!reply.trim() || !activeSession || activeChatEnded) return;
 
     void primeNotificationSound();
     setSending(true);
@@ -326,8 +371,8 @@ export function LiveChatConsole() {
                   <span className="conversation-meta">
                     <small>{row.reference}</small>
                     <StatusIndicator
-                      label={row.priority === "payment" ? "Paid" : row.unreadVisitorMessages ? "Reply" : categoryLabel(row.category)}
-                      tone={row.priority === "payment" || row.unreadVisitorMessages ? "warning" : "active"}
+                      label={row.isEnded ? "Previous" : row.priority === "payment" ? "Paid" : row.unreadVisitorMessages ? "Reply" : categoryLabel(row.category)}
+                      tone={row.isEnded ? "good" : row.priority === "payment" || row.unreadVisitorMessages ? "warning" : "active"}
                     />
                   </span>
                 </button>
@@ -350,14 +395,35 @@ export function LiveChatConsole() {
               ) : null}
             </div>
             {activeRow ? (
-              <StatusIndicator
-                label={activeRow.priority === "payment" ? "Payment handoff" : activeRow.unreadVisitorMessages ? "Needs reply" : "Open"}
-                tone={activeRow.priority === "payment" || activeRow.unreadVisitorMessages ? "warning" : "active"}
-              />
+              <div className="chat-head-actions">
+                <StatusIndicator
+                  label={
+                    activeChatEnded
+                      ? "Previous"
+                      : activeRow.priority === "payment"
+                        ? "Payment handoff"
+                        : activeRow.unreadVisitorMessages
+                          ? "Needs reply"
+                          : "Open"
+                  }
+                  tone={activeChatEnded ? "good" : activeRow.priority === "payment" || activeRow.unreadVisitorMessages ? "warning" : "active"}
+                />
+                {!activeChatEnded ? (
+                  <button
+                    className="text-button end-chat-button"
+                    disabled={endingSession === activeSession}
+                    onClick={() => void endConversation()}
+                    type="button"
+                  >
+                    <Archive aria-hidden size={15} />
+                    {endingSession === activeSession ? "Ending" : "End chat"}
+                  </button>
+                ) : null}
+              </div>
             ) : null}
           </div>
 
-          {activeWaitingOrder ? (
+          {activeWaitingOrder && !activeChatEnded ? (
             <div className="active-ticket-card">
               <div>
                 <strong>{activeWaitingOrder.serviceName}</strong>
@@ -412,18 +478,25 @@ export function LiveChatConsole() {
             )}
           </div>
 
+          {activeChatEnded ? (
+            <p className="chat-ended-notice">
+              This conversation is closed and stored as previous chat history. It is read-only now.
+            </p>
+          ) : null}
+
           <form className="chat-form imessage-compose" onSubmit={sendReply}>
             <label className="field">
               <span className="label">Reply</span>
               <textarea
                 aria-label="Admin live chat reply"
                 className="textarea chat-textarea"
+                disabled={activeChatEnded}
                 onChange={(event) => setReply(event.target.value)}
-                placeholder="Type your reply..."
+                placeholder={activeChatEnded ? "This previous chat is read-only." : "Type your reply..."}
                 value={reply}
               />
             </label>
-            <Button disabled={sending || !reply.trim() || !activeSession} icon={sending ? Loader2 : Send} type="submit">
+            <Button disabled={sending || !reply.trim() || !activeSession || activeChatEnded} icon={sending ? Loader2 : Send} type="submit">
               {sending ? "Sending" : "Send"}
             </Button>
           </form>

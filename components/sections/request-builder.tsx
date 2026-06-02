@@ -14,9 +14,9 @@ import {
   Palette,
   Sparkles
 } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
-import { createCheckoutSession, submitQuoteRequest, uploadProjectFiles } from "@/lib/api";
-import { applyDiscount, normalizeDiscountCode } from "@/lib/discount-codes";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { createCheckoutSession, submitQuoteRequest, uploadProjectFiles, validateDiscountCode } from "@/lib/api";
+import { emptyDiscountApplication, normalizeDiscountCode, type DiscountApplication } from "@/lib/discount-codes";
 import { clamp, formatPrice } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { serviceCategories, services, type Service, type ServiceCategory } from "@/data/services";
@@ -367,6 +367,8 @@ export function RequestBuilder() {
   const [activeStep, setActiveStep] = useState<IntakeStepId>("service");
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [handoffSessionId, setHandoffSessionId] = useState("");
+  const [discountPreview, setDiscountPreview] = useState<DiscountApplication | null>(null);
+  const [discountChecking, setDiscountChecking] = useState(false);
 
   const selectedService = services.find((service) => service.slug === form.serviceType) ?? services[1];
   const isCustomRequest = selectedService.slug === "custom-request";
@@ -409,8 +411,39 @@ export function RequestBuilder() {
     selectedService.slug,
     structuredAnswers
   ]);
-  const discountPreview = useMemo(() => applyDiscount(estimate, form.discountCode), [estimate, form.discountCode]);
   const hasDiscountCode = form.discountCode.trim().length > 0;
+  const discountEligible = !selectedService.priceSuffix;
+  const effectiveDiscountPreview = discountPreview ?? emptyDiscountApplication(estimate);
+
+  useEffect(() => {
+    const code = normalizeDiscountCode(form.discountCode);
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      if (!code || isOffer || !discountEligible) {
+        setDiscountPreview(null);
+        setDiscountChecking(false);
+        return;
+      }
+
+      setDiscountPreview(null);
+      setDiscountChecking(true);
+      void validateDiscountCode({
+        amount: estimate,
+        code,
+        serviceType: selectedService.slug
+      }).then((result) => {
+        if (cancelled) return;
+        setDiscountPreview(result.ok && result.data ? result.data : emptyDiscountApplication(estimate));
+        setDiscountChecking(false);
+      });
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [discountEligible, estimate, form.discountCode, isOffer, selectedService.slug]);
 
   const requiredQuestionAnswers = form.creativeControl
     ? []
@@ -450,7 +483,7 @@ export function RequestBuilder() {
       ? "Add your name and email, then we can open checkout or review your offer."
       : isOffer && (!Number.isFinite(offeredAmount) || offeredAmount <= 0)
         ? "Add the amount you would like to offer so we can review it fairly."
-        : !isOffer && hasDiscountCode && !discountPreview.code
+        : !isOffer && hasDiscountCode && !discountChecking && !effectiveDiscountPreview.code
           ? "That discount code is not recognised yet, but you can still continue at the normal price."
           : `${liveSupportHandoffMessage} ${liveSupportEtaMessage}`;
   const canContinue =
@@ -548,7 +581,7 @@ export function RequestBuilder() {
       attachmentNames: form.attachmentNames,
       creativeControl: form.creativeControl,
       deliverySpeed: selectedDeliverySpeed,
-      discountCode: isOffer ? "" : normalizeDiscountCode(form.discountCode),
+      discountCode: isOffer || !discountEligible ? "" : normalizeDiscountCode(form.discountCode),
       estimate,
       goals: form.creativeControl && !form.goals.trim() ? creativeGoals : form.goals,
       offerAmount: isCustomRequest ? "" : form.offerAmount,
@@ -975,27 +1008,36 @@ export function RequestBuilder() {
 
             {!isCustomRequest && !isOffer ? (
               <div className="discount-panel">
-                <label className="field">
-                  <span className="label">Discount code <small>Optional</small></span>
-                  <input
-                    aria-label="Discount code"
-                    autoCapitalize="characters"
-                    className="input"
-                    onChange={(event) => update("discountCode", normalizeDiscountCode(event.target.value))}
-                    placeholder="Enter your code before checkout"
-                    value={form.discountCode}
-                  />
-                  <span className="helper">Add a customer code here before we send you to Stripe Checkout.</span>
-                </label>
-                {hasDiscountCode ? (
-                  <p className={discountPreview.code ? "discount-note success" : "discount-note warning"}>
-                    {discountPreview.code
-                      ? `${discountPreview.code} applied: ${discountPreview.percentOff}% off. New checkout total ${formatPrice(
-                          discountPreview.amount
-                        )}.`
-                      : "Code not recognised. You can still continue at the normal price, or check the code and try again."}
-                  </p>
-                ) : null}
+                {discountEligible ? (
+                  <>
+                    <label className="field">
+                      <span className="label">Discount code <small>Optional</small></span>
+                      <input
+                        aria-label="Discount code"
+                        autoCapitalize="characters"
+                        className="input"
+                        onChange={(event) => update("discountCode", normalizeDiscountCode(event.target.value))}
+                        placeholder="Enter your code before checkout"
+                        value={form.discountCode}
+                      />
+                      <span className="helper">Add a customer code here before we send you to Stripe Checkout.</span>
+                    </label>
+                    {hasDiscountCode ? (
+                      <p className={effectiveDiscountPreview.code ? "discount-note success" : "discount-note warning"}>
+                        {discountChecking
+                          ? "Checking discount code..."
+                          : effectiveDiscountPreview.code
+                            ? `${effectiveDiscountPreview.code} applied: ${effectiveDiscountPreview.percentOff}% off. New checkout total ${formatPrice(
+                                effectiveDiscountPreview.amount
+                              )}.`
+                            : effectiveDiscountPreview.ineligibleReason ??
+                              "Code not recognised. You can still continue at the normal price, or check the code and try again."}
+                      </p>
+                    ) : null}
+                  </>
+                ) : (
+                  <p className="discount-note warning">Discount codes do not apply to monthly care plans.</p>
+                )}
               </div>
             ) : null}
 

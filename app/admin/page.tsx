@@ -1,4 +1,5 @@
 import {
+  BadgePercent,
   Bell,
   Bot,
   CalendarCheck,
@@ -23,6 +24,7 @@ import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
 import { CustomerListConsole } from "@/components/admin/customer-list-console";
 import { DailyMaintenancePanel } from "@/components/admin/daily-maintenance-panel";
+import { DiscountCodeManager } from "@/components/admin/discount-code-manager";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { PaymentHub } from "@/components/admin/payment-hub";
@@ -58,6 +60,7 @@ const adminModules = [
 const adminQuickLinks = [
   { href: "#support", icon: MessageSquareReply, label: "Reply to chats", meta: "Customers waiting" },
   { href: "#payments", icon: CreditCard, label: "Payment hub", meta: "Refunds and receipts" },
+  { href: "#discounts", icon: BadgePercent, label: "Discounts", meta: "Codes and offers" },
   { href: "#customers", icon: UserRoundCheck, label: "Customer list", meta: "Details and updates" },
   { href: "#prompts", icon: Sparkles, label: "Build prompts", meta: "One-shot briefs" },
   { href: "#automation", icon: ShieldCheck, label: "Self-healing", meta: "Daily checks", mobileHidden: true },
@@ -231,6 +234,12 @@ export default async function AdminPage() {
       <section className="section-tight" id="payments">
         <div className="container">
           <PaymentHub />
+        </div>
+      </section>
+
+      <section className="section-tight" id="discounts">
+        <div className="container">
+          <DiscountCodeManager />
         </div>
       </section>
 

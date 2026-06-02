@@ -3,12 +3,14 @@ import { adminUnauthorized, isAdminRequestAuthenticated } from "@/lib/admin-sess
 import {
   appendLiveChatMessage,
   deleteAllLiveChatMessages,
+  endLiveChatSession,
   getLiveChatMessages,
+  getLiveChatSessionMeta,
   getLiveChatSessions,
   isVisibleLiveChatMessage,
   type LiveChatRole
 } from "@/lib/live-chat";
-import { archiveWaitingOrders } from "@/lib/orders";
+import { archiveOrderChatSession, archiveWaitingOrders } from "@/lib/orders";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     messages: (await getLiveChatMessages(sessionId)).filter(isVisibleLiveChatMessage),
+    session: sessionId ? await getLiveChatSessionMeta(sessionId) : undefined,
     sessions: isAdmin ? await getLiveChatSessions() : []
   });
 }
@@ -43,14 +46,52 @@ export async function POST(request: Request) {
     return adminUnauthorized();
   }
 
+  const sessionId = payload.sessionId ?? "site-visitor";
+  const session = await getLiveChatSessionMeta(sessionId);
+
+  if (session.status === "ended") {
+    return NextResponse.json({ error: "This chat has ended. Start a new chat if you need more help.", session }, { status: 409 });
+  }
+
   const message = await appendLiveChatMessage({
-    sessionId: payload.sessionId ?? "site-visitor",
+    sessionId,
     role: payload.role === "agent" ? "agent" : "visitor",
     author: payload.author?.trim() || (payload.role === "agent" ? "Studio support" : "Website visitor"),
     body: payload.body.trim()
   });
 
   return NextResponse.json({ message });
+}
+
+export async function PATCH(request: Request) {
+  const payload = (await request.json().catch(() => null)) as {
+    action?: "end";
+    author?: string;
+    role?: LiveChatRole;
+    sessionId?: string;
+  } | null;
+
+  if (payload?.action !== "end" || !payload.sessionId?.trim()) {
+    return NextResponse.json({ error: "A chat session is required." }, { status: 400 });
+  }
+
+  if (payload.role === "agent" && !isAdminRequestAuthenticated(request)) {
+    return adminUnauthorized();
+  }
+
+  const role = payload.role === "agent" ? "agent" : "visitor";
+  const session = await endLiveChatSession({
+    endedBy: payload.author?.trim() || (role === "agent" ? "Studio support" : "Customer"),
+    endedByRole: role,
+    sessionId: payload.sessionId.trim()
+  });
+
+  await archiveOrderChatSession(payload.sessionId.trim());
+
+  return NextResponse.json({
+    messages: (await getLiveChatMessages(payload.sessionId.trim())).filter(isVisibleLiveChatMessage),
+    session
+  });
 }
 
 export async function DELETE(request: Request) {

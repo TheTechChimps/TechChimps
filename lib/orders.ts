@@ -1,5 +1,5 @@
 import { services, type Service } from "@/data/services";
-import { applyDiscount } from "@/lib/discount-codes";
+import { applyStoredDiscount } from "@/lib/discount-code-store";
 import { listJson, readJson, writeJson } from "@/lib/storage";
 
 export type OfferMode = "standard" | "custom" | "discount";
@@ -168,7 +168,7 @@ export function parseOfferAmount(value?: string) {
   return Math.round(amount * 100) / 100;
 }
 
-export function createOrderRecord(input: OrderInput, status: OrderStatus): OrderRecord {
+export async function createOrderRecord(input: OrderInput, status: OrderStatus): Promise<OrderRecord> {
   const service = getServiceBySlug(input.serviceType);
 
   if (!service) {
@@ -179,7 +179,14 @@ export function createOrderRecord(input: OrderInput, status: OrderStatus): Order
   const offerAmount = parseOfferAmount(input.offerAmount);
   const baseAmount = calculateServiceEstimate(input, service);
   const undiscountedAmount = offerMode === "standard" ? baseAmount : offerAmount ?? baseAmount;
-  const discount = offerMode === "standard" ? applyDiscount(undiscountedAmount, input.discountCode) : applyDiscount(undiscountedAmount);
+  const discount =
+    offerMode === "standard"
+      ? await applyStoredDiscount(undiscountedAmount, input.discountCode, {
+          isSubscription: Boolean(service.priceSuffix),
+          priceSuffix: service.priceSuffix,
+          serviceCategory: service.category
+        })
+      : await applyStoredDiscount(undiscountedAmount);
   const amount = discount.amount;
   const reference = generateReference();
   const now = new Date().toISOString();
@@ -239,7 +246,7 @@ export async function deleteOrder(reference: string) {
 }
 
 export async function createOrder(input: OrderInput, status: OrderStatus) {
-  return saveOrder(createOrderRecord(input, status));
+  return saveOrder(await createOrderRecord(input, status));
 }
 
 export async function getOrder(reference: string) {
@@ -300,6 +307,29 @@ export async function findActiveCustomerTicket(email: string) {
   return (
     orders.find((order) => order.contactEmail.trim().toLowerCase() === normalizedEmail) ?? null
   );
+}
+
+export async function archiveOrderChatSession(sessionId: string) {
+  const orders = await listOrders();
+  const order = orders.find((item) => item.chatSessionId === sessionId);
+
+  if (!order) return null;
+
+  const waitingStatuses: OrderStatus[] = [
+    "paid_waiting_support",
+    "offer_waiting_review",
+    "custom_request_waiting_review"
+  ];
+
+  if (!waitingStatuses.includes(order.status)) return order;
+
+  const now = new Date().toISOString();
+
+  return updateOrder(order.reference, (current) => ({
+    ...current,
+    chatConnectedAt: current.chatConnectedAt ?? now,
+    status: "support_connected"
+  }));
 }
 
 export async function archiveWaitingOrders() {

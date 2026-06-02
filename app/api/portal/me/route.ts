@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getInboxMessages, safeCustomer } from "@/lib/accounts";
 import { getCustomerSession } from "@/lib/customer-session";
-import { getLiveChatMessages, isVisibleLiveChatMessage } from "@/lib/live-chat";
+import { getLiveChatMessages, getLiveChatSessionMeta, isVisibleLiveChatMessage } from "@/lib/live-chat";
 import { listOrders } from "@/lib/orders";
 
 export const dynamic = "force-dynamic";
@@ -37,12 +37,16 @@ export async function GET(request: Request) {
         }))
       ].map(async (thread) => {
         const threadMessages = (await getLiveChatMessages(thread.sessionId)).filter(isVisibleLiveChatMessage);
+        const meta = await getLiveChatSessionMeta(thread.sessionId);
         const lastMessage = threadMessages.at(-1);
 
         return {
           ...thread,
+          endedAt: meta.endedAt,
+          isEnded: meta.status === "ended",
           lastMessage: lastMessage?.body ?? "No messages yet. Start the conversation here.",
           lastMessageAt: lastMessage?.createdAt ?? "",
+          status: meta.status === "ended" ? "Ended" : thread.status,
           messages: threadMessages
         };
       })
