@@ -1,10 +1,11 @@
-import { Mail, MapPin, ShieldCheck } from "lucide-react";
+import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { CustomerAccountLink } from "@/components/portal/customer-account-link";
-import { getContactEmail } from "@/lib/contact";
+import { getContactEmail, getContactPhone } from "@/lib/contact";
 
 export function Footer() {
   const contactEmail = getContactEmail();
+  const contactPhone = getContactPhone();
 
   return (
     <footer className="footer">
@@ -32,6 +33,9 @@ export function Footer() {
           </span>
           <a href={`mailto:${contactEmail}`}>
             <Mail aria-hidden size={18} /> {contactEmail}
+          </a>
+          <a href={contactPhone.telHref}>
+            <Phone aria-hidden size={18} /> {contactPhone.display}
           </a>
           <span>
             <ShieldCheck aria-hidden size={18} /> Support guarantee included

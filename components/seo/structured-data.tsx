@@ -1,7 +1,9 @@
 import { publicServices } from "@/data/services";
+import { getContactPhone } from "@/lib/contact";
 
 export function StructuredData() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techchimps.com";
+  const contactPhone = getContactPhone();
   const schema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -11,14 +13,14 @@ export function StructuredData() {
     url: baseUrl,
     image: `${baseUrl}/images/techchimps-social-card-v5.png`,
     areaServed: "United Kingdom",
-    telephone: "+447472457653",
+    telephone: contactPhone.e164,
     sameAs: [
       "https://www.instagram.com/thetechchimps/",
       "https://www.facebook.com/profile.php?id=61590253839961",
       "https://www.linkedin.com/in/tech-chimps-360287412/",
       "https://www.youtube.com/@TheTechChimps",
       "https://github.com/TheTechChimps",
-      "https://wa.me/447472457653"
+      contactPhone.whatsappHref
     ],
     priceRange: "GBP 19-299",
     knowsAbout: [

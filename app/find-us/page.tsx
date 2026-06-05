@@ -1,9 +1,12 @@
-import { ExternalLink, Mail, MessageCircle, Sparkles } from "lucide-react";
+import { ExternalLink, Mail, MessageCircle, Phone, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { LiveSupportWidget } from "@/components/sections/live-support-widget";
+import { getContactPhone } from "@/lib/contact";
 import { createMetadata } from "@/lib/seo";
+
+const contactPhone = getContactPhone();
 
 const socialLinks = [
   {
@@ -54,7 +57,7 @@ const socialLinks = [
   {
     name: "WhatsApp",
     handle: "TechChimps.com",
-    href: "https://wa.me/447472457653",
+    href: contactPhone.whatsappHref,
     description: "Quick questions and direct chat.",
     cta: "Message",
     accent: "#25d366",
@@ -147,6 +150,9 @@ export default function FindUsPage() {
               </Link>
               <a className="button button-secondary button-lg" href="mailto:techchimps@proton.me">
                 <Mail aria-hidden size={18} /> Email us
+              </a>
+              <a className="button button-secondary button-lg" href={contactPhone.telHref}>
+                <Phone aria-hidden size={18} /> {contactPhone.display}
               </a>
             </div>
           </div>
