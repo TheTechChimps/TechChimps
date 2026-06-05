@@ -1,14 +1,31 @@
 import {
   Bot,
   Code2,
+  FileText,
   Globe2,
+  Music,
   MonitorCog,
+  Palette,
   ShieldCheck,
   Sparkles,
+  Video,
   Wrench
 } from "lucide-react";
 
-export type ServiceCategory = "Quick Launch" | "Websites" | "Web Apps" | "Windows Apps" | "Discord" | "Care" | "Custom Request";
+export type ServiceCategory =
+  | "Quick Launch"
+  | "Creative Design"
+  | "Music & Audio"
+  | "Video Editing"
+  | "Beat Production"
+  | "Websites"
+  | "Web Apps"
+  | "Python Programs"
+  | "Windows Apps"
+  | "Discord"
+  | "Document Help"
+  | "Care"
+  | "Custom Request";
 
 export type Service = {
   slug: string;
@@ -104,6 +121,240 @@ export const services: Service[] = [
     icon: Code2
   },
   {
+    slug: "profile-picture-avatar-art",
+    category: "Creative Design",
+    name: "Profile Picture / Avatar Art",
+    price: 19,
+    timeline: "Same day",
+    summary: "A clean profile picture or avatar for socials, music pages, gaming, creators, or small brands.",
+    beginnerExplanation:
+      "Best when you want your profile to look finished and recognisable without needing a full brand package.",
+    includes: ["One square profile design", "Simple colour direction", "Social-ready export", "One tidy revision"],
+    outcomes: ["Look more professional", "Upgrade your first impression", "Match your online identity"],
+    icon: Palette
+  },
+  {
+    slug: "social-banner-design",
+    category: "Creative Design",
+    name: "Social Banner",
+    price: 25,
+    timeline: "Same day",
+    summary: "A sleek header banner for YouTube, Facebook, LinkedIn, X, Twitch, or creator profiles.",
+    beginnerExplanation:
+      "Best when your page needs a strong top banner that says who you are and what you offer straight away.",
+    includes: ["One platform banner", "Brand colours and text", "Correct export sizing", "One tidy revision"],
+    outcomes: ["Cleaner profile layout", "Clearer offer", "More polished socials"],
+    icon: Palette
+  },
+  {
+    slug: "flyer-poster-design",
+    category: "Creative Design",
+    name: "Flyer / Poster Design",
+    price: 35,
+    timeline: "1 day",
+    summary: "A bright flyer or poster for an event, offer, launch, service, music release, or local promotion.",
+    beginnerExplanation:
+      "Best when you need a simple design people can understand quickly on socials, WhatsApp, or print.",
+    includes: ["One flyer or poster", "Clear call-to-action", "Social-ready export", "One tidy revision"],
+    outcomes: ["Promote faster", "Explain the offer clearly", "Share a design that looks real"],
+    icon: Palette
+  },
+  {
+    slug: "business-card-brand-asset",
+    category: "Creative Design",
+    name: "Business Card / Brand Asset",
+    price: 35,
+    timeline: "1 day",
+    summary: "A neat business card, menu card, price card, service card, or simple branded asset.",
+    beginnerExplanation:
+      "Best when you need one practical branded design to send, print, or use in customer messages.",
+    includes: ["One practical brand asset", "Text and layout polish", "Export for sharing", "One tidy revision"],
+    outcomes: ["Look more legitimate", "Send clearer information", "Keep branding consistent"],
+    icon: Palette
+  },
+  {
+    slug: "logo-concept",
+    category: "Creative Design",
+    name: "Logo Concept",
+    price: 39,
+    timeline: "1-2 days",
+    summary: "A simple starter logo concept for a brand, creator, project, server, or small business.",
+    beginnerExplanation:
+      "Best when you need a clean logo direction before investing in a full identity system.",
+    includes: ["One logo concept", "Simple colour palette", "Transparent PNG export", "One tidy revision"],
+    outcomes: ["Give the brand a face", "Use it across socials", "Build a clearer visual direction"],
+    icon: Palette
+  },
+  {
+    slug: "full-social-brand-pack",
+    category: "Creative Design",
+    name: "Full Social Brand Pack",
+    price: 79,
+    timeline: "2-3 days",
+    summary: "A compact visual pack with a profile image, banner, colours, and simple social templates.",
+    beginnerExplanation:
+      "Best when you want your main socials to look like they belong to the same brand.",
+    includes: ["Profile image", "Main social banner", "Colour direction", "Two simple post templates"],
+    outcomes: ["More consistent branding", "Cleaner social presence", "Faster launch visuals"],
+    icon: Palette
+  },
+  {
+    slug: "mastering-only",
+    category: "Music & Audio",
+    name: "Mastering Only",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "A final loudness, clarity, and polish pass for a finished mix.",
+    beginnerExplanation:
+      "Best when your song is already mixed and you want it to sound more release-ready across phones, speakers, and headphones.",
+    includes: ["Stereo master", "Loudness and balance polish", "WAV/MP3 delivery", "One revision pass"],
+    outcomes: ["More consistent playback", "Cleaner final sound", "Release-ready export"],
+    icon: Music
+  },
+  {
+    slug: "mixing-only",
+    category: "Music & Audio",
+    name: "Mixing Only",
+    price: 69,
+    timeline: "2-4 days",
+    summary: "A mix pass that balances vocals, drums, instruments, effects, and space.",
+    beginnerExplanation:
+      "Best when you have stems or recorded parts and need the track to sound cleaner, wider, and more balanced.",
+    includes: ["Stem mix", "Basic vocal/instrument polish", "Effects balance", "One revision pass"],
+    outcomes: ["Cleaner levels", "Better vocal placement", "More professional sound"],
+    icon: Music
+  },
+  {
+    slug: "mixing-mastering",
+    category: "Music & Audio",
+    name: "Mixing + Mastering",
+    price: 89,
+    timeline: "3-5 days",
+    summary: "A combined mix and master so your track moves from raw stems to a polished final export.",
+    beginnerExplanation:
+      "Best value when you need both the main mix and final release polish handled together.",
+    includes: ["Full mix pass", "Final master", "WAV/MP3 delivery", "Two revision passes"],
+    outcomes: ["Better value than separate services", "Cleaner finished track", "Ready-to-share audio"],
+    icon: Music
+  },
+  {
+    slug: "advanced-mix-master",
+    category: "Music & Audio",
+    name: "Advanced Mix + Master",
+    price: 129,
+    timeline: "4-7 days",
+    summary: "A deeper mix and master for tracks that need more detailed vocal, stem, or creative processing.",
+    beginnerExplanation:
+      "Best when the track has more layers, needs stronger creative direction, or must sound more polished for a bigger release.",
+    includes: ["Detailed stem balance", "Creative effects polish", "Final master", "Two revision passes"],
+    outcomes: ["More refined sound", "Stronger release quality", "Clearer creative identity"],
+    icon: Music
+  },
+  {
+    slug: "short-video-edit",
+    category: "Video Editing",
+    name: "Short Video Edit",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "A sharp edit for clips under 60 seconds, ideal for TikTok, Instagram Reels, YouTube Shorts, or ads.",
+    beginnerExplanation:
+      "Best when you need one short clip made clear, punchy, and ready to post.",
+    includes: ["Under 60 seconds", "Basic cuts and pacing", "Captions or text overlays", "Social-ready export"],
+    outcomes: ["Post faster", "Hold attention", "Look more polished"],
+    icon: Video
+  },
+  {
+    slug: "standard-video-edit",
+    category: "Video Editing",
+    name: "Standard Video Edit",
+    price: 99,
+    timeline: "2-4 days",
+    summary: "A clean edit for videos around 1-5 minutes with structure, pacing, text, and simple polish.",
+    beginnerExplanation:
+      "Best for explainers, business clips, music promos, creator content, or simple YouTube videos.",
+    includes: ["1-5 minute edit", "Cuts and pacing", "Text/caption polish", "One revision pass"],
+    outcomes: ["Clearer story", "Better retention", "Ready-to-upload video"],
+    icon: Video
+  },
+  {
+    slug: "long-video-edit",
+    category: "Video Editing",
+    name: "Long Video Edit",
+    price: 149,
+    timeline: "4-7 days",
+    summary: "A longer edit for 5-15 minute videos with clearer structure, pacing, and presentation.",
+    beginnerExplanation:
+      "Best when you have more footage and need the final video to feel organised rather than thrown together.",
+    includes: ["5-15 minute edit", "Footage tidy-up", "Sections and pacing", "One revision pass"],
+    outcomes: ["Less messy footage", "More watchable content", "Clearer delivery"],
+    icon: Video
+  },
+  {
+    slug: "advanced-youtube-edit",
+    category: "Video Editing",
+    name: "Advanced / YouTube Edit",
+    price: 199,
+    timeline: "1-2 weeks",
+    summary: "A bigger edit for 15-30 minute content with stronger story flow, assets, polish, and platform-ready structure.",
+    beginnerExplanation:
+      "Best for serious YouTube videos, launch content, training videos, podcasts, or detailed business content.",
+    includes: ["15-30 minute edit", "Advanced structure", "Graphics/text polish", "Two revision passes"],
+    outcomes: ["More professional video", "Cleaner viewer journey", "Stronger long-form content"],
+    icon: Video
+  },
+  {
+    slug: "basic-beat-lease",
+    category: "Beat Production",
+    name: "Basic Beat Lease",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "A ready-to-use beat lease direction for demos, content, freestyles, or early releases.",
+    beginnerExplanation:
+      "Best when you want a beat quickly and do not need exclusive ownership or stems.",
+    includes: ["Beat direction match", "MP3/WAV delivery", "Simple usage notes", "One small tweak"],
+    outcomes: ["Start recording faster", "Get a clear sound", "Keep the budget low"],
+    icon: Music
+  },
+  {
+    slug: "custom-beat-production",
+    category: "Beat Production",
+    name: "Custom Beat Production",
+    price: 99,
+    timeline: "3-5 days",
+    summary: "A custom beat built around your genre, mood, references, and vocal style.",
+    beginnerExplanation:
+      "Best when you want a beat made for your voice, brand, or project rather than a generic track.",
+    includes: ["Custom beat idea", "Genre and mood matching", "WAV delivery", "One revision pass"],
+    outcomes: ["More personal sound", "Better fit for your vocals", "Ready to record"],
+    icon: Music
+  },
+  {
+    slug: "custom-beat-wav-stems",
+    category: "Beat Production",
+    name: "Custom Beat with WAV + Stems",
+    price: 149,
+    timeline: "4-7 days",
+    summary: "A custom beat package with WAV and stems so it can be mixed, arranged, or adjusted properly.",
+    beginnerExplanation:
+      "Best when you plan to record properly and want more control over the final mix.",
+    includes: ["Custom beat", "WAV export", "Tracked stems", "One revision pass"],
+    outcomes: ["More mix control", "Cleaner studio workflow", "Better release preparation"],
+    icon: Music
+  },
+  {
+    slug: "exclusive-beat-package",
+    category: "Beat Production",
+    name: "Exclusive Beat Package",
+    price: 199,
+    timeline: "1-2 weeks",
+    summary: "A higher-end custom beat package shaped for a release, artist identity, or campaign.",
+    beginnerExplanation:
+      "Best when the beat needs to feel unique to you and support a more serious release.",
+    includes: ["Exclusive custom direction", "WAV and stems", "Arrangement polish", "Two revision passes"],
+    outcomes: ["Distinct artist sound", "Stronger release identity", "More flexible final files"],
+    icon: Music
+  },
+  {
     slug: "barebones-website",
     category: "Websites",
     name: "Barebones Website",
@@ -195,6 +446,58 @@ export const services: Service[] = [
     icon: MonitorCog
   },
   {
+    slug: "simple-python-script",
+    category: "Python Programs",
+    name: "Simple Python Script",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "A small Python script for a focused task, file job, data clean-up, or repeatable action.",
+    beginnerExplanation:
+      "Best when you do the same simple digital task often and want a script to handle it faster.",
+    includes: ["One focused script", "Plain setup notes", "Basic error handling", "Usage example"],
+    outcomes: ["Save repeat time", "Reduce small mistakes", "Get a practical tool"],
+    icon: Code2
+  },
+  {
+    slug: "python-automation-tool",
+    category: "Python Programs",
+    name: "Python Automation Tool",
+    price: 99,
+    timeline: "2-4 days",
+    summary: "A Python automation for files, reports, scraping approved data, formatting, alerts, or small workflows.",
+    beginnerExplanation:
+      "Best when you want Python to take over a manual workflow that currently eats your time.",
+    includes: ["Automation workflow", "Input/output handling", "Friendly instructions", "One revision pass"],
+    outcomes: ["Less manual admin", "Faster repeat jobs", "Cleaner outputs"],
+    icon: Code2
+  },
+  {
+    slug: "advanced-python-program",
+    category: "Python Programs",
+    name: "Advanced Python Program",
+    price: 199,
+    timeline: "4-10 days",
+    summary: "A more capable Python program with multiple steps, settings, files, reports, or integrations.",
+    beginnerExplanation:
+      "Best when the job has several steps and needs a stronger structure than a simple script.",
+    includes: ["Multi-step workflow", "Settings or config", "Reports/logging", "Clear usage notes"],
+    outcomes: ["More reliable process", "Better visibility", "A tool that can grow"],
+    icon: Code2
+  },
+  {
+    slug: "python-app-interface",
+    category: "Python Programs",
+    name: "Python App with Interface",
+    price: 299,
+    timeline: "1-2 weeks",
+    summary: "A Python-powered tool with a simple interface so non-technical users can run it confidently.",
+    beginnerExplanation:
+      "Best when the tool needs buttons, settings, and clear screens instead of command-line use.",
+    includes: ["Simple interface", "Python workflow", "Inputs and outputs", "Friendly error states"],
+    outcomes: ["Easier for anyone to use", "Cleaner workflow", "Less technical friction"],
+    icon: MonitorCog
+  },
+  {
     slug: "basic-desktop-tool",
     category: "Windows Apps",
     name: "Basic Desktop Tool",
@@ -273,6 +576,71 @@ export const services: Service[] = [
     icon: Bot
   },
   {
+    slug: "document-formatting",
+    category: "Document Help",
+    name: "Document Formatting",
+    price: 29,
+    timeline: "Same day",
+    summary: "A tidy formatting pass for documents, forms, reports, CVs, proposals, or business paperwork.",
+    beginnerExplanation:
+      "Best when the content is there but the layout needs to look cleaner, clearer, and easier to read.",
+    includes: ["Formatting tidy-up", "Headings and spacing", "Readable layout", "Export guidance"],
+    outcomes: ["Cleaner documents", "Better presentation", "Less formatting stress"],
+    icon: FileText
+  },
+  {
+    slug: "proofreading-improvements",
+    category: "Document Help",
+    name: "Proofreading + Improvements",
+    price: 39,
+    timeline: "Same day",
+    summary: "A proofreading and clarity pass for wording, grammar, flow, and professional tone.",
+    beginnerExplanation:
+      "Best when you have written the content and want it checked, cleaned up, and made easier to understand.",
+    includes: ["Grammar and spelling review", "Clarity improvements", "Tone polish", "Plain feedback notes"],
+    outcomes: ["Clearer writing", "Fewer mistakes", "More confident submission"],
+    icon: FileText
+  },
+  {
+    slug: "work-paperwork-help",
+    category: "Document Help",
+    name: "Work Paperwork Help",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "Support with work-related forms, admin documents, templates, letters, reports, and paperwork structure.",
+    beginnerExplanation:
+      "Best when you need help organising your own information into a clearer professional document.",
+    includes: ["Document structure help", "Wording tidy-up", "Template or layout support", "Checklist review"],
+    outcomes: ["Less admin confusion", "Cleaner paperwork", "Faster completion"],
+    icon: FileText
+  },
+  {
+    slug: "study-support-pack",
+    category: "Document Help",
+    name: "Study Support Pack",
+    price: 49,
+    timeline: "1-2 days",
+    summary: "Friendly study support for planning, explaining, proofreading, formatting, and structuring your own work.",
+    beginnerExplanation:
+      "Best when you want help understanding, organising, or improving work you are responsible for completing yourself.",
+    includes: ["Structure guidance", "Proofreading support", "Explanation notes", "Formatting help"],
+    outcomes: ["Clearer direction", "Better understanding", "More organised work"],
+    icon: FileText
+  },
+  {
+    slug: "research-notes-structure-help",
+    category: "Document Help",
+    name: "Research Notes / Structure Help",
+    price: 59,
+    timeline: "2-3 days",
+    summary: "Help turning scattered notes, requirements, and sources into a clear outline or document plan.",
+    beginnerExplanation:
+      "Best when you have information but need a cleaner structure before writing, presenting, or finishing the document.",
+    includes: ["Notes organisation", "Outline creation", "Section planning", "Plain next-step guidance"],
+    outcomes: ["Less overwhelm", "Clearer structure", "Better organised thinking"],
+    icon: FileText
+  },
+  {
     slug: "monthly-care-plan",
     category: "Care",
     name: "Monthly Care Plan",
@@ -304,10 +672,16 @@ export const services: Service[] = [
 
 export const serviceCategories: ServiceCategory[] = [
   "Quick Launch",
+  "Creative Design",
+  "Music & Audio",
+  "Video Editing",
+  "Beat Production",
   "Websites",
   "Web Apps",
+  "Python Programs",
   "Windows Apps",
   "Discord",
+  "Document Help",
   "Care"
 ];
 

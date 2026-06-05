@@ -6,12 +6,14 @@ import { Tabs } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/utils";
 
 export function Pricing() {
+  const startingPrice = Math.min(...publicServices.map((service) => service.price));
+
   return (
     <section className="section pricing-band" id="pricing">
       <div className="container">
         <div className="section-header center">
           <span className="eyebrow">Lowest prices on the market</span>
-          <h1 className="title">Simple prices from {formatPrice(49)}.</h1>
+          <h1 className="title">Simple prices from {formatPrice(startingPrice)}.</h1>
           <p className="subtitle">Choose a service, choose delivery speed, then pay or make an offer.</p>
         </div>
         <Tabs

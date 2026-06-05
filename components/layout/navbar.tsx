@@ -13,7 +13,7 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/find-us", label: "Find us" },
+  { href: "/find-us", label: "Contact us" },
   { href: "/faq", label: "FAQ" }
 ];
 
@@ -145,7 +145,7 @@ export function Navbar() {
             </Link>
             <CustomerAccountLink onNavigate={closeMenus} />
             <Link href="/find-us" onClick={closeMenus}>
-              Find us
+              Contact us
             </Link>
           </div>
           <div className="mobile-service-menu">

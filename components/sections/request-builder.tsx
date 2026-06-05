@@ -47,7 +47,7 @@ type BuilderState = {
 const initialState: BuilderState = {
   attachmentNames: [],
   serviceType: "standard-website",
-  budget: "149-299",
+  budget: "49-149",
   timeline: "this-month",
   deliverySpeed: "standard",
   completionDate: "",
@@ -169,6 +169,139 @@ const categoryQuestions: Record<ServiceCategory, ServiceQuestion[]> = {
       placeholder: "More bookings, more DMs, clearer offer, better first impression..."
     }
   ],
+  "Creative Design": [
+    {
+      id: "asset-type",
+      label: "Design use",
+      prompt: "Where will this design be used?",
+      placeholder: "Instagram profile, YouTube banner, flyer, business card, logo, Facebook page..."
+    },
+    {
+      id: "text-details",
+      label: "Text and details",
+      prompt: "What exact words, names, handles, dates, prices, or contact details must be included?",
+      placeholder: "Brand name, slogan, phone number, event date, social handle, website link...",
+      rows: 4
+    },
+    {
+      id: "style-direction",
+      label: "Style direction",
+      prompt: "What should it feel like?",
+      placeholder: "Glossy, colourful, luxury, playful, serious, clean, streetwear, music, corporate..."
+    },
+    {
+      id: "assets-needed",
+      label: "Assets and examples",
+      prompt: "Do you already have logos, photos, colours, or examples we should use?",
+      placeholder: "Upload files later, paste links, mention colours, or say if we can choose for you.",
+      rows: 3
+    },
+    {
+      id: "export-needs",
+      label: "File needs",
+      prompt: "Do you need any specific sizes or file types?",
+      placeholder: "Instagram square, YouTube banner, print-ready PDF, transparent PNG, web image..."
+    }
+  ],
+  "Music & Audio": [
+    {
+      id: "track-details",
+      label: "Track details",
+      prompt: "What type of track is this and what style should it fit?",
+      placeholder: "Rap vocal, drill track, pop demo, podcast intro, dance track, acoustic song..."
+    },
+    {
+      id: "files-available",
+      label: "Files available",
+      prompt: "What files can you provide?",
+      placeholder: "Full WAV, stems, vocals, beat, project export, reference track, rough demo..."
+    },
+    {
+      id: "sound-goal",
+      label: "Sound goal",
+      prompt: "What should the final audio sound like?",
+      placeholder: "Louder, cleaner vocals, warmer, more bass, radio-ready, darker, brighter...",
+      rows: 3
+    },
+    {
+      id: "problem-areas",
+      label: "Problem areas",
+      prompt: "What feels wrong or unfinished in the current audio?",
+      placeholder: "Vocals too quiet, harsh highs, muddy bass, uneven volume, noisy recording..."
+    },
+    {
+      id: "delivery-formats",
+      label: "Delivery formats",
+      prompt: "What files do you want back?",
+      placeholder: "WAV, MP3, instrumental, acapella, clean version, stems, streaming master..."
+    }
+  ],
+  "Video Editing": [
+    {
+      id: "video-purpose",
+      label: "Video purpose",
+      prompt: "What is the video for?",
+      placeholder: "TikTok, YouTube, business promo, music video, advert, course, podcast clip..."
+    },
+    {
+      id: "raw-footage",
+      label: "Footage and length",
+      prompt: "How much footage do you have and how long should the final video be?",
+      placeholder: "10 clips into a 45 second Reel, 30 minutes into a 5 minute YouTube video..."
+    },
+    {
+      id: "edit-style",
+      label: "Edit style",
+      prompt: "What pace and feeling should the edit have?",
+      placeholder: "Fast and punchy, clean corporate, cinematic, funny, music-led, calm tutorial..."
+    },
+    {
+      id: "graphics-captions",
+      label: "Text, captions, and graphics",
+      prompt: "Do you need captions, titles, logos, effects, transitions, or music?",
+      placeholder: "Auto captions, intro title, lower thirds, logo, subtitles, beat cuts...",
+      rows: 3
+    },
+    {
+      id: "platform-export",
+      label: "Platform and export",
+      prompt: "Where will it be posted and what size should it be?",
+      placeholder: "Vertical 9:16, YouTube 16:9, square, Facebook, LinkedIn, website..."
+    }
+  ],
+  "Beat Production": [
+    {
+      id: "genre-mood",
+      label: "Genre and mood",
+      prompt: "What genre, mood, and energy should the beat have?",
+      placeholder: "UK drill dark, melodic trap, upbeat afrobeat, emotional piano, club bounce..."
+    },
+    {
+      id: "references",
+      label: "Reference tracks",
+      prompt: "Are there any songs, artists, or beats that show the direction?",
+      placeholder: "Paste links or describe the sound. We will not copy, just use the direction.",
+      rows: 3
+    },
+    {
+      id: "tempo-key",
+      label: "Tempo and key",
+      prompt: "Do you know the BPM or key, or should we choose?",
+      placeholder: "140 BPM, no key preference, needs to fit my vocal, choose what works..."
+    },
+    {
+      id: "structure",
+      label: "Structure",
+      prompt: "How should the beat be arranged?",
+      placeholder: "Intro, hook, verse, hook, bridge, outro, or leave structure to us..."
+    },
+    {
+      id: "file-rights",
+      label: "Files and rights",
+      prompt: "Do you need WAV, stems, exclusive use, or just a simple beat file?",
+      placeholder: "MP3 demo, WAV, stems, exclusive package, recording-ready files..."
+    }
+  ],
   Websites: [
     {
       id: "pages-sections",
@@ -237,6 +370,40 @@ const categoryQuestions: Record<ServiceCategory, ServiceQuestion[]> = {
       placeholder: "Stripe, webhook, email inbox, Google Sheets, Discord, CRM..."
     }
   ],
+  "Python Programs": [
+    {
+      id: "task-to-automate",
+      label: "Task to automate",
+      prompt: "What should the Python program do from start to finish?",
+      placeholder: "Read files, clean data, make reports, rename images, check prices, send alerts...",
+      rows: 4
+    },
+    {
+      id: "inputs-outputs",
+      label: "Inputs and outputs",
+      prompt: "What information goes in and what should come out?",
+      placeholder: "CSV in, cleaned spreadsheet out. Folder of images in, resized images out...",
+      rows: 3
+    },
+    {
+      id: "where-runs",
+      label: "Where it runs",
+      prompt: "Where will you use it?",
+      placeholder: "Windows PC, Mac, server, browser, local folder, Google Drive, command line..."
+    },
+    {
+      id: "interface-needs",
+      label: "Interface needs",
+      prompt: "Should it be a simple script, button-based app, or something with screens?",
+      placeholder: "Command script is fine, I need buttons, I need settings, I need a dashboard..."
+    },
+    {
+      id: "rules-errors",
+      label: "Rules and warnings",
+      prompt: "What rules, checks, or warnings should the program follow?",
+      placeholder: "Skip duplicates, warn before deleting, show failed rows, never overwrite originals..."
+    }
+  ],
   "Windows Apps": [
     {
       id: "manual-process",
@@ -301,6 +468,41 @@ const categoryQuestions: Record<ServiceCategory, ServiceQuestion[]> = {
       label: "External links or APIs",
       prompt: "Should the bot connect to anything outside Discord?",
       placeholder: "Website, Stripe, Google Sheets, webhooks, game stats, CRM..."
+    }
+  ],
+  "Document Help": [
+    {
+      id: "document-type",
+      label: "Document type",
+      prompt: "What type of document do you need help with?",
+      placeholder: "CV, report, form, proposal, letter, study notes, work paperwork, template..."
+    },
+    {
+      id: "help-needed",
+      label: "Help needed",
+      prompt: "What kind of support do you want?",
+      placeholder: "Formatting, proofreading, structure, wording clarity, explanation, checklist...",
+      rows: 3
+    },
+    {
+      id: "content-status",
+      label: "What you already have",
+      prompt: "What content, notes, instructions, or requirements can you provide?",
+      placeholder: "I have a draft, bullet notes, a form, marking criteria, company notes, screenshots...",
+      rows: 4
+    },
+    {
+      id: "tone-format",
+      label: "Tone and format",
+      prompt: "How should the finished document feel and be formatted?",
+      placeholder: "Professional, simple, formal, friendly, UK spelling, PDF, Word, Google Docs..."
+    },
+    {
+      id: "responsibility-note",
+      label: "Fair-use note",
+      prompt: "If this is school or study related, what part do you need help understanding or improving yourself?",
+      placeholder: "Explain the topic, improve my draft, organise my notes, check clarity...",
+      rows: 3
     }
   ],
   Care: [
@@ -851,7 +1053,10 @@ export function RequestBuilder() {
                   onChange={(event) => update("budget", event.target.value)}
                   value={form.budget}
                 >
-                  <option value="under-149">Under {formatPrice(149)}</option>
+                  <option value="under-49">Under {formatPrice(49)}</option>
+                  <option value="49-149">
+                    {formatPrice(49)}-{formatPrice(149)}
+                  </option>
                   <option value="149-299">
                     {formatPrice(149)}-{formatPrice(299)}
                   </option>

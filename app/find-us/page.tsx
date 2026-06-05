@@ -2,6 +2,7 @@ import { ExternalLink, Mail, MessageCircle, Phone, Sparkles } from "lucide-react
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { ContactLiveChatButton } from "@/components/contact-live-chat-button";
 import { LiveSupportWidget } from "@/components/sections/live-support-widget";
 import { getContactPhone } from "@/lib/contact";
 import { createMetadata } from "@/lib/seo";
@@ -116,11 +117,12 @@ function SocialLogo({ name }: { name: string }) {
 }
 
 export const metadata = createMetadata({
-  title: "Find us",
+  title: "Contact Us",
   description:
-    "Find TechChimps on Instagram, Facebook, LinkedIn, YouTube, GitHub, and WhatsApp for updates, demos, portfolio proof, and friendly support.",
+    "Contact TechChimps by email, phone, WhatsApp, live chat, Instagram, Facebook, LinkedIn, YouTube, and GitHub for friendly support and service updates.",
   path: "/find-us",
   keywords: [
+    "contact TechChimps",
     "TechChimps Instagram",
     "TechChimps Facebook",
     "TechChimps YouTube",
@@ -137,17 +139,18 @@ export default function FindUsPage() {
         <div className="container find-us-hero-inner">
           <div className="find-us-copy">
             <span className="eyebrow">
-              <Sparkles aria-hidden size={16} /> Find us online
+              <Sparkles aria-hidden size={16} /> Contact TechChimps
             </span>
-            <h1 className="headline">Follow the builds.</h1>
+            <h1 className="headline">Contact us.</h1>
             <p className="subtitle">
-              TechChimps lives across social, video, code, and business updates. Choose your favourite place and keep up
-              with the latest websites, apps, bots, tech services, and automation.
+              Ask a question, start a live chat, message us on WhatsApp, or follow the latest websites, apps, bots,
+              creative work, audio, video, and automation updates.
             </p>
             <div className="button-row">
               <Link className="button button-primary button-lg" href="/request">
                 Start a request
               </Link>
+              <ContactLiveChatButton />
               <a className="button button-secondary button-lg" href="mailto:techchimps@proton.me">
                 <Mail aria-hidden size={18} /> Email us
               </a>
@@ -158,7 +161,13 @@ export default function FindUsPage() {
           </div>
 
           <div className="find-us-brand-card">
-            <Image alt="TechChimps glossy monkey and banana logo" height={220} src="/images/techchimps-logo-square.png" width={220} />
+            <Image
+              alt="TechChimps glossy monkey and banana logo"
+              height={220}
+              priority
+              src="/images/techchimps-logo-square.png"
+              width={220}
+            />
             <strong>TechChimps</strong>
             <span>Powered by bananas</span>
           </div>

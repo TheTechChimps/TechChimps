@@ -20,7 +20,7 @@ export default function TermsPage() {
         {
           title: "Services",
           body: [
-            "TechChimps provides websites, apps, bots, automation, desktop tools, care plans, support, and custom software services.",
+            "TechChimps provides websites, apps, bots, automation, creative design, audio, video editing, beat production, Python tools, document support, desktop tools, care plans, support, and custom software services.",
             "Every order is based on the information you provide in the request form, chat, uploads, or agreed written messages."
           ]
         },

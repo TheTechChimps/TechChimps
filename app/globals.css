@@ -3262,126 +3262,6 @@ img {
   transform: scale(1.04);
 }
 
-.helper-monkey {
-  bottom: var(--space-2);
-  display: grid;
-  gap: 0.7rem;
-  left: var(--space-2);
-  max-width: min(22rem, calc(100vw - 2rem));
-  position: fixed;
-  z-index: 42;
-}
-
-.helper-monkey-avatar {
-  align-items: center;
-  background:
-    radial-gradient(circle at 35% 25%, rgb(255 255 255 / 24%), transparent 32%),
-    color-mix(in srgb, var(--surface) 88%, transparent);
-  border: 1px solid color-mix(in srgb, var(--brand) 34%, var(--border));
-  border-radius: 999px;
-  box-shadow: 0 18px 42px rgb(0 0 0 / 25%), 0 0 28px rgb(46 230 190 / 16%);
-  cursor: pointer;
-  display: inline-flex;
-  height: 4.25rem;
-  justify-content: center;
-  padding: 0;
-  position: relative;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-  width: 4.25rem;
-}
-
-.helper-monkey-avatar:hover {
-  box-shadow: 0 20px 48px rgb(0 0 0 / 30%), 0 0 36px rgb(255 216 79 / 18%);
-  transform: translateY(-2px);
-}
-
-.helper-monkey-avatar img {
-  animation: helperBob 3.4s ease-in-out infinite;
-  border-radius: 999px;
-  height: 3.55rem;
-  object-fit: cover;
-  width: 3.55rem;
-}
-
-.helper-monkey-avatar span {
-  animation: supportPulse 2.8s ease-in-out infinite;
-  border: 1px solid color-mix(in srgb, var(--honey) 58%, transparent);
-  border-radius: inherit;
-  content: "";
-  inset: -0.35rem;
-  pointer-events: none;
-  position: absolute;
-}
-
-.helper-monkey-card {
-  animation: helperCardIn 260ms ease both;
-  background:
-    linear-gradient(145deg, rgb(255 255 255 / 12%), rgb(46 230 190 / 7%)),
-    color-mix(in srgb, var(--surface) 94%, transparent);
-  border: 1px solid color-mix(in srgb, var(--brand) 34%, var(--border));
-  border-radius: 1rem;
-  box-shadow: 0 22px 56px rgb(0 0 0 / 28%), 0 0 32px rgb(46 230 190 / 12%);
-  display: grid;
-  gap: 0.55rem;
-  max-width: min(20rem, calc(100vw - 2rem));
-  padding: 0.95rem;
-  position: relative;
-}
-
-.helper-monkey-card strong {
-  color: var(--text);
-  font-size: 1rem;
-}
-
-.helper-monkey-card p {
-  color: var(--text-muted);
-  font-size: 0.84rem;
-  font-weight: 680;
-  line-height: 1.45;
-  margin: 0;
-}
-
-.helper-monkey-close {
-  align-items: center;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-  border-radius: 999px;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: inline-flex;
-  height: 1.75rem;
-  justify-content: center;
-  position: absolute;
-  right: 0.65rem;
-  top: 0.65rem;
-  width: 1.75rem;
-}
-
-.helper-monkey-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  padding-top: 0.25rem;
-}
-
-.helper-monkey-actions a,
-.helper-monkey-actions button {
-  align-items: center;
-  background: color-mix(in srgb, var(--brand) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--border));
-  border-radius: 999px;
-  color: var(--text);
-  cursor: pointer;
-  display: inline-flex;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 900;
-  gap: 0.25rem;
-  min-height: 2rem;
-  padding: 0.35rem 0.62rem;
-  text-decoration: none;
-}
-
 .guided-tour {
   background:
     linear-gradient(145deg, rgb(255 255 255 / 12%), transparent 28%, rgb(46 230 190 / 8%)),
@@ -5283,29 +5163,6 @@ img {
   }
 }
 
-@keyframes helperBob {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-
-  50% {
-    transform: translateY(-0.22rem) rotate(2deg);
-  }
-}
-
-@keyframes helperCardIn {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes bananaFall {
   0% {
     transform: translate3d(-1.5rem, -8vh, 0) rotate(var(--banana-rotate));
@@ -6219,26 +6076,6 @@ img {
 
   .custom-request-nudge p {
     font-size: 0.8rem;
-  }
-
-  .helper-monkey {
-    bottom: max(var(--space-1), env(safe-area-inset-bottom));
-    left: var(--space-1);
-    max-width: calc(100vw - 5.4rem);
-  }
-
-  .helper-monkey-avatar {
-    height: 3.35rem;
-    width: 3.35rem;
-  }
-
-  .helper-monkey-avatar img {
-    height: 2.72rem;
-    width: 2.72rem;
-  }
-
-  .helper-monkey-card {
-    max-width: min(18rem, calc(100vw - 5.4rem));
   }
 
   .guided-tour {

@@ -1,6 +1,6 @@
 # TechChimps
 
-Affordable websites, apps, Discord bots, desktop tools and automation for beginners, creators, communities and small businesses.
+Affordable websites, apps, creative design, audio, video, beats, Python tools, Discord bots, desktop tools and automation for beginners, creators, communities and small businesses.
 
 Powered by bananas.
 
@@ -12,9 +12,14 @@ TechChimps is a friendly UK digital studio. We turn normal ideas into clear digi
 
 Services include:
 
+- Profile pictures and starter creative assets from GBP 19
 - Creator link hubs from GBP 49
 - Business websites from GBP 99
 - Web apps and dashboards
+- Logos, banners, flyers and social profile art
+- Mixing, mastering, video editing and custom beats
+- Python programs and automation tools
+- Document formatting, proofreading and structure help
 - Discord bots and community tools
 - Windows desktop tools
 - Automation for repeat tasks

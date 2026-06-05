@@ -4,10 +4,16 @@ import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 
 const categorySummaries: Record<ServiceCategory, string> = {
   "Quick Launch": "Fast, simple offers people can buy today.",
+  "Creative Design": "Logo, banner, flyer, and profile art.",
+  "Music & Audio": "Mixing, mastering, and audio polish.",
+  "Video Editing": "Short clips, promos, and YouTube edits.",
+  "Beat Production": "Custom beats and stem packages.",
   Websites: "Launch a clear online home.",
   "Web Apps": "Build a useful browser tool.",
+  "Python Programs": "Automate repeat digital jobs.",
   "Windows Apps": "Speed up PC tasks.",
   Discord: "Automate your community.",
+  "Document Help": "Format, proof, and structure documents.",
   Care: "Keep everything healthy.",
   "Custom Request": "Shape something different with us."
 };

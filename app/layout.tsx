@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { BananaRain } from "@/components/banana-rain";
 import { CursorGlow } from "@/components/cursor-glow";
-import { HelperMonkey } from "@/components/helper-monkey";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { StructuredData } from "@/components/seo/structured-data";
@@ -23,7 +22,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Navbar />
           {children}
           <Footer />
-          <HelperMonkey />
         </div>
       </body>
     </html>

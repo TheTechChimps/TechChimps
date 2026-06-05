@@ -25,7 +25,7 @@ export async function createHostedCheckoutSession(
         price_data: {
           currency: "gbp",
           product_data: {
-            description: order.goals.slice(0, 240),
+            description: (order.goals || `${order.serviceName} with TechChimps creative control`).slice(0, 240),
             name: order.serviceName
           },
           recurring: order.isSubscription ? { interval: "month" } : undefined,

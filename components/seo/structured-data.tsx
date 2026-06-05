@@ -9,7 +9,7 @@ export function StructuredData() {
     "@type": "LocalBusiness",
     name: "TechChimps",
     description:
-      "Friendly UK tech services studio building affordable websites, web apps, Discord bots, automations, desktop tools, maintenance, and custom software for beginners, creators, and businesses.",
+      "Friendly UK tech services studio building affordable websites, web apps, creative design, audio services, video edits, custom beats, Python programs, Discord bots, automations, desktop tools, document support, maintenance, and custom software for beginners, creators, and businesses.",
     url: baseUrl,
     image: `${baseUrl}/images/techchimps-social-card-v5.png`,
     areaServed: "United Kingdom",
@@ -29,7 +29,12 @@ export function StructuredData() {
       "Discord bot development",
       "desktop app development",
       "automation services UK",
-      "custom software development"
+      "custom software development",
+      "logo design UK",
+      "video editing services UK",
+      "mixing and mastering UK",
+      "Python automation services",
+      "document formatting help"
     ],
     makesOffer: publicServices.map((service) => ({
       "@type": "Offer",

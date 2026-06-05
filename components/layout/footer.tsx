@@ -13,12 +13,12 @@ export function Footer() {
         <div>
           <p className="eyebrow">TechChimps</p>
           <h2>Powered by bananas.</h2>
-          <p>Affordable tech services for websites, apps, bots, automation, and care plans.</p>
+          <p>Affordable services for websites, apps, bots, creative work, audio, video, automation, and care plans.</p>
         </div>
         <div className="footer-links">
           <Link href="/services">Services</Link>
           <Link href="/pricing">Pricing</Link>
-          <Link href="/find-us">Find us</Link>
+          <Link href="/find-us">Contact us</Link>
           <Link href="/request">Custom request</Link>
           <Link href="/process">Steps</Link>
           <Link href="/faq">FAQ</Link>

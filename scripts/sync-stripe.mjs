@@ -214,9 +214,10 @@ function extractServices() {
       priceSuffix: readOptionalStringProperty(node, "priceSuffix"),
       slug: readStringProperty(node, "slug"),
       summary: readStringProperty(node, "summary")
-    }));
+    }))
+    .filter((service) => service.slug !== "custom-request" && service.price > 0);
 
-  const invalid = services.filter((service) => !service.slug || !service.name || !service.category || !service.price);
+  const invalid = services.filter((service) => !service.slug || !service.name || !service.category || service.price <= 0);
   if (invalid.length > 0) {
     throw new Error(`Could not parse all services: ${invalid.map((service) => service.slug || service.name).join(", ")}`);
   }

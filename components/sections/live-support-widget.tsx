@@ -119,11 +119,19 @@ export function LiveSupportWidget({
     latestAgentMessageIdRef.current = "";
   }, [activeSessionId]);
 
-  const openChat = () => {
+  const openChat = useCallback(() => {
     setOpen(true);
     setMinimized(false);
     void primeNotificationSound();
-  };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("techchimps:open-live-chat", openChat);
+
+    return () => {
+      window.removeEventListener("techchimps:open-live-chat", openChat);
+    };
+  }, [openChat]);
 
   const closeChat = () => {
     setOpen(false);

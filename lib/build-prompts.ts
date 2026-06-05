@@ -43,6 +43,34 @@ function categoryGuidance(order: OrderRecord) {
         "Include obvious contact, booking, payment, social, or lead-capture routes depending on the brief.",
         "Avoid filler sections. Every section must help the visitor take action."
       ];
+    case "Creative Design":
+      return [
+        "Create a polished visual asset that fits the requested platform, size, and brand direction.",
+        "Prioritize legibility, hierarchy, strong spacing, and export-ready presentation over clutter.",
+        "Use the customer's wording, handles, dates, and contact details exactly where provided.",
+        "Provide a concise handoff with file/export notes and any sizing assumptions."
+      ];
+    case "Music & Audio":
+      return [
+        "Treat the customer's reference sound, file list, and problem areas as the source of truth.",
+        "Focus on clarity, balance, loudness consistency, and the requested delivery formats.",
+        "Do not promise impossible fixes for poor source recordings; document realistic assumptions.",
+        "Leave clear notes for revisions, exported files, and any missing stems or references."
+      ];
+    case "Video Editing":
+      return [
+        "Build the final edit around the target platform, length, pacing, and viewer action.",
+        "Keep captions, titles, transitions, music, and overlays readable on mobile.",
+        "Make the first few seconds clear and engaging, especially for short-form content.",
+        "Document export size, aspect ratio, assets used, and any missing footage assumptions."
+      ];
+    case "Beat Production":
+      return [
+        "Shape the beat around the requested genre, mood, references, arrangement, and file needs.",
+        "Use references for direction only; avoid copying melodies, samples, or protected material.",
+        "Keep the structure easy for recording and mark assumptions about BPM, key, stems, and rights.",
+        "Provide clear delivery notes for WAV, stems, lease, or exclusive package expectations."
+      ];
     case "Websites":
       return [
         "Build a polished business website with strong hierarchy, trust signals, clear CTAs, and local SEO foundations.",
@@ -57,6 +85,13 @@ function categoryGuidance(order: OrderRecord) {
         "Create a focused dashboard or task view if it helps the customer complete the main workflow.",
         "Prioritize clarity, speed, accessibility, and maintainable typed code."
       ];
+    case "Python Programs":
+      return [
+        "Build the automation around the exact inputs, outputs, rules, and environment the customer described.",
+        "Protect source files where possible, include friendly errors, and avoid destructive defaults.",
+        "Prefer simple setup and usage over over-engineering; add an interface only when requested or useful.",
+        "Document how to install, run, configure, and verify the Python tool."
+      ];
     case "Windows Apps":
       return [
         "Design the desktop workflow around repeat use, clear controls, file handling, and friendly error states.",
@@ -70,6 +105,13 @@ function categoryGuidance(order: OrderRecord) {
         "Include ticket, moderation, welcome, logging, role, reminder, or webhook flows only where they fit the customer brief.",
         "Keep the admin experience simple and safe.",
         "Document deployment and hosting steps clearly."
+      ];
+    case "Document Help":
+      return [
+        "Support formatting, proofreading, structure, clarity, and explanation without replacing the customer's own responsibility.",
+        "For study-related work, help the customer understand and improve their own material rather than producing dishonest submissions.",
+        "Keep tone, formatting, and export choices aligned to the requested audience and document type.",
+        "Leave a concise note explaining what changed and what the customer should review."
       ];
     case "Care":
       return [

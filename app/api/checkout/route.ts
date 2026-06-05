@@ -14,7 +14,13 @@ function isValidEmail(value: string) {
 export async function POST(request: Request) {
   const payload = (await request.json().catch(() => null)) as OrderInput | null;
 
-  if (!payload || !payload.contactEmail || !payload.serviceType || !payload.goals || !payload.contactName) {
+  if (
+    !payload ||
+    !payload.contactEmail ||
+    !payload.serviceType ||
+    (!payload.goals?.trim() && !payload.creativeControl) ||
+    !payload.contactName
+  ) {
     return NextResponse.json({ error: "Missing required order details." }, { status: 400 });
   }
 
@@ -25,6 +31,11 @@ export async function POST(request: Request) {
   if (payload.offerMode && payload.offerMode !== "standard") {
     return NextResponse.json({ error: "Custom and discounted offers need review before payment." }, { status: 400 });
   }
+
+  const normalizedPayload: OrderInput = {
+    ...payload,
+    goals: payload.goals ?? ""
+  };
 
   const activeTicket = await findActiveCustomerTicket(payload.contactEmail);
   if (activeTicket) {
@@ -39,7 +50,7 @@ export async function POST(request: Request) {
   }
 
   const stripe = getStripe();
-  const order = await createOrder({ ...payload, offerMode: "standard" }, "checkout_started");
+  const order = await createOrder({ ...normalizedPayload, offerMode: "standard" }, "checkout_started");
   await saveBuildPromptForOrder(order);
   const customer = await ensureCustomerForOrder(order);
   await addInboxMessage({

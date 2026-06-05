@@ -4,7 +4,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/motion";
 
 const proof = [
-  { label: "From \u00a349", icon: PoundSterling },
+  { label: "From \u00a319", icon: PoundSterling },
   { label: "Guided brief", icon: ShieldCheck },
   { label: "Secure checkout", icon: CreditCard },
   { label: "Live support", icon: MessageCircle }
@@ -17,7 +17,7 @@ export function Hero() {
       <div className="hero-pattern" aria-hidden />
       <div className="container hero-inner">
         <Reveal className="hero-copy">
-          <span className="eyebrow">Friendly tech services for websites, apps, bots and automation</span>
+          <span className="eyebrow">Friendly services for tech, design, audio, video and automation</span>
           <h1 className="headline">TechChimps</h1>
           <p className="subtitle">
             Tell us what you want built. We give you a clear price, a fast plan, and a finished product ready to launch.

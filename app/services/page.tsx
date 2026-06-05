@@ -5,9 +5,19 @@ import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
   title: "Affordable Tech Services UK",
-  description: "Choose a clear TechChimps tech service, from quick launch pages to websites, apps, bots, automation, desktop tools, and care plans.",
+  description:
+    "Choose a clear TechChimps service, from quick launch pages to websites, apps, creative design, audio, video editing, custom beats, Python programs, bots, automation, desktop tools, document help, and care plans.",
   path: "/services",
-  keywords: ["affordable web design UK", "custom software development", "Discord bot development"]
+  keywords: [
+    "affordable web design UK",
+    "custom software development",
+    "Discord bot development",
+    "logo design UK",
+    "video editing services UK",
+    "mixing and mastering UK",
+    "Python automation services",
+    "document formatting help"
+  ]
 });
 
 export default function ServicesPage() {
