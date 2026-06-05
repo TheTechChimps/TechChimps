@@ -50,6 +50,15 @@ const socialLinks = [
     cta: "Open",
     accent: "#f6f8fa",
     surface: "linear-gradient(135deg, #24292f, #586069)"
+  },
+  {
+    name: "WhatsApp",
+    handle: "TechChimps.com",
+    href: "https://wa.me/447472457653",
+    description: "Quick questions and direct chat.",
+    cta: "Message",
+    accent: "#25d366",
+    surface: "linear-gradient(135deg, #075e54, #25d366)"
   }
 ];
 
@@ -88,6 +97,14 @@ function SocialLogo({ name }: { name: string }) {
     );
   }
 
+  if (name === "WhatsApp") {
+    return (
+      <svg aria-hidden viewBox="0 0 24 24">
+        <path d="M12.04 2.1a9.82 9.82 0 0 0-8.4 14.88L2.5 21.9l5.04-1.12a9.82 9.82 0 1 0 4.5-18.68Zm0 17.82a7.98 7.98 0 0 1-4.06-1.1l-.29-.17-2.99.67.68-2.9-.2-.31a7.98 7.98 0 1 1 6.86 3.81Zm4.43-5.98c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.62.57.25 1.02.4 1.37.51.58.18 1.1.15 1.52.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z" />
+      </svg>
+    );
+  }
+
   return (
     <svg aria-hidden viewBox="0 0 24 24">
       <path d="M12 .7C5.75.7.7 5.75.7 12c0 5 3.24 9.24 7.73 10.74.57.1.78-.24.78-.54v-2.01c-3.14.68-3.8-1.35-3.8-1.35-.52-1.3-1.26-1.66-1.26-1.66-1.02-.7.08-.69.08-.69 1.14.08 1.74 1.18 1.74 1.18 1.01 1.73 2.66 1.23 3.31.94.1-.73.4-1.23.72-1.52-2.51-.28-5.15-1.25-5.15-5.57 0-1.23.44-2.24 1.17-3.03-.12-.29-.51-1.44.11-2.99 0 0 .95-.3 3.11 1.16.9-.25 1.87-.38 2.83-.38s1.93.13 2.83.38c2.16-1.46 3.11-1.16 3.11-1.16.62 1.55.23 2.7.11 2.99.73.79 1.17 1.8 1.17 3.03 0 4.33-2.64 5.28-5.16 5.56.41.35.77 1.04.77 2.1v3.12c0 .3.2.65.78.54A11.31 11.31 0 0 0 23.3 12C23.3 5.75 18.25.7 12 .7Z" />
@@ -98,14 +115,15 @@ function SocialLogo({ name }: { name: string }) {
 export const metadata = createMetadata({
   title: "Find us",
   description:
-    "Find TechChimps on Instagram, Facebook, LinkedIn, YouTube, and GitHub for updates, demos, portfolio proof, and friendly support.",
+    "Find TechChimps on Instagram, Facebook, LinkedIn, YouTube, GitHub, and WhatsApp for updates, demos, portfolio proof, and friendly support.",
   path: "/find-us",
   keywords: [
     "TechChimps Instagram",
     "TechChimps Facebook",
     "TechChimps YouTube",
     "TechChimps GitHub",
-    "TechChimps LinkedIn"
+    "TechChimps LinkedIn",
+    "TechChimps WhatsApp"
   ]
 });
 

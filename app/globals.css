@@ -2648,7 +2648,7 @@ img {
 .find-us-grid {
   display: grid;
   gap: var(--space-1);
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .find-us-social-section {

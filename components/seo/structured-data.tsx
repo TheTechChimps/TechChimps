@@ -11,6 +11,15 @@ export function StructuredData() {
     url: baseUrl,
     image: `${baseUrl}/images/techchimps-social-card-v5.png`,
     areaServed: "United Kingdom",
+    telephone: "+447472457653",
+    sameAs: [
+      "https://www.instagram.com/thetechchimps/",
+      "https://www.facebook.com/profile.php?id=61590253839961",
+      "https://www.linkedin.com/in/tech-chimps-360287412/",
+      "https://www.youtube.com/@TheTechChimps",
+      "https://github.com/TheTechChimps",
+      "https://wa.me/447472457653"
+    ],
     priceRange: "GBP 19-299",
     knowsAbout: [
       "affordable web design UK",
