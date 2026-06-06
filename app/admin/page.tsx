@@ -20,6 +20,7 @@ import {
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
+import { AdminAppPanel } from "@/components/admin/admin-app-panel";
 import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
 import { CustomerListConsole } from "@/components/admin/customer-list-console";
@@ -164,6 +165,12 @@ export default async function AdminPage() {
               })}
             </nav>
           </Card>
+        </div>
+      </section>
+
+      <section className="section-tight">
+        <div className="container">
+          <AdminAppPanel />
         </div>
       </section>
 

@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "domain:setup": "node scripts/setup-domain.mjs",
     "deploy:netlify": "node scripts/deploy-netlify.mjs",
+    "generate:vapid": "node scripts/generate-vapid.mjs",
     "setup:vercel": "node scripts/setup-vercel.mjs",
     "sync:stripe": "node scripts/sync-stripe.mjs",
     "sync:vercel-env": "node scripts/sync-vercel-env.mjs",
@@ -26,13 +27,15 @@
     "next": "^16.2.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "stripe": "^22.1.1"
+    "stripe": "^22.1.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.15.11",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9.16.0",
     "eslint-config-next": "^16.2.6",
     "typescript": "^5.7.2"

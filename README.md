@@ -102,10 +102,14 @@ EMAIL_AUTOMATION_WEBHOOK_URL=...
 CRON_SECRET=...
 EMAIL_FROM=techchimps@proton.me
 ADMIN_PASSWORD=...
-ADMIN_EMAIL=admin@techchimps.com
+ADMIN_EMAIL=techchimps@proton.me
 ADMIN_NAME=TechChimps Admin
 ADMIN_USERS_JSON=
 ADMIN_SESSION_SECRET=...
+NEXT_PUBLIC_ADMIN_VAPID_PUBLIC_KEY=...
+ADMIN_VAPID_PUBLIC_KEY=...
+ADMIN_VAPID_PRIVATE_KEY=...
+ADMIN_VAPID_SUBJECT=mailto:techchimps@proton.me
 ```
 
 Vercel is the preferred hosting target. The storage layer uses Vercel Blob in production, then local memory for development when no storage token is present.
@@ -121,6 +125,17 @@ npm run deploy:vercel
 `sync:vercel-deploy-hook` creates and saves the production deploy hook after the Vercel project is connected to a Git repository. Vercel blocks deploy hooks until Git is connected.
 
 Use `/api/stripe/webhook` as the Stripe webhook endpoint and enable `checkout.session.completed`. `/api/automations/health` reports integration readiness and can be called with `POST` to run a self-healing sweep for paid orders that need their chat handoff repaired.
+
+## Android admin app
+
+The admin dashboard can be installed on Android as a private PWA. It sends phone notifications for paid orders, custom offers, customer live chat messages, refunds, tickets and inbox activity.
+
+```bash
+npm run generate:vapid
+npm run sync:vercel-env
+```
+
+On the Samsung phone, open `https://techchimps.com/admin` in Chrome, log in, use **Install app**, then tap **Enable alerts** and **Send test**. Push notifications require HTTPS and Chrome notification permission for TechChimps.
 
 ## Production operations
 

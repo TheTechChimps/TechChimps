@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendChatPushNotification } from "@/lib/admin-push";
 import { adminUnauthorized, isAdminRequestAuthenticated } from "@/lib/admin-session";
 import {
   appendLiveChatMessage,
@@ -59,6 +60,14 @@ export async function POST(request: Request) {
     author: payload.author?.trim() || (payload.role === "agent" ? "Studio support" : "Website visitor"),
     body: payload.body.trim()
   });
+
+  if (message.role === "visitor") {
+    await sendChatPushNotification({
+      author: message.author,
+      body: message.body,
+      sessionId: message.sessionId
+    });
+  }
 
   return NextResponse.json({ message });
 }

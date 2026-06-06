@@ -1,4 +1,5 @@
 import type Stripe from "stripe";
+import { sendOrderPushNotification } from "@/lib/admin-push";
 import { addInboxMessage, ensureCustomerForOrder } from "@/lib/accounts";
 import { appendLiveChatMessage } from "@/lib/live-chat";
 import {
@@ -196,6 +197,7 @@ export async function triggerPlatformDeploy(order: OrderRecord) {
 
 export async function runOrderAutomation(order: OrderRecord, event: string) {
   await Promise.all([
+    sendOrderPushNotification(order, event),
     notifyStudio(order, event),
     postJson(process.env.CRM_API_URL, order, event, "CRM sync"),
     postJson(process.env.QUOTE_WEBHOOK_URL, order, event, "Quote webhook"),

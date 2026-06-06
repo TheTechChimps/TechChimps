@@ -155,7 +155,14 @@ function syncNetlifyEnv(env) {
     "EMAIL_AUTOMATION_WEBHOOK_URL",
     "EMAIL_FROM",
     "ADMIN_PASSWORD",
-    "ADMIN_SESSION_SECRET"
+    "ADMIN_EMAIL",
+    "ADMIN_NAME",
+    "ADMIN_USERS_JSON",
+    "ADMIN_SESSION_SECRET",
+    "NEXT_PUBLIC_ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PRIVATE_KEY",
+    "ADMIN_VAPID_SUBJECT"
   ];
 
   for (const key of envKeys) {
@@ -263,7 +270,14 @@ function writeEnv(file, env) {
     "NETLIFY_BUILD_HOOK_URL",
     "EMAIL_FROM",
     "ADMIN_PASSWORD",
-    "ADMIN_SESSION_SECRET"
+    "ADMIN_EMAIL",
+    "ADMIN_NAME",
+    "ADMIN_USERS_JSON",
+    "ADMIN_SESSION_SECRET",
+    "NEXT_PUBLIC_ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PRIVATE_KEY",
+    "ADMIN_VAPID_SUBJECT"
   ];
 
   const lines = keys.map((key) => `${key}=${env[key] || ""}`);

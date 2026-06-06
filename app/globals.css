@@ -4543,6 +4543,81 @@ img {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.admin-app-panel {
+  align-items: start;
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.8fr);
+  overflow: hidden;
+}
+
+.admin-app-copy {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-app-copy h2 {
+  color: var(--text);
+  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.admin-app-copy p,
+.admin-app-panel .helper {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.admin-app-status-row,
+.admin-app-actions,
+.admin-app-feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.admin-app-feature-list {
+  align-content: start;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 10%), rgb(46 230 190 / 7%)),
+    color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--border));
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+}
+
+.admin-app-feature-list span {
+  align-items: center;
+  background: rgb(255 255 255 / 7%);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 999px;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 860;
+  gap: 0.45rem;
+  min-height: 2.15rem;
+  padding: 0.38rem 0.65rem;
+}
+
+.admin-app-feature-list svg {
+  color: var(--honey);
+  flex: 0 0 auto;
+}
+
+.admin-app-actions {
+  grid-column: 1 / -1;
+}
+
+.admin-app-actions .button {
+  min-width: 9.5rem;
+}
+
+.admin-app-panel > .helper {
+  grid-column: 1 / -1;
+}
+
 .payment-hub {
   display: grid;
   gap: var(--space-2);
@@ -5303,6 +5378,7 @@ img {
   .footer-grid,
   .final-cta-inner,
   .admin-toolbar,
+  .admin-app-panel,
   .customer-console-grid,
   .prompt-inbox-grid {
     grid-template-columns: 1fr;
@@ -5655,6 +5731,49 @@ img {
 
   .tabs-trigger:last-child:nth-child(odd) {
     grid-column: 1 / -1;
+  }
+
+  .admin-app-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-app-actions .button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-app-panel {
+    gap: var(--space-1);
+    padding: var(--space-2);
+  }
+
+  .admin-app-copy {
+    gap: 0.45rem;
+  }
+
+  .admin-app-copy h2 {
+    font-size: 1.2rem;
+    line-height: 1.15;
+  }
+
+  .admin-app-copy p,
+  .admin-app-panel .helper {
+    font-size: 0.9rem;
+  }
+
+  .admin-app-status-row {
+    gap: 0.45rem;
+  }
+
+  .admin-app-feature-list {
+    gap: 0.45rem;
+    padding: 0.7rem;
+  }
+
+  .admin-app-feature-list span {
+    min-height: 1.9rem;
+    padding: 0.32rem 0.55rem;
   }
 
   .form-grid,

@@ -326,7 +326,14 @@ function writeEnv(file, env) {
     "VERCEL_SCOPE",
     "EMAIL_FROM",
     "ADMIN_PASSWORD",
-    "ADMIN_SESSION_SECRET"
+    "ADMIN_EMAIL",
+    "ADMIN_NAME",
+    "ADMIN_USERS_JSON",
+    "ADMIN_SESSION_SECRET",
+    "NEXT_PUBLIC_ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PUBLIC_KEY",
+    "ADMIN_VAPID_PRIVATE_KEY",
+    "ADMIN_VAPID_SUBJECT"
   ];
   const keys = [...new Set([...preferredKeys, ...existingKeys, ...Object.keys(env)])].filter(
     (key) => env[key] !== undefined && env[key] !== ""
