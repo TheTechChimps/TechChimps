@@ -80,10 +80,18 @@ export function LiveChatConsole() {
   const lastVisitorSignalRef = useRef("");
 
   const loadMessages = useCallback(async () => {
-    const [chatResponse, orderResponse] = await Promise.all([
-      fetch("/api/live-chat", { cache: "no-store" }),
-      fetch("/api/orders?waiting=true", { cache: "no-store" })
-    ]);
+    let chatResponse: Response;
+    let orderResponse: Response;
+
+    try {
+      [chatResponse, orderResponse] = await Promise.all([
+        fetch("/api/live-chat", { cache: "no-store" }),
+        fetch("/api/orders?waiting=true", { cache: "no-store" })
+      ]);
+    } catch {
+      return;
+    }
+
     let nextSessions: LiveChatSessionSummary[] = [];
     let nextOrders: OrderRecord[] = [];
 

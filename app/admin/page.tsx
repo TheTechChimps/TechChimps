@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   CreditCard,
   Download,
+  Eye,
   FileSignature,
   FileText,
   FolderKanban,
@@ -31,6 +32,7 @@ import { DiscountCodeManager } from "@/components/admin/discount-code-manager";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { PaymentHub } from "@/components/admin/payment-hub";
+import { PreviewManager } from "@/components/admin/preview-manager";
 import { SignoffManager } from "@/components/admin/signoff-manager";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { activityTimeline, automationFlows, emailTemplates, pipelineColumns } from "@/data/dashboard";
@@ -66,6 +68,7 @@ const adminModules = [
 const adminQuickLinks = [
   { href: "#support", icon: MessageSquareReply, label: "Reply to chats", meta: "Customers waiting" },
   { href: "#payments", icon: CreditCard, label: "Payment hub", meta: "Refunds and receipts" },
+  { href: "#previews", icon: Eye, label: "Previews", meta: "Watermarked review" },
   { href: "#signoffs", icon: FileSignature, label: "Sign-offs", meta: "Final approvals" },
   { href: "#discounts", icon: BadgePercent, label: "Discounts", meta: "Codes and offers" },
   { href: "#customers", icon: UserRoundCheck, label: "Customer list", meta: "Details and updates" },
@@ -274,6 +277,12 @@ export default async function AdminPage() {
       <section className="section-tight" id="payments">
         <div className="container">
           <PaymentHub />
+        </div>
+      </section>
+
+      <section className="section-tight" id="previews">
+        <div className="container">
+          <PreviewManager />
         </div>
       </section>
 

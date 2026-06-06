@@ -4,6 +4,7 @@ import { deleteBuildPrompt, listBuildPrompts, type BuildPromptRecord } from "@/l
 import { deleteFinalSignoff, listFinalSignoffs, type FinalSignoffRecord } from "@/lib/final-signoffs";
 import { deleteLiveChatSessions, getLiveChatMessages } from "@/lib/live-chat";
 import { deleteOrder, listOrders, type OrderRecord } from "@/lib/orders";
+import { deletePreview, listPreviews, type PreviewRecord } from "@/lib/previews";
 import { listJson, writeJson } from "@/lib/storage";
 
 type QaCleanupCandidate = {
@@ -13,6 +14,7 @@ type QaCleanupCandidate = {
   finalSignoffs: FinalSignoffRecord[];
   liveChatSessionIds: string[];
   orders: OrderRecord[];
+  previews: PreviewRecord[];
   prompts: BuildPromptRecord[];
   references: string[];
 };
@@ -48,14 +50,15 @@ function uniqueSorted(values: string[]) {
 }
 
 export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
-  const [orders, customers, prompts, liveChatMessages, automationEvents, crmProjects, finalSignoffs] = await Promise.all([
+  const [orders, customers, prompts, liveChatMessages, automationEvents, crmProjects, finalSignoffs, previews] = await Promise.all([
     listOrders(),
     listCustomers(),
     listBuildPrompts(),
     getLiveChatMessages(),
     listJson<AutomationEventRecord>(AUTOMATION_STORE, "events/"),
     listJson<CrmProjectRecord>(AUTOMATION_STORE, "crm/"),
-    listFinalSignoffs()
+    listFinalSignoffs(),
+    listPreviews()
   ]);
 
   const qaOrders = orders.filter(isQaOrder);
@@ -89,6 +92,16 @@ export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
   );
   qaFinalSignoffs.forEach((signoff) => references.add(signoff.orderReference));
 
+  const qaPreviews = previews.filter(
+    (preview) =>
+      references.has(preview.orderReference) ||
+      isQaEmail(preview.customerEmail) ||
+      /^QA\b/i.test(preview.customerName) ||
+      includesQaMarker(preview.note) ||
+      includesQaMarker(preview.title)
+  );
+  qaPreviews.forEach((preview) => references.add(preview.orderReference));
+
   const qaSessionIds = new Set<string>();
   for (const reference of references) {
     qaSessionIds.add(`order-${reference.toLowerCase()}`);
@@ -113,6 +126,7 @@ export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
     finalSignoffs: qaFinalSignoffs,
     liveChatSessionIds: uniqueSorted(Array.from(qaSessionIds)),
     orders: qaOrders,
+    previews: qaPreviews,
     prompts: qaPrompts,
     references: uniqueSorted(Array.from(references))
   };
@@ -126,6 +140,7 @@ export function summarizeQaCleanup(candidates: QaCleanupCandidate) {
     finalSignoffs: candidates.finalSignoffs.length,
     liveChatSessions: candidates.liveChatSessionIds.length,
     orders: candidates.orders.length,
+    previews: candidates.previews.length,
     prompts: candidates.prompts.length,
     references: candidates.references.length
   };
@@ -139,6 +154,7 @@ export async function runQaCleanup() {
     ...candidates.prompts.map((prompt) => deleteBuildPrompt(prompt.orderReference)),
     ...candidates.customers.map((customer) => deleteCustomerAccount(customer.email)),
     ...candidates.finalSignoffs.map((signoff) => deleteFinalSignoff(signoff)),
+    ...candidates.previews.map((preview) => deletePreview(preview)),
     ...candidates.automationEvents.map((event) =>
       writeJson<AutomationEventRecord | null>(AUTOMATION_STORE, `events/${event.id}`, null)
     ),

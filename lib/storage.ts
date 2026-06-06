@@ -3,6 +3,13 @@ import { del as deleteVercelBlob, get as getVercelBlob, list as listVercelBlobs,
 
 type MemoryStores = Record<string, Record<string, unknown>>;
 type BlobInput = string | ArrayBuffer | Blob;
+type MemoryBlobRecord = {
+  body: ArrayBuffer;
+  contentType?: string;
+  metadata?: Record<string, unknown>;
+  storedAt: string;
+  type: string;
+};
 const INDEX_KEY = "__keys";
 
 const memoryRoot = globalThis as typeof globalThis & {
@@ -117,10 +124,55 @@ export async function writeBlob(storeName: string, key: string, value: BlobInput
   }
 
   getMemoryStore(storeName)[key] = {
+    body: await blobInputToArrayBuffer(value),
+    contentType: typeof metadata?.type === "string" ? metadata.type : value instanceof Blob ? value.type : undefined,
     metadata,
     storedAt: new Date().toISOString(),
     type: value instanceof Blob ? value.type : typeof value
-  };
+  } satisfies MemoryBlobRecord;
+}
+
+export async function readBlob(storeName: string, key: string) {
+  const vercelToken = getVercelBlobToken();
+
+  if (vercelToken) {
+    try {
+      const result = await getVercelBlob(vercelPath(storeName, key), {
+        access: "private",
+        useCache: false,
+        token: vercelToken
+      });
+      if (result?.statusCode !== 200 || !result.stream) return null;
+
+      return {
+        body: await new Response(result.stream).arrayBuffer(),
+        contentType: result.headers.get("content-type") ?? undefined
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  const blobStore = getBlobStore(storeName);
+
+  if (blobStore) {
+    try {
+      const body = (await blobStore.get(key, { type: "arrayBuffer" })) as ArrayBuffer | null;
+      if (!body) return null;
+
+      return { body };
+    } catch {
+      return null;
+    }
+  }
+
+  const stored = getMemoryStore(storeName)[key] as MemoryBlobRecord | undefined;
+  return stored?.body
+    ? {
+        body: stored.body,
+        contentType: stored.contentType
+      }
+    : null;
 }
 
 export async function listJson<T>(storeName: string, prefix = ""): Promise<T[]> {
@@ -216,6 +268,12 @@ async function writeVercelJson<T>(storeName: string, key: string, value: T, toke
       contentType: "application/json",
       token
     });
+}
+
+async function blobInputToArrayBuffer(value: BlobInput) {
+  if (typeof value === "string") return new TextEncoder().encode(value).buffer;
+  if (value instanceof Blob) return value.arrayBuffer();
+  return value;
 }
 
 async function listJsonFromIndex<T>(storeName: string, prefix = "") {

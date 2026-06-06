@@ -4,17 +4,19 @@ import { listBuildPrompts } from "@/lib/build-prompts";
 import { listFinalSignoffs } from "@/lib/final-signoffs";
 import { getLiveChatMessages } from "@/lib/live-chat";
 import { listOrders } from "@/lib/orders";
+import { listPreviews } from "@/lib/previews";
 import { getStorageMode, listJson } from "@/lib/storage";
 
 export async function createBackupSnapshot() {
-  const [customers, orders, prompts, liveChatMessages, automationEvents, crmProjects, finalSignoffs] = await Promise.all([
+  const [customers, orders, prompts, liveChatMessages, automationEvents, crmProjects, finalSignoffs, previews] = await Promise.all([
     listCustomers(),
     listOrders(),
     listBuildPrompts(),
     getLiveChatMessages(),
     listJson<AutomationEventRecord>("techchimps-automation", "events/"),
     listJson<CrmProjectRecord>("techchimps-automation", "crm/"),
-    listFinalSignoffs()
+    listFinalSignoffs(),
+    listPreviews()
   ]);
   const inbox = await Promise.all(
     customers.map(async (customer) => ({
@@ -36,6 +38,7 @@ export async function createBackupSnapshot() {
       finalSignoffs: finalSignoffs.length,
       liveChatMessages: liveChatMessages.length,
       orders: orders.length,
+      previews: previews.length,
       prompts: prompts.length
     },
     data: {
@@ -46,6 +49,7 @@ export async function createBackupSnapshot() {
       inbox,
       liveChatMessages,
       orders,
+      previews,
       prompts
     }
   };

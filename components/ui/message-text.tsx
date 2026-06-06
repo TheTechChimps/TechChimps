@@ -2,6 +2,7 @@ const urlPattern = /(https?:\/\/[^\s]+)/g;
 
 function linkLabel(url: string) {
   if (url.includes("checkout.stripe.com")) return "Open secure payment link";
+  if (url.includes("/preview/")) return "Open watermarked preview";
   if (url.includes("/signoff/")) return "Open final acceptance";
   return "Open link";
 }
