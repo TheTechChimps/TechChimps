@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   CreditCard,
   Download,
+  FileSignature,
   FileText,
   FolderKanban,
   Gauge,
@@ -21,6 +22,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminAppPanel } from "@/components/admin/admin-app-panel";
+import { AdminOverviewPanel } from "@/components/admin/admin-overview-panel";
 import { Card } from "@/components/ui/card";
 import { CodexPromptInbox } from "@/components/admin/codex-prompt-inbox";
 import { CustomerListConsole } from "@/components/admin/customer-list-console";
@@ -29,10 +31,13 @@ import { DiscountCodeManager } from "@/components/admin/discount-code-manager";
 import { LiveChatConsole } from "@/components/admin/live-chat-console";
 import { QaCleanupPanel } from "@/components/admin/qa-cleanup-panel";
 import { PaymentHub } from "@/components/admin/payment-hub";
+import { SignoffManager } from "@/components/admin/signoff-manager";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { activityTimeline, automationFlows, emailTemplates, pipelineColumns } from "@/data/dashboard";
 import { ADMIN_SESSION_COOKIE, getAdminSessionFromToken, isAdminCookieAuthenticated } from "@/lib/admin-session";
+import { getAnalyticsSummary } from "@/lib/analytics";
 import { getIntegrationReadiness } from "@/lib/automation";
+import { listFinalSignoffs } from "@/lib/final-signoffs";
 import { getLiveChatSessions } from "@/lib/live-chat";
 import { getWaitingOrders, listOrders, type OrderRecord } from "@/lib/orders";
 import { createMetadata } from "@/lib/seo";
@@ -61,6 +66,7 @@ const adminModules = [
 const adminQuickLinks = [
   { href: "#support", icon: MessageSquareReply, label: "Reply to chats", meta: "Customers waiting" },
   { href: "#payments", icon: CreditCard, label: "Payment hub", meta: "Refunds and receipts" },
+  { href: "#signoffs", icon: FileSignature, label: "Sign-offs", meta: "Final approvals" },
   { href: "#discounts", icon: BadgePercent, label: "Discounts", meta: "Codes and offers" },
   { href: "#customers", icon: UserRoundCheck, label: "Customer list", meta: "Details and updates" },
   { href: "#prompts", icon: Sparkles, label: "Build prompts", meta: "One-shot briefs" },
@@ -105,14 +111,23 @@ export default async function AdminPage() {
   }
 
   const integrationStatuses = getIntegrationReadiness();
-  const [orders, waitingOrders, liveSessions] = await Promise.all([listOrders(), getWaitingOrders(), getLiveChatSessions()]);
+  const [orders, waitingOrders, liveSessions, analytics, signoffs] = await Promise.all([
+    listOrders(),
+    getWaitingOrders(),
+    getLiveChatSessions(),
+    getAnalyticsSummary(),
+    listFinalSignoffs()
+  ]);
   const needReplyCount = liveSessions.filter((session) => session.unreadVisitorMessages || session.priority !== "normal").length;
   const reviewCount = waitingOrders.filter(
     (order) => order.status === "offer_waiting_review" || order.status === "custom_request_waiting_review"
   ).length;
   const paidOrders = orders.filter(hasPaid);
+  const totalPaid = paidOrders.reduce((total, order) => total + order.amount, 0);
+  const totalRefunded = paidOrders.reduce((total, order) => total + (order.refundedAmount ?? 0), 0);
   const paidWaitingCount = waitingOrders.filter((order) => order.status === "paid_waiting_support").length;
   const refundablePayments = paidOrders.filter((order) => order.stripeSessionId && order.amount > (order.refundedAmount ?? 0)).length;
+  const pendingSignoffs = signoffs.filter((signoff) => signoff.status === "pending").length;
   const adminStats = [
     { label: "Need reply", value: String(needReplyCount), tone: needReplyCount ? "warning" : "good" },
     { label: "Review offers", value: String(reviewCount), tone: reviewCount ? "warning" : "good" },
@@ -165,6 +180,24 @@ export default async function AdminPage() {
               })}
             </nav>
           </Card>
+        </div>
+      </section>
+
+      <section className="section-tight">
+        <div className="container">
+          <AdminOverviewPanel
+            analytics={analytics}
+            earnings={{
+              paidOrders: paidOrders.length,
+              refunded: totalRefunded,
+              totalPaid
+            }}
+            focus={{
+              needReplyCount,
+              pendingSignoffs,
+              reviewCount
+            }}
+          />
         </div>
       </section>
 
@@ -241,6 +274,12 @@ export default async function AdminPage() {
       <section className="section-tight" id="payments">
         <div className="container">
           <PaymentHub />
+        </div>
+      </section>
+
+      <section className="section-tight" id="signoffs">
+        <div className="container">
+          <SignoffManager />
         </div>
       </section>
 

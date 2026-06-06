@@ -107,6 +107,9 @@ export type OrderRecord = {
   refundedAmount?: number;
   refundStatus?: "partial" | "full";
   refunds?: OrderRefund[];
+  finalSignoffStatus?: "pending" | "signed" | "void";
+  finalSignoffToken?: string;
+  finalSignoffSignedAt?: string;
   chatConnectedAt?: string;
   automationLog: AutomationResult[];
   createdAt: string;

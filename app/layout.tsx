@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { BananaRain } from "@/components/banana-rain";
 import { CursorGlow } from "@/components/cursor-glow";
 import { Footer } from "@/components/layout/footer";
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <BananaRain />
         <SplashScreen />
         <StructuredData />
+        <AnalyticsTracker />
         <div className="site-shell">
           <Navbar />
           {children}

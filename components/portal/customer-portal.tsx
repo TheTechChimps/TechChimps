@@ -2,6 +2,7 @@
 
 import {
   Archive,
+  FileSignature,
   FileText,
   Inbox,
   KeyRound,
@@ -470,6 +471,17 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
                     <ReceiptText aria-hidden size={14} />
                     Receipt
                   </a>
+                ) : null}
+                {order.finalSignoffStatus === "pending" && order.finalSignoffToken ? (
+                  <Link className="portal-inline-action" href={`/signoff/${order.finalSignoffToken}`}>
+                    <FileSignature aria-hidden size={14} />
+                    Sign final acceptance
+                  </Link>
+                ) : order.finalSignoffStatus === "signed" ? (
+                  <span className="portal-inline-action portal-inline-status">
+                    <FileSignature aria-hidden size={14} />
+                    Final accepted
+                  </span>
                 ) : null}
               </footer>
             </article>

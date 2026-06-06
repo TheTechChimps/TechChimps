@@ -1476,7 +1476,7 @@ img {
 .trust-row {
   display: grid;
   gap: var(--space-2);
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .trust-row div {
@@ -4543,6 +4543,98 @@ img {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.admin-overview-panel {
+  display: grid;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+.admin-overview-head {
+  align-items: start;
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+}
+
+.admin-overview-head h2,
+.signoff-manager h2 {
+  color: var(--text);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.12;
+  margin: 0.2rem 0;
+}
+
+.admin-overview-head p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.admin-overview-metrics,
+.admin-focus-list {
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-overview-metrics div {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 9%), rgb(46 230 190 / 6%)),
+    color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--border));
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: var(--space-1);
+}
+
+.admin-overview-metrics svg {
+  color: var(--honey);
+}
+
+.admin-overview-metrics span,
+.admin-focus-list small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.admin-overview-metrics strong {
+  color: var(--text);
+  font-size: clamp(1rem, 1.4vw, 1.35rem);
+  overflow-wrap: anywhere;
+}
+
+.admin-focus-list a {
+  align-items: center;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 0.85rem;
+  text-decoration: none;
+}
+
+.admin-focus-list a:hover,
+.admin-focus-list a:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--border));
+  box-shadow: var(--edge-glow);
+}
+
+.admin-focus-list svg {
+  color: var(--brand);
+}
+
+.admin-focus-list span {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
 .admin-app-panel {
   align-items: start;
   display: grid;
@@ -4616,6 +4708,182 @@ img {
 
 .admin-app-panel > .helper {
   grid-column: 1 / -1;
+}
+
+.signoff-manager {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.signoff-generate-panel {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 8%), rgb(255 211 79 / 5%)),
+    color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--honey) 22%, var(--border));
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.signoff-generate-actions,
+.signoff-link-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.signoff-order-list {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.signoff-order .support-notice {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.portal-inline-status {
+  cursor: default;
+}
+
+.signoff-page {
+  min-height: 72vh;
+}
+
+.signoff-shell {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 58rem;
+}
+
+.signoff-intro {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.signoff-card {
+  display: grid;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+.signoff-summary {
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.signoff-summary div {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: var(--space-1);
+}
+
+.signoff-summary span,
+.signoff-summary small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.signoff-summary strong {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.signoff-terms {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.signoff-terms span {
+  align-items: flex-start;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.55rem;
+  line-height: 1.5;
+  padding: 0.75rem;
+}
+
+.signoff-terms svg,
+.signoff-complete svg {
+  color: var(--honey);
+  flex: 0 0 auto;
+}
+
+.signoff-form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.signature-pad {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 7%), rgb(46 230 190 / 5%)),
+    color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--brand) 42%, var(--border));
+  border-radius: var(--radius-md);
+  display: block;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.signature-pad canvas {
+  display: block;
+  height: 13rem;
+  width: 100%;
+}
+
+.signoff-form-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: space-between;
+}
+
+.checkbox-row {
+  align-items: flex-start;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.55rem;
+  line-height: 1.45;
+  max-width: 34rem;
+}
+
+.checkbox-row input {
+  accent-color: var(--brand);
+  flex: 0 0 auto;
+  margin-top: 0.2rem;
+}
+
+.signoff-complete {
+  align-items: center;
+  background:
+    linear-gradient(145deg, rgb(46 230 190 / 14%), rgb(255 211 79 / 7%)),
+    color-mix(in srgb, var(--surface-strong) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 34%, var(--border));
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.signoff-complete h2,
+.signoff-complete p {
+  margin: 0;
 }
 
 .payment-hub {
@@ -5378,10 +5646,19 @@ img {
   .footer-grid,
   .final-cta-inner,
   .admin-toolbar,
+  .admin-overview-metrics,
+  .admin-focus-list,
   .admin-app-panel,
+  .signoff-summary,
   .customer-console-grid,
   .prompt-inbox-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-overview-head,
+  .signoff-form-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .hero-section {
@@ -5774,6 +6051,37 @@ img {
   .admin-app-feature-list span {
     min-height: 1.9rem;
     padding: 0.32rem 0.55rem;
+  }
+
+  .admin-overview-panel,
+  .signoff-manager,
+  .signoff-card {
+    gap: var(--space-1);
+    padding: var(--space-2);
+  }
+
+  .admin-overview-metrics,
+  .admin-focus-list,
+  .signoff-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-focus-list a {
+    padding: 0.7rem;
+  }
+
+  .signoff-generate-panel {
+    padding: var(--space-1);
+  }
+
+  .signoff-generate-actions .button,
+  .signoff-link-row .button,
+  .signoff-form .button {
+    width: 100%;
+  }
+
+  .signature-pad canvas {
+    height: 10.5rem;
   }
 
   .form-grid,

@@ -18,6 +18,13 @@ export default function RefundsPage() {
       title="Refunds and cancellations"
       sections={[
         {
+          title: "Our result promise",
+          body: [
+            "If you are not happy with the final result, tell us before final acceptance. We will listen, fix reasonable issues, explain options clearly, or discuss a fair refund where appropriate.",
+            "We want customers to feel safe starting a project, while also keeping completed and accepted digital work fair for both sides."
+          ]
+        },
+        {
           title: "Before work starts",
           body: [
             "If you paid by mistake or change your mind before meaningful work has started, contact us as soon as possible.",
@@ -35,7 +42,8 @@ export default function RefundsPage() {
           title: "Completed work",
           body: [
             "Completed digital work, delivered files, launched pages, configured servers, bots, apps, or automation work are normally not refundable.",
-            "We will still handle genuine issues, broken delivery, or agreed support fixes fairly."
+            "Before final close-off, we may ask you to sign a final acceptance confirming you received the work and are happy with the outcome.",
+            "After final acceptance is signed, discretionary refunds for dissatisfaction, change of mind, or accepted completed work are not normally available. This does not affect legal rights that cannot be excluded, such as genuine faults, work not matching the agreed description, or services not provided with reasonable care and skill."
           ]
         },
         {

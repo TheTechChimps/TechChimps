@@ -1,6 +1,7 @@
 import { deleteCustomerAccount, listCustomers, type PublicCustomerAccount } from "@/lib/accounts";
 import type { AutomationEventRecord, CrmProjectRecord } from "@/lib/automation-webhooks";
 import { deleteBuildPrompt, listBuildPrompts, type BuildPromptRecord } from "@/lib/build-prompts";
+import { deleteFinalSignoff, listFinalSignoffs, type FinalSignoffRecord } from "@/lib/final-signoffs";
 import { deleteLiveChatSessions, getLiveChatMessages } from "@/lib/live-chat";
 import { deleteOrder, listOrders, type OrderRecord } from "@/lib/orders";
 import { listJson, writeJson } from "@/lib/storage";
@@ -9,6 +10,7 @@ type QaCleanupCandidate = {
   automationEvents: AutomationEventRecord[];
   crmProjects: CrmProjectRecord[];
   customers: PublicCustomerAccount[];
+  finalSignoffs: FinalSignoffRecord[];
   liveChatSessionIds: string[];
   orders: OrderRecord[];
   prompts: BuildPromptRecord[];
@@ -46,13 +48,14 @@ function uniqueSorted(values: string[]) {
 }
 
 export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
-  const [orders, customers, prompts, liveChatMessages, automationEvents, crmProjects] = await Promise.all([
+  const [orders, customers, prompts, liveChatMessages, automationEvents, crmProjects, finalSignoffs] = await Promise.all([
     listOrders(),
     listCustomers(),
     listBuildPrompts(),
     getLiveChatMessages(),
     listJson<AutomationEventRecord>(AUTOMATION_STORE, "events/"),
-    listJson<CrmProjectRecord>(AUTOMATION_STORE, "crm/")
+    listJson<CrmProjectRecord>(AUTOMATION_STORE, "crm/"),
+    listFinalSignoffs()
   ]);
 
   const qaOrders = orders.filter(isQaOrder);
@@ -77,6 +80,15 @@ export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
   );
   qaCrmProjects.forEach((project) => references.add(project.reference));
 
+  const qaFinalSignoffs = finalSignoffs.filter(
+    (signoff) =>
+      references.has(signoff.orderReference) ||
+      isQaEmail(signoff.customerEmail) ||
+      /^QA\b/i.test(signoff.customerName) ||
+      includesQaMarker(signoff.customMessage)
+  );
+  qaFinalSignoffs.forEach((signoff) => references.add(signoff.orderReference));
+
   const qaSessionIds = new Set<string>();
   for (const reference of references) {
     qaSessionIds.add(`order-${reference.toLowerCase()}`);
@@ -98,6 +110,7 @@ export async function getQaCleanupCandidates(): Promise<QaCleanupCandidate> {
     automationEvents: qaAutomationEvents,
     crmProjects: qaCrmProjects,
     customers: qaCustomers,
+    finalSignoffs: qaFinalSignoffs,
     liveChatSessionIds: uniqueSorted(Array.from(qaSessionIds)),
     orders: qaOrders,
     prompts: qaPrompts,
@@ -110,6 +123,7 @@ export function summarizeQaCleanup(candidates: QaCleanupCandidate) {
     automationEvents: candidates.automationEvents.length,
     crmProjects: candidates.crmProjects.length,
     customers: candidates.customers.length,
+    finalSignoffs: candidates.finalSignoffs.length,
     liveChatSessions: candidates.liveChatSessionIds.length,
     orders: candidates.orders.length,
     prompts: candidates.prompts.length,
@@ -124,6 +138,7 @@ export async function runQaCleanup() {
     ...candidates.orders.map((order) => deleteOrder(order.reference)),
     ...candidates.prompts.map((prompt) => deleteBuildPrompt(prompt.orderReference)),
     ...candidates.customers.map((customer) => deleteCustomerAccount(customer.email)),
+    ...candidates.finalSignoffs.map((signoff) => deleteFinalSignoff(signoff)),
     ...candidates.automationEvents.map((event) =>
       writeJson<AutomationEventRecord | null>(AUTOMATION_STORE, `events/${event.id}`, null)
     ),

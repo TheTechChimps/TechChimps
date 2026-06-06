@@ -18,5 +18,13 @@ export const faqs = [
   {
     question: "What happens after payment?",
     answer: "Checkout connects your order to live chat so we can guide the next step."
+  },
+  {
+    question: "What if I am not happy with the final result?",
+    answer: "Tell us before final acceptance. We will try to fix reasonable issues, adjust the direction, or discuss a fair refund where appropriate."
+  },
+  {
+    question: "What is final acceptance?",
+    answer: "It is a simple digital sign-off you may receive when the work is finished. It confirms you received the agreed work and are happy for the order to close."
   }
 ];

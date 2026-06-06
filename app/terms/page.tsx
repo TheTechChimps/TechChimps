@@ -46,6 +46,21 @@ export default function TermsPage() {
           ]
         },
         {
+          title: "Final acceptance",
+          body: [
+            "When a project is ready to close, TechChimps may send a final acceptance link by live chat, customer portal, email, WhatsApp, or another agreed contact method.",
+            "By signing final acceptance, you confirm you have received the agreed work, reviewed the outcome, are happy for the order to be marked complete, and understand that future changes or extra scope may need a new quote.",
+            "Final acceptance limits discretionary refunds for accepted completed work, dissatisfaction raised after sign-off, or change of mind after delivery. It does not remove statutory rights that cannot legally be excluded."
+          ]
+        },
+        {
+          title: "Refund promise before sign-off",
+          body: [
+            "If you are unhappy with the final result, contact us before signing final acceptance. We will try to fix reasonable issues, clarify the work, or discuss a fair refund where appropriate.",
+            "We keep this process practical and human because small digital projects should feel safe, clear, and fair."
+          ]
+        },
+        {
           title: "Support and contact",
           body: [
             "Live support and portal messages are provided to keep projects clear and calm.",
