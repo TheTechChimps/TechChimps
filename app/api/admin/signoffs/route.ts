@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminUnauthorized, isAdminRequestAuthenticated } from "@/lib/admin-session";
-import { finalSignoffDashboard, sendFinalSignoffToCustomer } from "@/lib/final-signoffs";
+import { finalAcceptanceStatements, finalSignoffDashboard, sendFinalSignoffToCustomer } from "@/lib/final-signoffs";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,10 @@ function requestOrigin(request: Request) {
 export async function GET(request: Request) {
   if (!isAdminRequestAuthenticated(request)) return adminUnauthorized();
 
-  return NextResponse.json(await finalSignoffDashboard(requestOrigin(request)));
+  return NextResponse.json({
+    ...(await finalSignoffDashboard(requestOrigin(request))),
+    statements: finalAcceptanceStatements
+  });
 }
 
 export async function POST(request: Request) {

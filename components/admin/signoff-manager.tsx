@@ -1,6 +1,8 @@
 "use client";
 
-import { CheckCircle2, Clipboard, FileSignature, Loader2, MessageSquareReply, RefreshCw, Search } from "lucide-react";
+/* eslint-disable @next/next/no-img-element -- Customer signatures are private data URLs captured for receipt viewing, not static optimized assets. */
+
+import { CheckCircle2, Clipboard, FileSignature, Loader2, MessageSquareReply, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +20,7 @@ type SignoffOrderRow = {
 type SignoffPayload = {
   orders: SignoffOrderRow[];
   signoffs: FinalSignoffRecord[];
+  statements: string[];
 };
 
 function formatDate(value?: string) {
@@ -42,7 +45,7 @@ function signoffTone(signoff?: FinalSignoffRecord | null) {
 }
 
 export function SignoffManager() {
-  const [data, setData] = useState<SignoffPayload>({ orders: [], signoffs: [] });
+  const [data, setData] = useState<SignoffPayload>({ orders: [], signoffs: [], statements: [] });
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [selectedReference, setSelectedReference] = useState("");
@@ -264,10 +267,55 @@ export function SignoffManager() {
                   </div>
                 </dl>
                 {latestSignoff?.status === "signed" ? (
-                  <p className="support-notice">
-                    <CheckCircle2 aria-hidden size={16} />
-                    Signed by {latestSignoff.signerName || order.contactName} using {latestSignoff.signerEmail || order.contactEmail}.
-                  </p>
+                  <div className="signed-receipt-panel">
+                    <div className="signed-receipt-heading">
+                      <span>
+                        <ShieldCheck aria-hidden size={18} />
+                        Signed completion receipt
+                      </span>
+                      <StatusIndicator label={formatDate(latestSignoff.signedAt || order.finalSignoffSignedAt)} tone="good" />
+                    </div>
+                    <dl className="payment-facts">
+                      <div>
+                        <dt>Signed by</dt>
+                        <dd>{latestSignoff.signerName || order.contactName}</dd>
+                      </div>
+                      <div>
+                        <dt>Signer email</dt>
+                        <dd>{latestSignoff.signerEmail || order.contactEmail}</dd>
+                      </div>
+                      <div>
+                        <dt>Order value</dt>
+                        <dd>{formatPrice(order.amount, order.priceSuffix)}</dd>
+                      </div>
+                      <div>
+                        <dt>Reference</dt>
+                        <dd>{order.reference}</dd>
+                      </div>
+                    </dl>
+                    {latestSignoff.signatureDataUrl ? (
+                      <div className="signature-receipt">
+                        <span>Captured signature</span>
+                        <img alt={`Digital signature from ${latestSignoff.signerName || order.contactName}`} src={latestSignoff.signatureDataUrl} />
+                      </div>
+                    ) : null}
+                    {data.statements.length ? (
+                      <details className="receipt-statement-drawer">
+                        <summary>
+                          <CheckCircle2 aria-hidden size={16} />
+                          View accepted terms
+                        </summary>
+                        <div className="acceptance-statement-list">
+                          {data.statements.map((statement) => (
+                            <span key={statement}>
+                              <CheckCircle2 aria-hidden size={14} />
+                              {statement}
+                            </span>
+                          ))}
+                        </div>
+                      </details>
+                    ) : null}
+                  </div>
                 ) : null}
                 {signoffUrl ? (
                   <div className="signoff-link-row">
