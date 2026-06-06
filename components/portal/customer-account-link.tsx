@@ -20,9 +20,10 @@ export function CustomerAccountLink({
     let mounted = true;
 
     const refresh = () => {
-      fetch("/api/portal/me", { cache: "no-store" })
-        .then((response) => {
-          if (mounted) setAuthenticated(response.ok);
+      fetch("/api/auth/status", { cache: "no-store" })
+        .then((response) => response.json())
+        .then((data: { authenticated?: boolean }) => {
+          if (mounted) setAuthenticated(Boolean(data.authenticated));
         })
         .catch(() => {
           if (mounted) setAuthenticated(false);

@@ -83,6 +83,16 @@ export function CustomerPortal({ contactEmail = "techchimps@proton.me" }: { cont
 
   const loadPortal = useCallback(async () => {
     try {
+      const statusResponse = await fetch("/api/auth/status", { cache: "no-store" });
+      const statusPayload = (await statusResponse.json().catch(() => ({}))) as { authenticated?: boolean };
+
+      if (!statusPayload.authenticated) {
+        setData(null);
+        setActiveChatSessionId("");
+        setActiveTab("chats");
+        return;
+      }
+
       const response = await fetch("/api/portal/me", { cache: "no-store" });
 
       if (response.ok) {
